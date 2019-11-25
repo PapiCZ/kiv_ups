@@ -37,7 +37,7 @@ func reset_asteroid(asteroid):
 	asteroid.get_node("Sprite").scale = Vector2(scale, scale)
 	asteroid.velocity = random_asteroid_velocity()
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+# Called every frame. "delta" is the elapsed time since the previous frame.
 func _process(delta):
 	for a in asteroids:
 		a.position += a.velocity * delta

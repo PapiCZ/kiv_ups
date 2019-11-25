@@ -17,17 +17,12 @@ func _on_StartGame_pressed():
 	emit_signal("change_menu", load("res://forms/start_game_menu/StartGame.tscn").instance())
 
 func _on_SignOut_pressed():
-	Network.stop_and_reset()
 	emit_signal("change_menu", load("res://forms/login_menu/Login.tscn").instance())
 	
 func _on_Quit_pressed():
+	Network.stop()
 	get_tree().quit()
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+
+# Called every frame. "delta" is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
-
-
-func _on_Timer_timeout():
-	Network.send({
-		"name": "+ěščřžýáíé"
-	}, 200)
