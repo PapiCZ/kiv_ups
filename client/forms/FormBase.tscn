@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://forms/Background.gd" type="Script" id=1]
+[ext_resource path="res://sprites/PIA17016.jpg" type="Texture" id=2]
+[ext_resource path="res://forms/FormWrapper.gd" type="Script" id=3]
+
+[node name="FormBase" type="Node2D"]
+
+[node name="Background" type="Node" parent="."]
+script = ExtResource( 1 )
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="Background"]
+
+[node name="Sprite" type="Sprite" parent="Background/ParallaxBackground"]
+position = Vector2( 793.374, 636.891 )
+scale = Vector2( 0.503907, 0.503907 )
+texture = ExtResource( 2 )
+
+[node name="AsteroidParent" type="Node2D" parent="Background/ParallaxBackground"]
+
+[node name="FormWrapper" type="CenterContainer" parent="Background/ParallaxBackground"]
+margin_left = 3.24036
+margin_right = 1923.24
+margin_bottom = 1080.0
+script = ExtResource( 3 )

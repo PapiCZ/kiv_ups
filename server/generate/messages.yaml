@@ -1,0 +1,11 @@
+messages:
+  - name: Authenticate
+    type: 200
+    fields:
+      - name: Name
+        type: string
+      - name: Foo
+        json-name: bar
+        type: int
+    contexts:
+      - DefaultContext
