@@ -1,11 +1,18 @@
+# 1xx general messages, 2xx client messages, 3xx server messages,
+# 4xx client in-game messages, 5xx server in-game messages
+
 messages:
+  - name: KeepAlive
+    type: 100
+    fields:
+      - name: Ping
+        type: string
+    contexts:
+      - ALL
   - name: Authenticate
     type: 200
     fields:
       - name: Name
         type: string
-      - name: Foo
-        json-name: bar
-        type: int
     contexts:
       - DefaultContext

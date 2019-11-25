@@ -87,18 +87,16 @@ func (gp *GameProtocol) Encode(msg ProtoMessage, writer io.WriteCloser) {
 		log.Errorln(err)
 	}
 
-	if len(msg.RequestId) != 0 {
-		// Write request ID
-		_, err = buff.Write([]byte(msg.RequestId))
-		if err != nil {
-			log.Errorln(err)
-		}
+	// Write request ID
+	_, err = buff.Write([]byte(msg.RequestId))
+	if err != nil {
+		log.Errorln(err)
+	}
 
-		// Write delimiter character
-		_, err = buff.Write([]byte{DelimiterCharacter})
-		if err != nil {
-			log.Errorln(err)
-		}
+	// Write delimiter character
+	_, err = buff.Write([]byte{DelimiterCharacter})
+	if err != nil {
+		log.Errorln(err)
 	}
 
 	// Write JSON
@@ -134,6 +132,8 @@ func (gp *GameProtocol) InfiniteDecode(reader io.ReadCloser, msgChan chan *Proto
 }
 
 func (gp *GameProtocol) Decode(reader io.Reader) (*ProtoMessage, error) {
+	// TODO: Make it more strict
+	// This shouldn't work.. |100|15|{"ping":"pong"} (missing request ID)
 	var err error
 
 	buffReader := bufio.NewReader(reader)
