@@ -29,5 +29,5 @@ func _on_Quit_pressed():
 
 func _on_Timer_timeout():
 	Network.send({
-		"name": "foobar"
-	}, 200, self)
+		"name": "+ěščřžýáíé"
+	}, 200)
