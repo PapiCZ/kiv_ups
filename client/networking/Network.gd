@@ -27,16 +27,12 @@ func _ready():
 	mutex = Mutex.new()
 
 func network_ok():
-	mutex.lock()
 	network_debug.log("Connected to %s:%d" % [host, port])
 	status_sprite.call_deferred("set_texture", preload("res://sprites/network_ok.png"))
-	mutex.unlock()
 	
 func network_error():
-	mutex.lock()
 	network_debug.log("Disconnected from %s:%d" % [host, port])
 	status_sprite.call_deferred("set_texture", preload("res://sprites/network_error.png"))
-	mutex.unlock()
 
 func send(message, type, \
 	response_callback_obj=null, response_callback_func=null, response_args=null, \
@@ -118,7 +114,6 @@ func recv_message_loop():
 				var pr = pending_requests[proto_message.request_id]
 				pending_requests.erase(proto_message.request_id)
 				mutex.unlock()
-				print(proto_message.message)
 				pr.response = proto_message.message
 				pr.response_time = OS.get_ticks_msec()
 				network_ping.call_deferred("set_text", "%d ms" % (pr.response_time - pr.request_time))
