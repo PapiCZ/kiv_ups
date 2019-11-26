@@ -40,6 +40,8 @@ func decode(buff):
 
 	# Read JSON len
 	var json_len_ascii = read_ascii_number_until_delimiter(buff, offset)
+	if json_len_ascii[0] == null:
+		return [null, null]
 	offset += json_len_ascii[0]
 	var json_len = int(json_len_ascii[1].get_string_from_utf8())
 
@@ -49,6 +51,8 @@ func decode(buff):
 
 	# Read request ID
 	var request_id_ascii = read_ascii_word_until_delimiter(buff, offset)
+	if request_id_ascii[0] == null:
+		return [null, null]
 	offset += request_id_ascii[0]
 	var request_id = request_id_ascii[1].get_string_from_utf8()
 

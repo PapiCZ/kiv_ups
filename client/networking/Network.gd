@@ -136,10 +136,14 @@ func recv_message_loop():
 				buff = PoolByteArray()
 
 func set_auth_data(username):
+	mutex.lock()
 	self.username = username
+	mutex.unlock()
 
 func auth():
+	mutex.lock()
 	send({"name": username}, MessageTypes.AUTHENTICATE)
+	mutex.unlock()
 
 func start_thread(host, port):
 	print("Spawned new network thread")
@@ -163,11 +167,13 @@ func _start(data):
 	network_ok()
 	auth()
 
+	mutex.lock()
 	KeepAliveTimer = Timer.new()
 	add_child(KeepAliveTimer)
 	KeepAliveTimer.set_wait_time(KEEP_ALIVE_INVERVAL)
 	KeepAliveTimer.connect("timeout", self, "_on_KeepAliveTimer_timeout")
 	KeepAliveTimer.start()
+	mutex.unlock()
 
 	recv_message_loop()
 	
@@ -177,12 +183,6 @@ func stop():
 	_kill_thread = false
 	client.disconnect_from_host()
 	network_error()
-
-func reconnect():
-	_kill_thread = true
-	thread.wait_to_finish()
-	_kill_thread = false
-	print("Killed network thread")
 
 	for pr in pending_requests.values():
 		pr._timeout_timer.stop()
@@ -195,6 +195,9 @@ func reconnect():
 		remove_child(KeepAliveTimer)
 		KeepAliveTimer = null
 
+func reconnect():
+	stop()
+	print("Killed network thread")
 	self.start_thread(host, port)
 
 func _on_KeepAliveTimer_timeout():
