@@ -32,13 +32,13 @@ func (a KeepAliveAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 
 func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	authenticateData := m.GetMessage().Message.(*protocol.AuthenticateMessage)
-	//server.Authenticate(ConvertShadowPlayerToPlayer(player, authenticateData.Name))
+	s.Authenticate(ConvertShadowPlayerToPlayer(m.GetPlayer(), authenticateData.Name))
 
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
 			Data:        authenticateData,
 			Status:      true,
-			Message:     "It works!",
+			Message:     "",
 		},
 		Targets: []interfaces.Player{m.GetPlayer()},
 	}

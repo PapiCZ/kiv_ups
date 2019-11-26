@@ -55,21 +55,20 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 	}
 
 	action := s.ActionDefinition.GetAction(message.Message.GetTypeId(), player.GetContext())
+	// TODO: should return error
 	actionResponse := action.Process(s, &PlayerMessage{
 		ClientMessage: &message,
-		Player:        p,
+		Player:        player,
 	})
 	sm := actionResponse.ServerMessage
 
-	if err != nil {
-		log.Errorln("Run action json marshal error:", err)
+	for _, target := range actionResponse.Targets {
+		log.Tracef("Server answers to client %d: %#v | Data: %#v", target.GetUID(), sm, sm.Data)
+		_ = target.GetTCPClient().Send(protocol.ProtoMessage{
+			Message:   sm,
+			RequestId: message.RequestId,
+		})
 	}
-
-	log.Tracef("Server answers to client %d: %s", message.Sender.UID, message.Message)
-	_ = message.Sender.Send(protocol.ProtoMessage{
-		Message:   sm,
-		RequestId: message.RequestId,
-	})
 
 	return
 }

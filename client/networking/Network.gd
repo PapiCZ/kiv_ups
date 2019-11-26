@@ -94,9 +94,7 @@ func recv_message_loop():
 			return
 
 		var available_bytes = client.get_available_bytes()
-		mutex.unlock()
 		if available_bytes:
-			mutex.lock()
 			var data_result = client.get_data(available_bytes)
 			mutex.unlock()
 			buff.append_array(data_result[1])
@@ -134,6 +132,8 @@ func recv_message_loop():
 				buff = buff.subarray(length, len(buff) - 1)
 			else:
 				buff = PoolByteArray()
+		else:
+			mutex.unlock()
 
 func set_auth_data(username):
 	mutex.lock()
