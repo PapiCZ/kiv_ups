@@ -12,6 +12,12 @@ func (m KeepAliveMessage) GetTypeId() MessageType {
 	return 100
 }
 
+type ActionErrorMessage struct{}
+
+func (m ActionErrorMessage) GetTypeId() MessageType {
+	return 101
+}
+
 type AuthenticateMessage struct {
 	Name string `json:"name"`
 }
@@ -28,15 +34,32 @@ func (m CreateLobbyMessage) GetTypeId() MessageType {
 	return 201
 }
 
+type DeleteLobbyMessage struct {
+	Name string `json:"name"`
+}
+
+func (m DeleteLobbyMessage) GetTypeId() MessageType {
+	return 202
+}
+
 type CreatedLobbyResponseMessage struct{}
 
 func (m CreatedLobbyResponseMessage) GetTypeId() MessageType {
 	return 301
 }
 
+type DeleteLobbyResponseMessage struct{}
+
+func (m DeleteLobbyResponseMessage) GetTypeId() MessageType {
+	return 302
+}
+
 func RegisterAllMessages(definition *Definition) {
 	definition.Register(KeepAliveMessage{})
+	definition.Register(ActionErrorMessage{})
 	definition.Register(AuthenticateMessage{})
 	definition.Register(CreateLobbyMessage{})
+	definition.Register(DeleteLobbyMessage{})
 	definition.Register(CreatedLobbyResponseMessage{})
+	definition.Register(DeleteLobbyResponseMessage{})
 }

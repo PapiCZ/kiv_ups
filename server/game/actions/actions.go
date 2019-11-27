@@ -26,8 +26,8 @@ func NewDefinition() ActionDefinition {
 }
 
 func (ad *ActionDefinition) Register(action Action) {
-	for ctx := range action.GetPlayerContexts() {
-		playerCtx := interfaces.PlayerContext(ctx)
+	for _, ctx := range action.GetPlayerContexts() {
+		playerCtx := ctx
 
 		if _, ok := ad.actionMap[playerCtx]; !ok {
 			ad.actionMap[playerCtx] = make(map[protocol.MessageType]Action)

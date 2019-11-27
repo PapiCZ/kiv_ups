@@ -11,6 +11,8 @@ messages:
         type: string
     contexts:
       - ALL
+  - name: ActionError
+    type: 101
   - name: Authenticate
     action: true
     type: 200
@@ -27,5 +29,15 @@ messages:
         type: string
     contexts:
       - LoggedInMenuContext
+  - name: DeleteLobby
+    action: true
+    type: 202
+    fields:
+      - name: Name
+        type: string
+    contexts:
+      - LoggedInMenuContext
   - name: CreatedLobbyResponse
     type: 301
+  - name: DeleteLobbyResponse
+    type: 302

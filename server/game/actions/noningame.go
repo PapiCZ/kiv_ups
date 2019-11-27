@@ -13,18 +13,18 @@ func (a KeepAliveAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 	if keepAliveData.Ping == "pong" {
 		return ActionResponse{
 			ServerMessage: tcp.ServerMessage{
-				Data:        &protocol.KeepAliveMessage{Ping:"ping-pong"},
-				Status:      true,
-				Message:     "",
+				Data:    &protocol.KeepAliveMessage{Ping: "ping-pong"},
+				Status:  true,
+				Message: "",
 			},
 			Targets: []interfaces.Player{m.GetPlayer()},
 		}
 	} else {
 		return ActionResponse{
 			ServerMessage: tcp.ServerMessage{
-				Data:        nil,
-				Status:      false,
-				Message:     "",
+				Data:    nil,
+				Status:  false,
+				Message: "",
 			},
 			Targets: []interfaces.Player{m.GetPlayer()},
 		}
@@ -34,12 +34,13 @@ func (a KeepAliveAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	authenticateData := m.GetMessage().Message.(*protocol.AuthenticateMessage)
 	s.Authenticate(ConvertShadowPlayerToPlayer(m.GetPlayer(), authenticateData.Name))
+	m.GetPlayer().SetContext(LoggedInMenuContext)
 
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
-			Data:        authenticateData,
-			Status:      true,
-			Message:     "",
+			Data:    authenticateData,
+			Status:  true,
+			Message: "",
 		},
 		Targets: []interfaces.Player{m.GetPlayer()},
 	}
@@ -49,16 +50,44 @@ func (a CreateLobbyAction) Process(s interfaces.MasterServer, m interfaces.Playe
 	createLobbyData := m.GetMessage().Message.(*protocol.CreateLobbyMessage)
 	s.AddLobby(interfaces.Lobby{
 		Name:    createLobbyData.Name,
+		Owner:   m.GetPlayer(),
 		Players: make(map[interfaces.PlayerUID]interfaces.Player),
 	})
 
-	log.Infof("Added lobby %s\n", createLobbyData.Name)
+	log.Infof("Added lobby %s", createLobbyData.Name)
 
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
-			Data:        &protocol.CreatedLobbyResponseMessage{},
-			Status:      true,
-			Message:     "",
+			Data:    &protocol.CreatedLobbyResponseMessage{},
+			Status:  true,
+			Message: "",
+		},
+		Targets: []interfaces.Player{m.GetPlayer()},
+	}
+}
+
+func (a DeleteLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
+	deleteLobbyData := m.GetMessage().Message.(*protocol.DeleteLobbyMessage)
+	lobby, err := s.GetLobby(deleteLobbyData.Name)
+
+	if err != nil || lobby.Owner != m.GetPlayer() {
+		return ActionResponse{
+			ServerMessage: tcp.ServerMessage{
+				Data:    &protocol.DeleteLobbyResponseMessage{},
+				Status:  false,
+				Message: "You can't delete this lobby!",
+			},
+			Targets: []interfaces.Player{m.GetPlayer()},
+		}
+	}
+
+	log.Infof("Deleted lobby %s", lobby.Name)
+
+	return ActionResponse{
+		ServerMessage: tcp.ServerMessage{
+			Data:    &protocol.DeleteLobbyResponseMessage{},
+			Status:  true,
+			Message: "",
 		},
 		Targets: []interfaces.Player{m.GetPlayer()},
 	}

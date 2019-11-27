@@ -36,7 +36,7 @@ func (p *Player) GetTCPClient() *tcp.Client {
 }
 
 func (p *Player) SetUID(uid interfaces.PlayerUID) {
-	p.UID = interfaces.PlayerUID(uid)
+	p.UID = uid
 }
 
 func (p *Player) GetUID() interfaces.PlayerUID {
@@ -53,4 +53,8 @@ func (p *Player) GetName() string {
 
 func (p *Player) GetContext() interfaces.PlayerContext {
 	return p.Context
+}
+
+func (p *Player) SetContext(ctx interfaces.PlayerContext) {
+	p.Context = ctx
 }

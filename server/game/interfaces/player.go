@@ -14,6 +14,7 @@ type Player interface {
 	GetName() string
 	SetName(name string)
 	GetContext() PlayerContext
+	SetContext(ctx PlayerContext)
 }
 
 type PlayerMessage interface {

@@ -105,7 +105,7 @@ func recv_message_loop():
 			if proto_message == null:
 				continue
 
-			network_debug.log("Recived: %d %s %s" % [proto_message.type, proto_message.request_id, proto_message.message])
+			network_debug.log("Received: %d %s %s" % [proto_message.type, proto_message.request_id, proto_message.message])
 
 			mutex.lock()
 			if pending_requests.has(proto_message.request_id):
