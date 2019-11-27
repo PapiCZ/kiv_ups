@@ -10,13 +10,14 @@ import (
 // ##############################################################
 
 const (
-	DefaultContext = interfaces.PlayerContext(0)
+	DefaultContext      = interfaces.PlayerContext(0)
+	LoggedInMenuContext = interfaces.PlayerContext(1)
 )
 
 type KeepAliveAction struct{}
 
 func (a KeepAliveAction) GetPlayerContexts() []interfaces.PlayerContext {
-	return []interfaces.PlayerContext{DefaultContext}
+	return []interfaces.PlayerContext{DefaultContext, LoggedInMenuContext}
 }
 
 func (a KeepAliveAction) GetMessage() protocol.Message {
@@ -33,7 +34,18 @@ func (a AuthenticateAction) GetMessage() protocol.Message {
 	return protocol.AuthenticateMessage{}
 }
 
+type CreateLobbyAction struct{}
+
+func (a CreateLobbyAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LoggedInMenuContext}
+}
+
+func (a CreateLobbyAction) GetMessage() protocol.Message {
+	return protocol.CreateLobbyMessage{}
+}
+
 func RegisterAllActions(actionDefinition *ActionDefinition) {
 	actionDefinition.Register(KeepAliveAction{})
 	actionDefinition.Register(AuthenticateAction{})
+	actionDefinition.Register(CreateLobbyAction{})
 }

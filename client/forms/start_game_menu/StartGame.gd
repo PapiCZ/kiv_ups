@@ -12,7 +12,7 @@ func _ready():
 	$FormContainer/Back.connect("pressed", self, "_on_Back_pressed")
 
 func _on_CreateLobby_pressed():
-	emit_signal("change_menu", load("res://forms/create_lobby_menu/CreateLobby.tscn").instance())
+	emit_signal("change_menu", Menu.get(Menu.MENU_LEVEL.CREATE_LOBBY))
 
 func _on_Back_pressed():
-	emit_signal("change_menu", load("res://forms/main_menu/MainMenu.tscn").instance())
+	emit_signal("change_menu", Menu.get(Menu.MENU_LEVEL.MAIN))

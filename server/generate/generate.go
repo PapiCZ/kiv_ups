@@ -16,6 +16,7 @@ type MessageMetadata struct {
 	Messages         []struct {
 		Name   string
 		Type   int
+		Action bool
 		Fields []struct {
 			Name     string
 			JsonName string `yaml:"json-name"`
@@ -97,6 +98,9 @@ func GenerateActions(messageMetadata MessageMetadata) {
 	allContextsMap := make(map[string]struct{}, 0)
 
 	for _, message := range messageMetadata.Messages {
+		if !message.Action {
+			continue
+		}
 		for _, ctx := range message.Contexts {
 			allContextsMap[ctx] = struct{}{}
 		}
@@ -119,8 +123,11 @@ func GenerateActions(messageMetadata MessageMetadata) {
 
 	f.Const().Defs(allContextStatements...)
 
-
 	for _, message := range messageMetadata.Messages {
+		if !message.Action {
+			continue
+		}
+
 		f.Type().Id(message.Name + "Action").Struct()
 
 		f.Empty()
@@ -150,6 +157,9 @@ func GenerateActions(messageMetadata MessageMetadata) {
 	f.Empty()
 	registerStatements := make([]Code, 0)
 	for _, messageType := range messageMetadata.Messages {
+		if !messageType.Action {
+			continue
+		}
 		registerStatements = append(
 			registerStatements,
 			Id("actionDefinition.Register").Call(Id(messageType.Name+"Action{}")),

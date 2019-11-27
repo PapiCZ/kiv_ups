@@ -51,7 +51,7 @@ func send(message, type, \
 	pr.request_time = OS.get_ticks_msec()
 	pr._response_callback_obj = response_callback_obj
 	pr._response_callback_func = response_callback_func
-	pr._response_args = [1, 3, 2]
+	pr._response_args = response_args
 	pr._timeout_callback_obj = timeout_callback_obj
 	pr._timeout_callback_func = timeout_callback_func
 	pr._timeout_args = timeout_args

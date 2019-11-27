@@ -4,6 +4,7 @@
 context-on-connect: DefaultContext
 messages:
   - name: KeepAlive
+    action: true
     type: 100
     fields:
       - name: Ping
@@ -11,9 +12,20 @@ messages:
     contexts:
       - ALL
   - name: Authenticate
+    action: true
     type: 200
     fields:
       - name: Name
         type: string
     contexts:
       - DefaultContext
+  - name: CreateLobby
+    action: true
+    type: 201
+    fields:
+      - name: Name
+        type: string
+    contexts:
+      - LoggedInMenuContext
+  - name: CreatedLobbyResponse
+    type: 301

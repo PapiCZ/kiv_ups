@@ -20,7 +20,23 @@ func (m AuthenticateMessage) GetTypeId() MessageType {
 	return 200
 }
 
+type CreateLobbyMessage struct {
+	Name string `json:"name"`
+}
+
+func (m CreateLobbyMessage) GetTypeId() MessageType {
+	return 201
+}
+
+type CreatedLobbyResponseMessage struct{}
+
+func (m CreatedLobbyResponseMessage) GetTypeId() MessageType {
+	return 301
+}
+
 func RegisterAllMessages(definition *Definition) {
 	definition.Register(KeepAliveMessage{})
 	definition.Register(AuthenticateMessage{})
+	definition.Register(CreateLobbyMessage{})
+	definition.Register(CreatedLobbyResponseMessage{})
 }

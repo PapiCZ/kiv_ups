@@ -6,10 +6,13 @@ extends CenterContainer
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	_on_change_menu(load("res://forms/login_menu/Login.tscn").instance())
+	for menu in Menu.all().values():
+		menu.connect("change_menu", self, "_on_menu_changed")
 
-func _on_change_menu(menu_root_node):	
-	menu_root_node.connect("change_menu", self, "_on_change_menu")
+	_on_menu_changed(Menu.get(Menu.MENU_LEVEL.LOGIN))
+
+func _on_menu_changed(menu_root_node):
+	menu_root_node.connect("change_menu", self, "_on_menu_changed")
 	for i in range(0, get_child_count()):
-		get_child(i).queue_free()
+		remove_child(get_child(i))
 	add_child(menu_root_node)

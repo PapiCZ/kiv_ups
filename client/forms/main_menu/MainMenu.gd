@@ -14,10 +14,10 @@ func _ready():
 	$FormContainer/Quit.connect("pressed", self, "_on_Quit_pressed")
 
 func _on_StartGame_pressed():
-	emit_signal("change_menu", load("res://forms/start_game_menu/StartGame.tscn").instance())
+	emit_signal("change_menu", Menu.get(Menu.MENU_LEVEL.START_GAME))
 
 func _on_SignOut_pressed():
-	emit_signal("change_menu", load("res://forms/login_menu/Login.tscn").instance())
+	emit_signal("change_menu", Menu.get(Menu.MENU_LEVEL.LOGIN))
 	
 func _on_Quit_pressed():
 	Network.stop()

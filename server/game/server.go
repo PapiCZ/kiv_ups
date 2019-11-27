@@ -13,6 +13,7 @@ type Server struct {
 	TCPServer        *tcp.Server
 	Players          map[tcp.UID]interfaces.Player
 	ActionDefinition actions.ActionDefinition
+	Lobbies          []interfaces.Lobby
 }
 
 func NewServer(sockaddr syscall.Sockaddr) (ms Server) {
@@ -26,6 +27,7 @@ func NewServer(sockaddr syscall.Sockaddr) (ms Server) {
 		TCPServer:        server,
 		Players:          make(map[tcp.UID]interfaces.Player),
 		ActionDefinition: actions.NewDefinition(),
+		Lobbies:          make([]interfaces.Lobby, 0),
 	}
 
 	actions.RegisterAllActions(&ms.ActionDefinition)
@@ -89,6 +91,10 @@ func (s *Server) Authenticate(player interfaces.Player) {
 	s.Players[player.GetTCPClient().UID] = player
 
 	log.Infoln("Authenticated player", player.GetName())
+}
+
+func (s *Server) AddLobby(lobby interfaces.Lobby) {
+	s.Lobbies = append(s.Lobbies, lobby)
 }
 
 type PlayerMessage struct {

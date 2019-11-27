@@ -6,3 +6,5 @@ extends Node
 
 const KEEP_ALIVE = 100
 const AUTHENTICATE = 200
+const CREATE_LOBBY = 201
+const CREATED_LOBBY_RESPONSE = 301
