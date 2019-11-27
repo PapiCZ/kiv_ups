@@ -1,6 +1,7 @@
 # 1xx general messages, 2xx client messages, 3xx server messages,
 # 4xx client in-game messages, 5xx server in-game messages
 
+context-on-connect: DefaultContext
 messages:
   - name: KeepAlive
     type: 100

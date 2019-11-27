@@ -50,7 +50,7 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 	if ok {
 		player = p
 	} else {
-		pl := NewShadowPlayer(message.Sender, "", actions.DefaultContext)
+		pl := NewShadowPlayer(message.Sender, "", interfaces.PlayerContext(0))
 		player = &pl
 	}
 

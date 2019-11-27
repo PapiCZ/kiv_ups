@@ -12,7 +12,8 @@ import (
 )
 
 type MessageMetadata struct {
-	Messages []struct {
+	ContextOnConnect string `yaml:"context-on-connect"`
+	Messages         []struct {
 		Name   string
 		Type   int
 		Fields []struct {
@@ -102,11 +103,22 @@ func GenerateActions(messageMetadata MessageMetadata) {
 	}
 
 	allContexts := make([]string, 0)
+	allContexts = append(allContexts, messageMetadata.ContextOnConnect)
+
 	for ctx := range allContextsMap {
-		if ctx != "ALL" {
+		if ctx != "ALL" && ctx != messageMetadata.ContextOnConnect {
 			allContexts = append(allContexts, ctx)
 		}
 	}
+
+	allContextStatements := make([]Code, 0)
+	for i, ctx := range allContexts {
+		allContextStatements = append(allContextStatements,
+			Id(ctx).Op("=").Qual("kiv_ups_server/game/interfaces", "PlayerContext").Params(Lit(i)))
+	}
+
+	f.Const().Defs(allContextStatements...)
+
 
 	for _, message := range messageMetadata.Messages {
 		f.Type().Id(message.Name + "Action").Struct()

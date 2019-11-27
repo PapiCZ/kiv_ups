@@ -6,10 +6,6 @@ import (
 	"kiv_ups_server/net/tcp/protocol"
 )
 
-const (
-	DefaultContext = interfaces.PlayerContext(0)
-)
-
 type ActionResponse struct {
 	ServerMessage tcp.ServerMessage
 	Targets       []interfaces.Player
