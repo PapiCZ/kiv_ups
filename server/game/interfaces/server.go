@@ -5,9 +5,10 @@ import (
 )
 
 type Lobby struct {
-	Name    string
-	Owner 	Player
-	Players map[PlayerUID]Player
+	Name         string
+	Owner        Player
+	Players      map[PlayerUID]Player
+	PlayersLimit int
 }
 
 type MasterServer interface {
@@ -17,7 +18,8 @@ type MasterServer interface {
 	GetTCPServer() *tcp.Server
 	GetPlayers() map[tcp.UID]Player
 	Authenticate(player Player)
-	AddLobby(lobby Lobby)
+	AddLobby(lobby *Lobby)
 	DeleteLobby(name string)
-	GetLobby(name string) (Lobby, error)
+	GetLobby(name string) (*Lobby, error)
+	GetLobbies() []*Lobby
 }

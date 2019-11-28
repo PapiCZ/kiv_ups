@@ -54,9 +54,20 @@ func (a DeleteLobbyAction) GetMessage() protocol.Message {
 	return protocol.DeleteLobbyMessage{}
 }
 
+type ListLobbiesAction struct{}
+
+func (a ListLobbiesAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LoggedInMenuContext}
+}
+
+func (a ListLobbiesAction) GetMessage() protocol.Message {
+	return protocol.ListLobbiesMessage{}
+}
+
 func RegisterAllActions(actionDefinition *ActionDefinition) {
 	actionDefinition.Register(KeepAliveAction{})
 	actionDefinition.Register(AuthenticateAction{})
 	actionDefinition.Register(CreateLobbyAction{})
 	actionDefinition.Register(DeleteLobbyAction{})
+	actionDefinition.Register(ListLobbiesAction{})
 }

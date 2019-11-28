@@ -7,10 +7,11 @@ import (
 )
 
 type Player struct {
-	tcpClient *tcp.Client
-	UID       interfaces.PlayerUID
-	Name      string
-	Context   interfaces.PlayerContext
+	tcpClient  *tcp.Client
+	UID        interfaces.PlayerUID
+	Name       string
+	Context    interfaces.PlayerContext
+	OwnedLobby *interfaces.Lobby
 }
 
 func NewPlayer(client *tcp.Client, name string, context interfaces.PlayerContext) Player {
@@ -57,4 +58,12 @@ func (p *Player) GetContext() interfaces.PlayerContext {
 
 func (p *Player) SetContext(ctx interfaces.PlayerContext) {
 	p.Context = ctx
+}
+
+func (p *Player) SetOwnedLobby(lobby *interfaces.Lobby) {
+	p.OwnedLobby = lobby
+}
+
+func (p *Player) GetOwnedLobby() *interfaces.Lobby {
+	return p.OwnedLobby
 }

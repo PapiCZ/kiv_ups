@@ -1,11 +1,14 @@
 extends Node
 
+signal menu_added
+
 enum MENU_LEVEL {
 	LOGIN,
 	MAIN,
 	START_GAME,
 	CREATE_LOBBY,
 	WAITING_LOBBY,
+	JOIN_LOBBY
 }
 
 var menus = {
@@ -14,16 +17,26 @@ var menus = {
 	MENU_LEVEL.START_GAME : preload("res://forms/start_game_menu/StartGame.tscn").instance(),
 	MENU_LEVEL.CREATE_LOBBY : preload("res://forms/create_lobby_menu/CreateLobby.tscn").instance(),
 	MENU_LEVEL.WAITING_LOBBY : preload("res://forms/waiting_lobby_menu/WaitingLobby.tscn").instance(),
+	MENU_LEVEL.JOIN_LOBBY : preload("res://forms/join_lobby_menu/JoinLobby.tscn").instance(),
 }
 
-func _ready():
-	pass
+func load():
+	for menu in Menu.all().values():
+		emit_signal("menu_added", menu)
 
 func all():
 	return menus
 
-func get(menu):
-	return menus[menu]
+func get(menu, call_load=true):
+	var menu_obj = menus[menu]
+
+	if call_load and menu_obj.has_method("_load"):
+		menu_obj._load()
+
+	return menu_obj
 
 func reset(menu):
-	menus[menu] = load(get(menu).filename).instance()
+	var menu_obj = load(get(menu, false).filename).instance()
+	menus[menu] = menu_obj
+	emit_signal("menu_added", menu_obj)
+	

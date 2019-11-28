@@ -27,11 +27,18 @@ func (m AuthenticateMessage) GetTypeId() MessageType {
 }
 
 type CreateLobbyMessage struct {
-	Name string `json:"name"`
+	Name         string `json:"name"`
+	PlayersLimit int    `json:"players_limit"`
 }
 
 func (m CreateLobbyMessage) GetTypeId() MessageType {
 	return 201
+}
+
+type CreatedLobbyResponseMessage struct{}
+
+func (m CreatedLobbyResponseMessage) GetTypeId() MessageType {
+	return 301
 }
 
 type DeleteLobbyMessage struct {
@@ -42,16 +49,24 @@ func (m DeleteLobbyMessage) GetTypeId() MessageType {
 	return 202
 }
 
-type CreatedLobbyResponseMessage struct{}
-
-func (m CreatedLobbyResponseMessage) GetTypeId() MessageType {
-	return 301
-}
-
 type DeleteLobbyResponseMessage struct{}
 
 func (m DeleteLobbyResponseMessage) GetTypeId() MessageType {
 	return 302
+}
+
+type ListLobbiesMessage struct{}
+
+func (m ListLobbiesMessage) GetTypeId() MessageType {
+	return 203
+}
+
+type ListLobbiesResponseMessage struct {
+	Lobbies interface{} `json:"lobbies"`
+}
+
+func (m ListLobbiesResponseMessage) GetTypeId() MessageType {
+	return 303
 }
 
 func RegisterAllMessages(definition *Definition) {
@@ -59,7 +74,9 @@ func RegisterAllMessages(definition *Definition) {
 	definition.Register(ActionErrorMessage{})
 	definition.Register(AuthenticateMessage{})
 	definition.Register(CreateLobbyMessage{})
-	definition.Register(DeleteLobbyMessage{})
 	definition.Register(CreatedLobbyResponseMessage{})
+	definition.Register(DeleteLobbyMessage{})
 	definition.Register(DeleteLobbyResponseMessage{})
+	definition.Register(ListLobbiesMessage{})
+	definition.Register(ListLobbiesResponseMessage{})
 }

@@ -21,7 +21,6 @@ text = "Asteroids"
 align = 1
 
 [node name="FormContainer" type="VBoxContainer" parent="."]
-editor/display_folded = true
 margin_left = 236.0
 margin_top = 306.0
 margin_right = 736.0

@@ -14,7 +14,7 @@ type Server struct {
 	TCPServer        *tcp.Server
 	Players          map[tcp.UID]interfaces.Player
 	ActionDefinition actions.ActionDefinition
-	Lobbies          map[string]interfaces.Lobby
+	Lobbies          map[string]*interfaces.Lobby
 }
 
 func NewServer(sockaddr syscall.Sockaddr) (ms Server) {
@@ -28,7 +28,7 @@ func NewServer(sockaddr syscall.Sockaddr) (ms Server) {
 		TCPServer:        server,
 		Players:          make(map[tcp.UID]interfaces.Player),
 		ActionDefinition: actions.NewDefinition(),
-		Lobbies:          make(map[string]interfaces.Lobby),
+		Lobbies:          make(map[string]*interfaces.Lobby),
 	}
 
 	actions.RegisterAllActions(&ms.ActionDefinition)
@@ -57,12 +57,11 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 		player = &pl
 	}
 
-
 	action := s.ActionDefinition.GetAction(message.Message.GetTypeId(), player.GetContext())
 
 	if action == nil {
 		_ = message.Sender.Send(protocol.ProtoMessage{
-			Message:   &tcp.ServerMessage{
+			Message: &tcp.ServerMessage{
 				Status:  false,
 				Message: "Action not found",
 				Data:    &protocol.ActionErrorMessage{},
@@ -109,7 +108,7 @@ func (s *Server) Authenticate(player interfaces.Player) {
 	log.Infoln("Authenticated player", player.GetName())
 }
 
-func (s *Server) AddLobby(lobby interfaces.Lobby) {
+func (s *Server) AddLobby(lobby *interfaces.Lobby) {
 	s.Lobbies[lobby.Name] = lobby
 }
 
@@ -117,14 +116,24 @@ func (s *Server) DeleteLobby(name string) {
 	delete(s.Lobbies, name)
 }
 
-func (s *Server) GetLobby(name string) (interfaces.Lobby, error) {
+func (s *Server) GetLobby(name string) (*interfaces.Lobby, error) {
 	lobby, ok := s.Lobbies[name]
 
 	if ok {
 		return lobby, nil
 	}
 
-	return interfaces.Lobby{}, errors.New("unknown lobby")
+	return &interfaces.Lobby{}, errors.New("unknown lobby")
+}
+
+func (s *Server) GetLobbies() []*interfaces.Lobby {
+	v := make([]*interfaces.Lobby, 0, len(s.Lobbies))
+
+	for _, value := range s.Lobbies {
+		v = append(v, value)
+	}
+
+	return v
 }
 
 type PlayerMessage struct {

@@ -14,5 +14,8 @@ func _ready():
 func _on_CreateLobby_pressed():
 	emit_signal("change_menu", Menu.get(Menu.MENU_LEVEL.CREATE_LOBBY))
 
+func _on_JoinLobby_pressed():
+	emit_signal("change_menu", Menu.get(Menu.MENU_LEVEL.JOIN_LOBBY))
+
 func _on_Back_pressed():
 	emit_signal("change_menu", Menu.get(Menu.MENU_LEVEL.MAIN))

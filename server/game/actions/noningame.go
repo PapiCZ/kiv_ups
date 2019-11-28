@@ -47,22 +47,37 @@ func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.Play
 }
 
 func (a CreateLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
-	createLobbyData := m.GetMessage().Message.(*protocol.CreateLobbyMessage)
-	s.AddLobby(interfaces.Lobby{
-		Name:    createLobbyData.Name,
-		Owner:   m.GetPlayer(),
-		Players: make(map[interfaces.PlayerUID]interfaces.Player),
-	})
+	if m.GetPlayer().GetOwnedLobby() == nil {
 
-	log.Infof("Added lobby %s", createLobbyData.Name)
+		createLobbyData := m.GetMessage().Message.(*protocol.CreateLobbyMessage)
+		lobby := interfaces.Lobby{
+			Name:    createLobbyData.Name,
+			Owner:   m.GetPlayer(),
+			Players: make(map[interfaces.PlayerUID]interfaces.Player),
+			PlayersLimit: createLobbyData.PlayersLimit,
+		}
+		s.AddLobby(&lobby)
 
-	return ActionResponse{
-		ServerMessage: tcp.ServerMessage{
-			Data:    &protocol.CreatedLobbyResponseMessage{},
-			Status:  true,
-			Message: "",
-		},
-		Targets: []interfaces.Player{m.GetPlayer()},
+		log.Infof("Added lobby %s", createLobbyData.Name)
+
+		m.GetPlayer().SetOwnedLobby(&lobby)
+		return ActionResponse{
+			ServerMessage: tcp.ServerMessage{
+				Data:    &protocol.CreatedLobbyResponseMessage{},
+				Status:  true,
+				Message: "",
+			},
+			Targets: []interfaces.Player{m.GetPlayer()},
+		}
+	} else {
+		return ActionResponse{
+			ServerMessage: tcp.ServerMessage{
+				Data:    &protocol.CreatedLobbyResponseMessage{},
+				Status:  false,
+				Message: "You can't create more than one lobby",
+			},
+			Targets: []interfaces.Player{m.GetPlayer()},
+		}
 	}
 }
 
@@ -82,10 +97,34 @@ func (a DeleteLobbyAction) Process(s interfaces.MasterServer, m interfaces.Playe
 	}
 
 	log.Infof("Deleted lobby %s", lobby.Name)
+	m.GetPlayer().SetOwnedLobby(nil)
 
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
 			Data:    &protocol.DeleteLobbyResponseMessage{},
+			Status:  true,
+			Message: "",
+		},
+		Targets: []interfaces.Player{m.GetPlayer()},
+	}
+}
+
+func (a ListLobbiesAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
+	lobbies := s.GetLobbies()
+	outputLobbies := make([]map[string]interface{}, 0, len(lobbies))
+
+	for _, v := range lobbies {
+		lobby := make(map[string]interface{})
+		lobby["name"] = v.Name
+		lobby["connected_players"] = len(v.Players)
+		lobby["players_limit"] = v.PlayersLimit
+
+		outputLobbies = append(outputLobbies, lobby)
+	}
+
+	return ActionResponse{
+		ServerMessage: tcp.ServerMessage{
+			Data:    &protocol.ListLobbiesResponseMessage{Lobbies:outputLobbies},
 			Status:  true,
 			Message: "",
 		},

@@ -113,9 +113,10 @@ func (gp *GameProtocol) Encode(msg ProtoMessage, writer io.WriteCloser) {
 }
 
 func (gp *GameProtocol) InfiniteDecode(reader io.ReadCloser, msgChan chan *ProtoMessage) {
-	// TODO: This goroutine will never die
+	buffReader := bufio.NewReader(reader)
+
 	for {
-		msg, err := gp.Decode(reader)
+		msg, err := gp.Decode(buffReader)
 		if err != nil {
 			if err == io.ErrClosedPipe {
 				log.Traceln("Closing InfiniteDecode...")
@@ -131,12 +132,10 @@ func (gp *GameProtocol) InfiniteDecode(reader io.ReadCloser, msgChan chan *Proto
 	}
 }
 
-func (gp *GameProtocol) Decode(reader io.Reader) (*ProtoMessage, error) {
+func (gp *GameProtocol) Decode(buffReader *bufio.Reader) (*ProtoMessage, error) {
 	// TODO: Make it more strict
 	// This shouldn't work.. |100|15|{"ping":"pong"} (missing request ID)
 	var err error
-
-	buffReader := bufio.NewReader(reader)
 
 	// Just for sure
 	err = gp.flushInvalidBytes(buffReader)

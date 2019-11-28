@@ -33,23 +33,28 @@ custom_constants/separation = 20
 
 [node name="LobbyName" type="LineEdit" parent="FormContainer"]
 margin_right = 500.0
-margin_bottom = 86.0
+margin_bottom = 62.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 clear_button_enabled = true
 placeholder_text = "Lobby name"
 caret_blink = true
 
-[node name="CreateLobby" type="Button" parent="FormContainer"]
-margin_top = 106.0
+[node name="PlayersLimit" type="SpinBox" parent="FormContainer"]
+margin_top = 82.0
 margin_right = 500.0
-margin_bottom = 192.0
+margin_bottom = 134.0
+
+[node name="CreateLobby" type="Button" parent="FormContainer"]
+margin_top = 154.0
+margin_right = 500.0
+margin_bottom = 216.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "Create lobby"
 
 [node name="Back" type="Button" parent="FormContainer"]
-margin_top = 212.0
+margin_top = 236.0
 margin_right = 500.0
 margin_bottom = 300.0
 size_flags_horizontal = 3

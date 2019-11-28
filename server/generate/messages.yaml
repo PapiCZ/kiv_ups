@@ -27,8 +27,12 @@ messages:
     fields:
       - name: Name
         type: string
+      - name: PlayersLimit
+        type: int
     contexts:
       - LoggedInMenuContext
+  - name: CreatedLobbyResponse
+    type: 301
   - name: DeleteLobby
     action: true
     type: 202
@@ -37,7 +41,15 @@ messages:
         type: string
     contexts:
       - LoggedInMenuContext
-  - name: CreatedLobbyResponse
-    type: 301
   - name: DeleteLobbyResponse
     type: 302
+  - name: ListLobbies
+    action: true
+    type: 203
+    contexts:
+      - LoggedInMenuContext
+  - name: ListLobbiesResponse
+    type: 303
+    fields:
+      - name: Lobbies
+        type: "interface{}"
