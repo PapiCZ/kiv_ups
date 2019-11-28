@@ -47,7 +47,7 @@ func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.Play
 }
 
 func (a CreateLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
-	if m.GetPlayer().GetOwnedLobby() == nil {
+	if m.GetPlayer().GetConnectedLobby() == nil {
 
 		createLobbyData := m.GetMessage().Message.(*protocol.CreateLobbyMessage)
 		lobby := interfaces.Lobby{
@@ -60,7 +60,7 @@ func (a CreateLobbyAction) Process(s interfaces.MasterServer, m interfaces.Playe
 
 		log.Infof("Added lobby %s", createLobbyData.Name)
 
-		m.GetPlayer().SetOwnedLobby(&lobby)
+		m.GetPlayer().SetConnectedLobby(&lobby)
 		return ActionResponse{
 			ServerMessage: tcp.ServerMessage{
 				Data:    &protocol.CreatedLobbyResponseMessage{},
@@ -97,7 +97,7 @@ func (a DeleteLobbyAction) Process(s interfaces.MasterServer, m interfaces.Playe
 	}
 
 	log.Infof("Deleted lobby %s", lobby.Name)
-	m.GetPlayer().SetOwnedLobby(nil)
+	m.GetPlayer().SetConnectedLobby(nil)
 
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{

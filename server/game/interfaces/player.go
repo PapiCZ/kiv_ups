@@ -15,8 +15,8 @@ type Player interface {
 	SetName(name string)
 	GetContext() PlayerContext
 	SetContext(ctx PlayerContext)
-	SetOwnedLobby(*Lobby)
-	GetOwnedLobby() *Lobby
+	SetConnectedLobby(*Lobby)
+	GetConnectedLobby() *Lobby
 }
 
 type PlayerMessage interface {

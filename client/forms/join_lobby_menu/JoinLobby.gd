@@ -1,7 +1,5 @@
 extends VBoxContainer
 
-signal change_menu
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 # warning-ignore:return_value_discarded
@@ -19,5 +17,5 @@ func _on_lobbies_loaded(data):
 		$FormContainer/PanelContainer/ScrollContainer/LobbyList.add_child(button)
 
 func _on_Back_pressed():
-	emit_signal("change_menu", Menu.get(Menu.MENU_LEVEL.START_GAME))
+	Menu.back()
 	Menu.reset(Menu.MENU_LEVEL.JOIN_LOBBY)

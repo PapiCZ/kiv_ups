@@ -153,14 +153,20 @@ func (s *Server) Start(clientMessageChan chan ClientMessage) {
 							client.TCP.Sockaddr.(*syscall.SockaddrInet4).Port,
 						)
 
+						clientMessageChan <- ClientMessage{
+							Message:           nil,
+							RequestId:         "",
+							DisconnectRequest: true,
+							Sender:            client,
+						}
 						close(client.MessageChan)
-						client.decodeReader.Close()
-						client.decodeWriter.Close()
+						_ = client.decodeReader.Close()
+						_ = client.decodeWriter.Close()
 
 						delete(s.Clients, client.TCP.FD)
 					} else {
 						// Client wanna talk
-						writers[client.UID].Write(buff[:n])
+						_, _ = writers[client.UID].Write(buff[:n])
 					}
 				}
 			}

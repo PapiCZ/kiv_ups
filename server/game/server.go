@@ -57,6 +57,12 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 		player = &pl
 	}
 
+	if message.DisconnectRequest {
+		s.OnPlayerDisconnected(player)
+
+		return nil
+	}
+
 	action := s.ActionDefinition.GetAction(message.Message.GetTypeId(), player.GetContext())
 
 	if action == nil {
@@ -88,6 +94,14 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 	}
 
 	return
+}
+
+func (s *Server) OnPlayerDisconnected(player interfaces.Player) {
+	if player.GetConnectedLobby().Owner == player {
+		s.DeleteLobby(player.GetConnectedLobby().Name)
+	}
+
+	// TODO: Kick players from lobby
 }
 
 func (s *Server) Stop() (err error) {

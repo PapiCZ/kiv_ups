@@ -58,5 +58,6 @@ func (c *Client) SendBytes(message []byte) (err error) {
 type ClientMessage struct {
 	protocol.Message
 	protocol.RequestId
-	Sender *Client
+	Sender            *Client
+	DisconnectRequest bool
 }

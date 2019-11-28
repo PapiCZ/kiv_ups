@@ -6,12 +6,8 @@ extends CenterContainer
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	Menu.connect("menu_added", self, "_menu_added")
-	Menu.load()
+	Menu.connect("change_menu", self, "_on_menu_changed")
 	_on_menu_changed(Menu.get(Menu.MENU_LEVEL.LOGIN))
-
-func _menu_added(menu):
-	menu.connect("change_menu", self, "_on_menu_changed")
 
 func _on_menu_changed(menu_root_node):
 	for i in range(0, get_child_count()):

@@ -11,6 +11,14 @@ type Lobby struct {
 	PlayersLimit int
 }
 
+func (l *Lobby) KickPlayer(player Player){
+	panic("implement me")
+}
+
+func (l *Lobby) KickPlayers() {
+	panic("implement me")
+}
+
 type MasterServer interface {
 	Start() (err error)
 	Stop() (err error)

@@ -1,7 +1,5 @@
 extends VBoxContainer
 
-signal change_menu
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 # warning-ignore:return_value_discarded
@@ -10,7 +8,7 @@ func _ready():
 	$FormContainer/Back.connect("pressed", self, "_on_Back_pressed")
 
 func _on_Back_pressed():
-	emit_signal("change_menu", Menu.get(Menu.MENU_LEVEL.START_GAME))
+	Menu.back()
 	Menu.reset(Menu.MENU_LEVEL.CREATE_LOBBY)
 
 func _on_CreateLobby_pressed():
@@ -18,11 +16,12 @@ func _on_CreateLobby_pressed():
 
 	if len(lobby_name):
 		Network.send({
-			"name": lobby_name
+			"name": lobby_name,
+			"players_limit": $FormContainer/PlayersLimit.value,
 		}, MessageTypes.CREATE_LOBBY, self, "_on_lobby_created", [lobby_name])
 
 func _on_lobby_created(data):
-	var menu = Menu.get(Menu.MENU_LEVEL.WAITING_LOBBY)
+	var menu = Menu.get(Menu.MENU_LEVEL.WAITING_LOBBY, false)
 	menu.lobby_name = data[1]
 	menu.get_node("Label").text = "Lobby " + data[1]
-	emit_signal("change_menu", Menu.get(Menu.MENU_LEVEL.WAITING_LOBBY))
+	Menu.go(Menu.MENU_LEVEL.WAITING_LOBBY)

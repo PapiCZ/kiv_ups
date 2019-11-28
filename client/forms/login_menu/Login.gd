@@ -1,7 +1,5 @@
 extends VBoxContainer
 
-signal change_menu
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 # warning-ignore:return_value_discarded
@@ -11,7 +9,7 @@ func _ready():
 
 func _on_LoginButton_pressed():
 	if len($FormContainer/Nickname.text):
-		emit_signal("change_menu", Menu.get(Menu.MENU_LEVEL.MAIN))
+		Menu.go(Menu.MENU_LEVEL.MAIN)
 		Network.set_auth_data($FormContainer/Nickname.text)
 		Network.start_thread("127.0.0.1", 35000)
 

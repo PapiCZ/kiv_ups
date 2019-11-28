@@ -1,6 +1,6 @@
 extends Node
 
-signal menu_added
+signal change_menu
 
 enum MENU_LEVEL {
 	LOGIN,
@@ -19,6 +19,8 @@ var menus = {
 	MENU_LEVEL.WAITING_LOBBY : preload("res://forms/waiting_lobby_menu/WaitingLobby.tscn").instance(),
 	MENU_LEVEL.JOIN_LOBBY : preload("res://forms/join_lobby_menu/JoinLobby.tscn").instance(),
 }
+
+var menu_stack = []
 
 func load():
 	for menu in Menu.all().values():
@@ -39,4 +41,13 @@ func reset(menu):
 	var menu_obj = load(get(menu, false).filename).instance()
 	menus[menu] = menu_obj
 	emit_signal("menu_added", menu_obj)
-	
+
+func go(menu):
+	var menu_obj = get(menu)
+	menu_stack.append(menu_obj)
+	emit_signal("change_menu", menu_obj)
+
+func back():
+	if len(menu_stack) >= 2:
+		menu_stack.pop_back()
+		emit_signal("change_menu", menu_stack.back())

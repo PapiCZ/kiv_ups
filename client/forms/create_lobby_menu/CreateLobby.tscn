@@ -44,6 +44,7 @@ caret_blink = true
 margin_top = 82.0
 margin_right = 500.0
 margin_bottom = 134.0
+value = 2.0
 
 [node name="CreateLobby" type="Button" parent="FormContainer"]
 margin_top = 154.0
