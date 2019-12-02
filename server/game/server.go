@@ -43,7 +43,7 @@ func (s *Server) Start() (err error) {
 
 	for {
 		message := <-clientMessageChan
-		s.RunAction(message)
+		_ = s.RunAction(message)
 	}
 }
 
@@ -78,22 +78,25 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 		return errors.New("invalid action")
 	}
 
-	// TODO: should return error
 	actionResponse := action.Process(s, &PlayerMessage{
 		ClientMessage: &message,
 		Player:        player,
 	})
 	sm := actionResponse.ServerMessage
 
-	for _, target := range actionResponse.Targets {
-		log.Tracef("Server answers to client %d: %#v | Data: %#v", target.GetUID(), sm, sm.Data)
-		_ = target.GetTCPClient().Send(protocol.ProtoMessage{
-			Message:   sm,
-			RequestId: message.RequestId,
-		})
-	}
+	s.SendMessage(sm, message.RequestId, actionResponse.Targets...)
 
 	return
+}
+
+func (s *Server) SendMessage(sm tcp.ServerMessage, requestId protocol.RequestId, player ...interfaces.Player) {
+	for _, p := range player {
+		log.Tracef("Server answers to client %d: %#v | Data: %#v", p.GetUID(), sm, sm.Data)
+		_ = p.GetTCPClient().Send(protocol.ProtoMessage{
+			Message:   sm,
+			RequestId: requestId,
+		})
+	}
 }
 
 func (s *Server) OnPlayerDisconnected(player interfaces.Player) {

@@ -21,7 +21,7 @@ func _on_CreateLobby_pressed():
 		}, MessageTypes.CREATE_LOBBY, self, "_on_lobby_created", [lobby_name])
 
 func _on_lobby_created(data):
-	var menu = Menu.get(Menu.MENU_LEVEL.WAITING_LOBBY, false)
+	var menu = Menu.get(Menu.MENU_LEVEL.LOBBY, false)
 	menu.lobby_name = data[1]
 	menu.get_node("Label").text = "Lobby " + data[1]
-	Menu.go(Menu.MENU_LEVEL.WAITING_LOBBY)
+	Menu.go(Menu.MENU_LEVEL.LOBBY)
