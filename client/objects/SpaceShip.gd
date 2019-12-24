@@ -3,11 +3,20 @@ extends KinematicBody2D
 export var max_speed = 300
 export var max_rotation_speed = 150
 var velocity = Vector2()
+var player_name
 
-func _process(delta):
+func _init():
+	self.player_name = player_name
+
+	Network.connect_message(MessageTypes.UPDATE_STATE, self, "_update_state")
+
+func _physics_process(delta):
 	var original_position = position
 	var original_velocity = velocity
 	var original_rotation = rotation
+
+	if Network.username != player_name:
+		return
 
 	if Input.is_action_pressed("ui_up"):
 		velocity.x = 0
@@ -40,3 +49,13 @@ func _process(delta):
 			"rotation": rotation,
 		}, MessageTypes.PLAYER_MOVE)
 
+func _update_state(data):
+	for spaceship_node in data[0].response.data.game_tree.children:
+		if spaceship_node.type != "spaceship":
+			continue
+
+		var spaceship = spaceship_node.value
+		if spaceship.player_name == player_name and Network.username != player_name:
+			position.x = spaceship.pos_x
+			position.y = spaceship.pos_y
+			rotation = spaceship.rotation

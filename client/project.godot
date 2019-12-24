@@ -40,6 +40,10 @@ theme/custom_font="res://fonts/joystix_monospace.tres"
 
 translations=PoolStringArray(  )
 
+[physics]
+
+common/physics_fps=30
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"

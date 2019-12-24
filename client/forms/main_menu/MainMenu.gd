@@ -20,7 +20,3 @@ func _on_SignOut_pressed():
 func _on_Quit_pressed():
 	Network.stop()
 	get_tree().quit()
-
-# Called every frame. "delta" is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass

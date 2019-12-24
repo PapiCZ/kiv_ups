@@ -9,7 +9,7 @@ func log(message):
 
 func _log(message):
 	if len(text) > 100000:
-		text = ""
+		text = text.right(1000)
 
 	text += str(message) + "\n"
 

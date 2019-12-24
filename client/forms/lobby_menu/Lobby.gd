@@ -3,6 +3,8 @@ extends VBoxContainer
 var lobby_name
 var InGame = preload("res://InGame.tscn")
 
+onready var Spaceship = preload("res://objects/SpaceShip.tscn")
+
 func _load():
 	Network.send({}, MessageTypes.LIST_LOBBY_PLAYERS, self, "_on_lobby_players_loaded")
 
@@ -19,7 +21,18 @@ func _on_Start_pressed():
 
 func _start_game(data):
 	Menu.hide_and_reset_stack()
-	get_parent().get_parent().get_parent().add_child(InGame.instance())
+
+	var ingame = InGame.instance()
+	var i = 0
+	for player in $FormContainer/PlayersContainer.players:
+		i += 1
+		var spaceship = Spaceship.instance()
+		spaceship.player_name = player.name
+		spaceship.position.x = 100 * i
+		spaceship.position.y = 500
+		ingame.add_child(spaceship)
+
+	get_parent().get_parent().get_parent().add_child(ingame)
 
 func _on_Back_pressed():
 	Network.send({
