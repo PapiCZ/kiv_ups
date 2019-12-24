@@ -1,14 +1,25 @@
 extends VBoxContainer
 
 var lobby_name
+var InGame = preload("res://InGame.tscn")
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
+func _load():
+	Network.send({}, MessageTypes.LIST_LOBBY_PLAYERS, self, "_on_lobby_players_loaded")
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+	Network.connect_message(MessageTypes.START_GAME_RESPONSE, self, "_start_game")
+
+func _on_lobby_players_loaded(data):
+	if data[0].response.status:
+		for player_name in data[0].response.data.players:
+			$FormContainer/PlayersContainer.add_player(player_name)
+
+func _on_Start_pressed():
+	Network.disconnect_message(MessageTypes.START_GAME_RESPONSE)
+	Network.send({}, MessageTypes.START_GAME, self, "_start_game")
+
+func _start_game(data):
+	Menu.hide_and_reset_stack()
+	get_parent().get_parent().get_parent().add_child(InGame.instance())
 
 func _on_Back_pressed():
 	Network.send({

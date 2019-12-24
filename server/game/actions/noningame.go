@@ -2,6 +2,7 @@ package actions
 
 import (
 	log "github.com/sirupsen/logrus"
+	"kiv_ups_server/game/gameserver"
 	"kiv_ups_server/game/interfaces"
 	"kiv_ups_server/net/tcp"
 	"kiv_ups_server/net/tcp/protocol"
@@ -51,15 +52,17 @@ func (a CreateLobbyAction) Process(s interfaces.MasterServer, m interfaces.Playe
 
 		createLobbyData := m.GetMessage().Message.(*protocol.CreateLobbyMessage)
 		lobby := interfaces.Lobby{
-			Name:    createLobbyData.Name,
-			Owner:   m.GetPlayer(),
-			Players: make(map[interfaces.PlayerUID]interfaces.Player),
+			Name:         createLobbyData.Name,
+			Owner:        m.GetPlayer(),
+			Players:      make(map[interfaces.PlayerUID]interfaces.Player),
 			PlayersLimit: createLobbyData.PlayersLimit,
 		}
 		s.AddLobby(&lobby)
+		lobby.AddPlayer(m.GetPlayer())
 
 		log.Infof("Added lobby %s", createLobbyData.Name)
 
+		m.GetPlayer().SetContext(LobbyContext)
 		m.GetPlayer().SetConnectedLobby(&lobby)
 		return ActionResponse{
 			ServerMessage: tcp.ServerMessage{
@@ -97,6 +100,7 @@ func (a DeleteLobbyAction) Process(s interfaces.MasterServer, m interfaces.Playe
 	}
 
 	log.Infof("Deleted lobby %s", lobby.Name)
+	m.GetPlayer().SetContext(LoggedInMenuContext)
 	m.GetPlayer().SetConnectedLobby(nil)
 
 	return ActionResponse{
@@ -124,10 +128,86 @@ func (a ListLobbiesAction) Process(s interfaces.MasterServer, m interfaces.Playe
 
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
-			Data:    &protocol.ListLobbiesResponseMessage{Lobbies:outputLobbies},
+			Data:    &protocol.ListLobbiesResponseMessage{Lobbies: outputLobbies},
 			Status:  true,
 			Message: "",
 		},
 		Targets: []interfaces.Player{m.GetPlayer()},
+	}
+}
+
+func (a JoinLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
+	joinLobbyData := m.GetMessage().Message.(*protocol.JoinLobbyMessage)
+	lobby, err := s.GetLobby(joinLobbyData.Name)
+	if err != nil {
+		return ActionResponse{
+			ServerMessage: tcp.ServerMessage{
+				Data:    &protocol.JoinLobbyResponseMessage{},
+				Status:  false,
+				Message: "",
+			},
+			Targets: []interfaces.Player{m.GetPlayer()},
+		}
+	}
+
+	lobby.AddPlayer(m.GetPlayer())
+	m.GetPlayer().SetContext(LobbyContext)
+	m.GetPlayer().SetConnectedLobby(lobby)
+
+	return ActionResponse{
+		ServerMessage: tcp.ServerMessage{
+			Data:    &protocol.JoinLobbyResponseMessage{},
+			Status:  true,
+			Message: "",
+		},
+		Targets: []interfaces.Player{m.GetPlayer()},
+	}
+}
+
+func (a ListLobbyPlayersAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
+	lobby := m.GetPlayer().GetConnectedLobby()
+
+	if lobby == nil {
+		return ActionResponse{
+			ServerMessage: tcp.ServerMessage{
+				Data:    &protocol.ListLobbyPlayersResponseMessage{},
+				Status:  false,
+				Message: "",
+			},
+			Targets: []interfaces.Player{m.GetPlayer()},
+		}
+	}
+
+	playerNames := make([]string, 0)
+	for _, player := range lobby.GetPlayers() {
+		playerNames = append(playerNames, player.GetName())
+	}
+
+	return ActionResponse{
+		ServerMessage: tcp.ServerMessage{
+			Data:    &protocol.ListLobbyPlayersResponseMessage{Players:playerNames},
+			Status:  true,
+			Message: "",
+		},
+		Targets: []interfaces.Player{m.GetPlayer()},
+	}
+}
+
+func (a StartGameAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
+	gs := gameserver.NewGameServer()
+
+	for _, player := range m.GetPlayer().GetConnectedLobby().GetPlayers() {
+		gs.AddPlayer(player)
+		player.SetGameServer(&gs)
+	}
+	go gs.Start()
+
+	return ActionResponse{
+		ServerMessage: tcp.ServerMessage{
+			Data:    &protocol.StartGameResponseMessage{},
+			Status:  true,
+			Message: "",
+		},
+		Targets: gs.GetPlayers(),
 	}
 }

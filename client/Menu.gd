@@ -24,7 +24,7 @@ var menu_stack = []
 
 func load():
 	for menu in Menu.all().values():
-		emit_signal("menu_added", menu)
+		emit_signal("change_menu", menu)
 
 func all():
 	return menus
@@ -51,3 +51,7 @@ func back():
 	if len(menu_stack) >= 2:
 		menu_stack.pop_back()
 		emit_signal("change_menu", menu_stack.back())
+
+func hide_and_reset_stack():
+	menu_stack = []
+	emit_signal("change_menu", null)

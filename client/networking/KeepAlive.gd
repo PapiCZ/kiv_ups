@@ -3,7 +3,7 @@ extends Node
 func send():
 	Network.send({
 		"ping": "pong"
-	}, MessageTypes.KEEP_ALIVE, self, "_check", null, self, "_network_error")
+	}, MessageTypes.KEEP_ALIVE, self, "_check", null, self, "_network_error", null)
 
 func _check(data):
 	var response = data[0].response

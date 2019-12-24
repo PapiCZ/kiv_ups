@@ -15,6 +15,7 @@ type Server struct {
 	Players          map[tcp.UID]interfaces.Player
 	ActionDefinition actions.ActionDefinition
 	Lobbies          map[string]*interfaces.Lobby
+	GameServers      []interfaces.GameServer
 }
 
 func NewServer(sockaddr syscall.Sockaddr) (ms Server) {
@@ -29,6 +30,7 @@ func NewServer(sockaddr syscall.Sockaddr) (ms Server) {
 		Players:          make(map[tcp.UID]interfaces.Player),
 		ActionDefinition: actions.NewDefinition(),
 		Lobbies:          make(map[string]*interfaces.Lobby),
+		GameServers:      make([]interfaces.GameServer, 0),
 	}
 
 	actions.RegisterAllActions(&ms.ActionDefinition)
@@ -43,7 +45,10 @@ func (s *Server) Start() (err error) {
 
 	for {
 		message := <-clientMessageChan
-		_ = s.RunAction(message)
+		err = s.RunAction(message)
+		if err != nil {
+			log.Errorln(err)
+		}
 	}
 }
 
@@ -59,6 +64,20 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 
 	if message.DisconnectRequest {
 		s.OnPlayerDisconnected(player)
+
+		return nil
+	}
+
+	if message.GetTypeId() >= 300 && message.GetTypeId() <= 500 {
+		gameServer := player.GetGameServer()
+		if gameServer != nil {
+			gameServer.GetRequestMessageChan() <- &PlayerMessage{
+				ClientMessage: &message,
+				Player:        player,
+			}
+		} else {
+			// TODO: error
+		}
 
 		return nil
 	}
@@ -92,15 +111,19 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 func (s *Server) SendMessage(sm tcp.ServerMessage, requestId protocol.RequestId, player ...interfaces.Player) {
 	for _, p := range player {
 		log.Tracef("Server answers to client %d: %#v | Data: %#v", p.GetUID(), sm, sm.Data)
-		_ = p.GetTCPClient().Send(protocol.ProtoMessage{
+		err := p.GetTCPClient().Send(protocol.ProtoMessage{
 			Message:   sm,
 			RequestId: requestId,
 		})
+
+		if err != nil {
+			log.Errorln(err)
+		}
 	}
 }
 
 func (s *Server) OnPlayerDisconnected(player interfaces.Player) {
-	if player.GetConnectedLobby().Owner == player {
+	if player.GetConnectedLobby() != nil && player.GetConnectedLobby().Owner == player {
 		s.DeleteLobby(player.GetConnectedLobby().Name)
 	}
 
@@ -151,6 +174,10 @@ func (s *Server) GetLobbies() []*interfaces.Lobby {
 	}
 
 	return v
+}
+
+func (s *Server) AddGameServer(gs interfaces.GameServer) {
+	s.GameServers = append(s.GameServers, gs)
 }
 
 type PlayerMessage struct {

@@ -12,6 +12,7 @@ type Player struct {
 	Name           string
 	Context        interfaces.PlayerContext
 	ConnectedLobby *interfaces.Lobby
+	GameServer     interfaces.GameServer
 }
 
 func NewPlayer(client *tcp.Client, name string, context interfaces.PlayerContext) Player {
@@ -66,4 +67,12 @@ func (p *Player) SetConnectedLobby(lobby *interfaces.Lobby) {
 
 func (p *Player) GetConnectedLobby() *interfaces.Lobby {
 	return p.ConnectedLobby
+}
+
+func (p *Player) SetGameServer(gs interfaces.GameServer) {
+	p.GameServer = gs
+}
+
+func (p *Player) GetGameServer() interfaces.GameServer {
+	return p.GameServer
 }

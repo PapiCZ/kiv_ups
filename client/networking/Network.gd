@@ -23,8 +23,23 @@ onready var status_sprite = get_tree().get_root().get_node("Game/NetworkStatus/S
 onready var network_debug = get_tree().get_root().get_node("Game/NetworkDebug")
 onready var network_ping = get_tree().get_root().get_node("Game/NetworkPing")
 
+var connected_signals = {}
+
 func _ready():
 	mutex = Mutex.new()
+
+func connect_message(type, callback_obj, callback_func):
+	mutex.lock()
+	if not connected_signals.has(type):
+		connected_signals[type] = []
+
+	connected_signals[type].append([callback_obj, callback_func])
+	mutex.unlock()
+
+func disconnect_message(type):
+	mutex.lock()
+	connected_signals[type] = []
+	mutex.unlock()
 
 func network_ok():
 	network_debug.log("Connected to %s:%d" % [host, port])
@@ -45,34 +60,38 @@ func send(message, type, \
 	var data = GameProtocol.encode(proto_message)
 	network_debug.log("Sent %s" % data.get_string_from_utf8())
 
-	var pr = PendingRequest.new()
-	pr.id = proto_message.request_id
-	pr.request = proto_message
-	pr.request_time = OS.get_ticks_msec()
-	pr._response_callback_obj = response_callback_obj
-	pr._response_callback_func = response_callback_func
-	pr._response_args = response_args
-	pr._timeout_callback_obj = timeout_callback_obj
-	pr._timeout_callback_func = timeout_callback_func
-	pr._timeout_args = timeout_args
+	if response_callback_obj != null or timeout_callback_obj != null:
+		var pr = PendingRequest.new()
+		pr.id = proto_message.request_id
+		pr.request = proto_message
+		pr.request_time = OS.get_ticks_msec()
+		pr._response_callback_obj = response_callback_obj
+		pr._response_callback_func = response_callback_func
+		pr._response_args = response_args
+		pr._timeout_callback_obj = timeout_callback_obj
+		pr._timeout_callback_func = timeout_callback_func
+		pr._timeout_args = timeout_args
 
-	if pr._timeout != null:
-		pr._timeout_timer = Timer.new()
-		add_child(pr._timeout_timer)
-		pr._timeout_timer.set_wait_time(pr._timeout)
-		var _timeout_args = [pr]
-		if pr._timeout_args != null:
-			for arg in pr._timeout_args:
-				_timeout_args.append(arg)
-		if pr._timeout_callback_obj != null and pr._timeout_callback_func != null:
-			pr._timeout_timer.connect("timeout", pr._timeout_callback_obj, pr._timeout_callback_func, _timeout_args)
-		pr._timeout_timer.connect("timeout", self, "_on_RequestTimeoutTimer_timeout", [pr])
-		pr._timeout_timer.start()
+		if pr._timeout != null:
+			pr._timeout_timer = Timer.new()
+			add_child(pr._timeout_timer)
+			pr._timeout_timer.set_wait_time(pr._timeout)
+			var _timeout_args = [pr]
+			if pr._timeout_args != null:
+				for arg in pr._timeout_args:
+					_timeout_args.append(arg)
+			if pr._timeout_callback_obj != null and pr._timeout_callback_func != null:
+				pr._timeout_timer.connect("timeout", pr._timeout_callback_obj, pr._timeout_callback_func, _timeout_args)
+			pr._timeout_timer.connect("timeout", self, "_on_RequestTimeoutTimer_timeout", [pr])
+			pr._timeout_timer.start()
 
-	mutex.lock()
-	pending_requests[pr.id] = pr
-	client.put_data(data)
-	mutex.unlock()
+		mutex.lock()
+		pending_requests[pr.id] = pr
+		client.put_data(data)
+		mutex.unlock()
+	else:
+		proto_message.queue_free()
+		client.put_data(data)
 	
 	return data
 
@@ -94,10 +113,13 @@ func recv_message_loop():
 			return
 
 		var available_bytes = client.get_available_bytes()
-		if available_bytes:
-			var data_result = client.get_data(available_bytes)
-			mutex.unlock()
-			buff.append_array(data_result[1])
+		if available_bytes or len(buff):
+			if available_bytes:
+				var data_result = client.get_data(available_bytes)
+				mutex.unlock()
+				buff.append_array(data_result[1])
+			else:
+				mutex.unlock()
 			var result = GameProtocol.decode(buff)
 			var length = result[0]
 			var proto_message = result[1]
@@ -114,7 +136,7 @@ func recv_message_loop():
 				mutex.unlock()
 				pr.response = proto_message.message
 				pr.response_time = OS.get_ticks_msec()
-				network_ping.call_deferred("set_text", "%d ms" % (pr.response_time - pr.request_time))
+				network_ping.set_text("%d ms" % (pr.response_time - pr.request_time))
 				if pr._timeout_timer != null:
 					pr._timeout_timer.stop()
 					remove_child(pr._timeout_timer)
@@ -125,8 +147,24 @@ func recv_message_loop():
 						for arg in pr._response_args:
 							response_args.append(arg)
 					pr._response_callback_obj.call_deferred(pr._response_callback_func, response_args)
+				pr.request.queue_free()
+				pr._timeout_timer.queue_free()
+				pr.queue_free()
 			else:
 				mutex.unlock()
+
+			mutex.lock()
+			if connected_signals.has(proto_message.type):
+				for callback in connected_signals[proto_message.type]:
+					var pr = PendingRequest.new()
+					pr.response = proto_message.message
+					pr.response_time = OS.get_ticks_msec()
+					var response_args = [pr]
+					callback[0].call_deferred(callback[1], response_args)
+					pr.queue_free()
+
+			proto_message.queue_free()
+			mutex.unlock()
 
 			if len(buff) > length:
 				buff = buff.subarray(length, len(buff) - 1)
@@ -136,9 +174,7 @@ func recv_message_loop():
 			mutex.unlock()
 
 func set_auth_data(username):
-	mutex.lock()
 	self.username = username
-	mutex.unlock()
 
 func auth():
 	mutex.lock()

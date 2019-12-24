@@ -8,6 +8,9 @@ func log(message):
 	call_deferred("_log", message)
 
 func _log(message):
+	if len(text) > 100000:
+		text = ""
+
 	text += str(message) + "\n"
 
 

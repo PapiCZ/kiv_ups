@@ -11,7 +11,21 @@ type Lobby struct {
 	PlayersLimit int
 }
 
-func (l *Lobby) KickPlayer(player Player){
+func (l *Lobby) AddPlayer(player Player) {
+	l.Players[player.GetUID()] = player
+}
+
+func (l *Lobby) GetPlayers() []Player {
+	players := make([]Player, 0)
+
+	for _, player := range l.Players {
+		players = append(players, player)
+	}
+
+	return players
+}
+
+func (l *Lobby) KickPlayer(player Player) {
 	panic("implement me")
 }
 
@@ -30,4 +44,12 @@ type MasterServer interface {
 	DeleteLobby(name string)
 	GetLobby(name string) (*Lobby, error)
 	GetLobbies() []*Lobby
+	AddGameServer(server GameServer)
+}
+
+type GameServer interface {
+	Start()
+	AddPlayer(player Player)
+	GetPlayers() []Player
+	GetRequestMessageChan() chan PlayerMessage
 }

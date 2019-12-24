@@ -69,6 +69,75 @@ func (m ListLobbiesResponseMessage) GetTypeId() MessageType {
 	return 303
 }
 
+type JoinLobbyMessage struct {
+	Name string `json:"name"`
+}
+
+func (m JoinLobbyMessage) GetTypeId() MessageType {
+	return 204
+}
+
+type JoinLobbyResponseMessage struct{}
+
+func (m JoinLobbyResponseMessage) GetTypeId() MessageType {
+	return 304
+}
+
+type PlayerLobbyJoinedMessage struct {
+	PlayerName string `json:"player_name"`
+}
+
+func (m PlayerLobbyJoinedMessage) GetTypeId() MessageType {
+	return 305
+}
+
+type ListLobbyPlayersMessage struct{}
+
+func (m ListLobbyPlayersMessage) GetTypeId() MessageType {
+	return 206
+}
+
+type ListLobbyPlayersResponseMessage struct {
+	Players []string `json:"players"`
+}
+
+func (m ListLobbyPlayersResponseMessage) GetTypeId() MessageType {
+	return 306
+}
+
+type StartGameMessage struct{}
+
+func (m StartGameMessage) GetTypeId() MessageType {
+	return 207
+}
+
+type StartGameResponseMessage struct{}
+
+func (m StartGameResponseMessage) GetTypeId() MessageType {
+	return 307
+}
+
+type PlayerMoveMessage struct {
+	PlayerName string  `json:"player_name"`
+	PosX       int     `json:"pos_x"`
+	PosY       int     `json:"pos_y"`
+	VelocityX  float64 `json:"velocity_x"`
+	VelocityY  float64 `json:"velocity_y"`
+	Rotation   float64 `json:"rotation"`
+}
+
+func (m PlayerMoveMessage) GetTypeId() MessageType {
+	return 400
+}
+
+type UpdateStateMessage struct {
+	GameTree interface{} `json:"game_tree"`
+}
+
+func (m UpdateStateMessage) GetTypeId() MessageType {
+	return 500
+}
+
 func RegisterAllMessages(definition *Definition) {
 	definition.Register(KeepAliveMessage{})
 	definition.Register(ActionErrorMessage{})
@@ -79,4 +148,13 @@ func RegisterAllMessages(definition *Definition) {
 	definition.Register(DeleteLobbyResponseMessage{})
 	definition.Register(ListLobbiesMessage{})
 	definition.Register(ListLobbiesResponseMessage{})
+	definition.Register(JoinLobbyMessage{})
+	definition.Register(JoinLobbyResponseMessage{})
+	definition.Register(PlayerLobbyJoinedMessage{})
+	definition.Register(ListLobbyPlayersMessage{})
+	definition.Register(ListLobbyPlayersResponseMessage{})
+	definition.Register(StartGameMessage{})
+	definition.Register(StartGameResponseMessage{})
+	definition.Register(PlayerMoveMessage{})
+	definition.Register(UpdateStateMessage{})
 }

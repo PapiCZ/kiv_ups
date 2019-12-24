@@ -53,3 +53,57 @@ messages:
     fields:
       - name: Lobbies
         type: "interface{}"
+  - name: JoinLobby
+    action: true
+    type: 204
+    fields:
+      - name: Name
+        type: string
+    contexts:
+      - LoggedInMenuContext
+  - name: JoinLobbyResponse
+    type: 304
+  - name: PlayerLobbyJoined
+    type: 305
+    fields:
+      - name: PlayerName
+        type: string
+  - name: ListLobbyPlayers
+    type: 206
+    action: true
+    contexts:
+      - LobbyContext
+  - name: ListLobbyPlayersResponse
+    type: 306
+    fields:
+      - name: Players
+        type: "[]string"
+  - name: StartGame
+    action: true
+    type: 207
+    contexts:
+      - LobbyContext
+  - name: StartGameResponse
+    type: 307
+  - name: PlayerMove
+    type: 400
+    fields:
+      - name: PlayerName
+        type: string
+      - name: PosX
+        type: int
+      - name: PosY
+        type: int
+      - name: VelocityX
+        type: float64
+      - name: VelocityY
+        type: float64
+      - name: Rotation
+        type: float64
+    contexts:
+      - InGameContext
+  - name: UpdateState
+    type: 500
+    fields:
+      - name: GameTree
+        type: "interface{}"

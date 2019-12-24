@@ -15,11 +15,13 @@ type Player interface {
 	SetName(name string)
 	GetContext() PlayerContext
 	SetContext(ctx PlayerContext)
-	SetConnectedLobby(*Lobby)
 	GetConnectedLobby() *Lobby
+	SetConnectedLobby(*Lobby)
+	GetGameServer() GameServer
+	SetGameServer(gs GameServer)
 }
 
 type PlayerMessage interface {
 	GetMessage() *tcp.ClientMessage
-	GetPlayer()  Player
+	GetPlayer() Player
 }

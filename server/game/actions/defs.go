@@ -12,12 +12,13 @@ import (
 const (
 	DefaultContext      = interfaces.PlayerContext(0)
 	LoggedInMenuContext = interfaces.PlayerContext(1)
+	LobbyContext        = interfaces.PlayerContext(2)
 )
 
 type KeepAliveAction struct{}
 
 func (a KeepAliveAction) GetPlayerContexts() []interfaces.PlayerContext {
-	return []interfaces.PlayerContext{DefaultContext, LoggedInMenuContext}
+	return []interfaces.PlayerContext{DefaultContext, LoggedInMenuContext, LobbyContext}
 }
 
 func (a KeepAliveAction) GetMessage() protocol.Message {
@@ -64,10 +65,43 @@ func (a ListLobbiesAction) GetMessage() protocol.Message {
 	return protocol.ListLobbiesMessage{}
 }
 
+type JoinLobbyAction struct{}
+
+func (a JoinLobbyAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LoggedInMenuContext}
+}
+
+func (a JoinLobbyAction) GetMessage() protocol.Message {
+	return protocol.JoinLobbyMessage{}
+}
+
+type ListLobbyPlayersAction struct{}
+
+func (a ListLobbyPlayersAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LobbyContext}
+}
+
+func (a ListLobbyPlayersAction) GetMessage() protocol.Message {
+	return protocol.ListLobbyPlayersMessage{}
+}
+
+type StartGameAction struct{}
+
+func (a StartGameAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LobbyContext}
+}
+
+func (a StartGameAction) GetMessage() protocol.Message {
+	return protocol.StartGameMessage{}
+}
+
 func RegisterAllActions(actionDefinition *ActionDefinition) {
 	actionDefinition.Register(KeepAliveAction{})
 	actionDefinition.Register(AuthenticateAction{})
 	actionDefinition.Register(CreateLobbyAction{})
 	actionDefinition.Register(DeleteLobbyAction{})
 	actionDefinition.Register(ListLobbiesAction{})
+	actionDefinition.Register(JoinLobbyAction{})
+	actionDefinition.Register(ListLobbyPlayersAction{})
+	actionDefinition.Register(StartGameAction{})
 }
