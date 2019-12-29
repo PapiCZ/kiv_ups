@@ -4,6 +4,7 @@ import (
 	"kiv_ups_server/game/interfaces"
 	"kiv_ups_server/net/tcp"
 	"math/rand"
+	"time"
 )
 
 type Player struct {
@@ -13,6 +14,7 @@ type Player struct {
 	Context        interfaces.PlayerContext
 	ConnectedLobby *interfaces.Lobby
 	GameServer     interfaces.GameServer
+	LastKeepAlive  int64
 }
 
 func NewPlayer(client *tcp.Client, name string, context interfaces.PlayerContext) Player {
@@ -31,6 +33,10 @@ func NewShadowPlayer(client *tcp.Client, name string, context interfaces.PlayerC
 		Name:      name,
 		Context:   context,
 	}
+}
+
+func (p *Player) SetTCPClient(tcpClient *tcp.Client) {
+	p.tcpClient = tcpClient
 }
 
 func (p *Player) GetTCPClient() *tcp.Client {
@@ -75,4 +81,12 @@ func (p *Player) SetGameServer(gs interfaces.GameServer) {
 
 func (p *Player) GetGameServer() interfaces.GameServer {
 	return p.GameServer
+}
+
+func (p *Player) IsConnected() bool {
+	return time.Now().Unix() < p.LastKeepAlive + 2
+}
+
+func (p *Player) RefreshKeepAlive() {
+	p.LastKeepAlive = time.Now().Unix()
 }

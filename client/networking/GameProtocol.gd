@@ -61,6 +61,7 @@ func decode(buff):
 		offset += 1
 
 	# Read JSON
+	# print(len(buff.subarray(offset, offset + json_len - 1).get_string_from_utf8()))
 	var json_result = JSON.parse(buff.subarray(offset, offset + json_len - 1).get_string_from_utf8())
 	if json_result.error == OK:
 		proto_message = ProtoMessage.new()

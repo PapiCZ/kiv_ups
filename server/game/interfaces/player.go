@@ -9,6 +9,7 @@ type PlayerUID int
 
 type Player interface {
 	GetTCPClient() *tcp.Client
+	SetTCPClient(*tcp.Client)
 	GetUID() PlayerUID
 	SetUID(uid PlayerUID)
 	GetName() string
@@ -19,6 +20,8 @@ type Player interface {
 	SetConnectedLobby(*Lobby)
 	GetGameServer() GameServer
 	SetGameServer(gs GameServer)
+	IsConnected() bool
+	RefreshKeepAlive()
 }
 
 type PlayerMessage interface {

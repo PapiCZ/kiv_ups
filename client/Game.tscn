@@ -22,7 +22,7 @@ scroll_following = true
 script = ExtResource( 2 )
 
 [node name="FormBase" parent="." instance=ExtResource( 3 )]
-position = Vector2( 22, -45 )
+position = Vector2( 2.57378, 0.327881 )
 
 [node name="NetworkStatus" type="Node2D" parent="."]
 position = Vector2( 1860, 20 )

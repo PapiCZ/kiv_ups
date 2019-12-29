@@ -117,10 +117,60 @@ func (m StartGameResponseMessage) GetTypeId() MessageType {
 	return 307
 }
 
+type LobbyPlayerConnectedMessage struct {
+	Name string `json:"name"`
+}
+
+func (m LobbyPlayerConnectedMessage) GetTypeId() MessageType {
+	return 308
+}
+
+type LobbyPlayerDisconnectedMessage struct {
+	Name string `json:"name"`
+}
+
+func (m LobbyPlayerDisconnectedMessage) GetTypeId() MessageType {
+	return 309
+}
+
+type GameEndMessage struct {
+	ScoreSummary interface{} `json:"score_summary"`
+}
+
+func (m GameEndMessage) GetTypeId() MessageType {
+	return 310
+}
+
+type GameReconnectAvailableMessage struct{}
+
+func (m GameReconnectAvailableMessage) GetTypeId() MessageType {
+	return 211
+}
+
+type GameReconnectAvailableResponseMessage struct {
+	Available bool `json:"available"`
+}
+
+func (m GameReconnectAvailableResponseMessage) GetTypeId() MessageType {
+	return 311
+}
+
+type ReconnectMessage struct{}
+
+func (m ReconnectMessage) GetTypeId() MessageType {
+	return 212
+}
+
+type ReconnectResponseMessage struct{}
+
+func (m ReconnectResponseMessage) GetTypeId() MessageType {
+	return 312
+}
+
 type PlayerMoveMessage struct {
 	PlayerName string  `json:"player_name"`
-	PosX       int     `json:"pos_x"`
-	PosY       int     `json:"pos_y"`
+	PosX       float64 `json:"pos_x"`
+	PosY       float64 `json:"pos_y"`
 	VelocityX  float64 `json:"velocity_x"`
 	VelocityY  float64 `json:"velocity_y"`
 	Rotation   float64 `json:"rotation"`
@@ -130,12 +180,26 @@ func (m PlayerMoveMessage) GetTypeId() MessageType {
 	return 400
 }
 
+type ShootProjectileMessage struct{}
+
+func (m ShootProjectileMessage) GetTypeId() MessageType {
+	return 401
+}
+
 type UpdateStateMessage struct {
 	GameTree interface{} `json:"game_tree"`
 }
 
 func (m UpdateStateMessage) GetTypeId() MessageType {
 	return 500
+}
+
+type PlayerDisconnectedMessage struct {
+	PlayerName string `json:"player_name"`
+}
+
+func (m PlayerDisconnectedMessage) GetTypeId() MessageType {
+	return 501
 }
 
 func RegisterAllMessages(definition *Definition) {
@@ -155,6 +219,15 @@ func RegisterAllMessages(definition *Definition) {
 	definition.Register(ListLobbyPlayersResponseMessage{})
 	definition.Register(StartGameMessage{})
 	definition.Register(StartGameResponseMessage{})
+	definition.Register(LobbyPlayerConnectedMessage{})
+	definition.Register(LobbyPlayerDisconnectedMessage{})
+	definition.Register(GameEndMessage{})
+	definition.Register(GameReconnectAvailableMessage{})
+	definition.Register(GameReconnectAvailableResponseMessage{})
+	definition.Register(ReconnectMessage{})
+	definition.Register(ReconnectResponseMessage{})
 	definition.Register(PlayerMoveMessage{})
+	definition.Register(ShootProjectileMessage{})
 	definition.Register(UpdateStateMessage{})
+	definition.Register(PlayerDisconnectedMessage{})
 }

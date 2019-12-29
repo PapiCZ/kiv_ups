@@ -95,6 +95,26 @@ func (a StartGameAction) GetMessage() protocol.Message {
 	return protocol.StartGameMessage{}
 }
 
+type GameReconnectAvailableAction struct{}
+
+func (a GameReconnectAvailableAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LoggedInMenuContext}
+}
+
+func (a GameReconnectAvailableAction) GetMessage() protocol.Message {
+	return protocol.GameReconnectAvailableMessage{}
+}
+
+type ReconnectAction struct{}
+
+func (a ReconnectAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LoggedInMenuContext}
+}
+
+func (a ReconnectAction) GetMessage() protocol.Message {
+	return protocol.ReconnectMessage{}
+}
+
 func RegisterAllActions(actionDefinition *ActionDefinition) {
 	actionDefinition.Register(KeepAliveAction{})
 	actionDefinition.Register(AuthenticateAction{})
@@ -104,4 +124,6 @@ func RegisterAllActions(actionDefinition *ActionDefinition) {
 	actionDefinition.Register(JoinLobbyAction{})
 	actionDefinition.Register(ListLobbyPlayersAction{})
 	actionDefinition.Register(StartGameAction{})
+	actionDefinition.Register(GameReconnectAvailableAction{})
+	actionDefinition.Register(ReconnectAction{})
 }

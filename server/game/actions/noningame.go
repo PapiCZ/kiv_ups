@@ -12,6 +12,7 @@ func (a KeepAliveAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 	keepAliveData := m.GetMessage().Message.(*protocol.KeepAliveMessage)
 
 	if keepAliveData.Ping == "pong" {
+		m.GetPlayer().RefreshKeepAlive()
 		return ActionResponse{
 			ServerMessage: tcp.ServerMessage{
 				Data:    &protocol.KeepAliveMessage{Ping: "ping-pong"},
@@ -34,8 +35,19 @@ func (a KeepAliveAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 
 func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	authenticateData := m.GetMessage().Message.(*protocol.AuthenticateMessage)
-	s.Authenticate(ConvertShadowPlayerToPlayer(m.GetPlayer(), authenticateData.Name))
-	m.GetPlayer().SetContext(LoggedInMenuContext)
+	connectedPlayer := m.GetPlayer()
+
+	// Reconnect?
+	for _, player := range s.GetPlayers() {
+		if player.GetName() == authenticateData.Name {
+			player.SetTCPClient(m.GetPlayer().GetTCPClient())
+			connectedPlayer = player
+			break
+		}
+	}
+
+	s.Authenticate(ConvertShadowPlayerToPlayer(connectedPlayer, authenticateData.Name))
+	connectedPlayer.SetContext(LoggedInMenuContext)
 
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
@@ -150,6 +162,12 @@ func (a JoinLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 		}
 	}
 
+	s.SendMessageWithoutRequest(tcp.ServerMessage{
+		Data:    &protocol.LobbyPlayerConnectedMessage{Name: m.GetPlayer().GetName()},
+		Status:  true,
+		Message: "",
+	}, lobby.GetPlayers()...)
+
 	lobby.AddPlayer(m.GetPlayer())
 	m.GetPlayer().SetContext(LobbyContext)
 	m.GetPlayer().SetConnectedLobby(lobby)
@@ -185,7 +203,34 @@ func (a ListLobbyPlayersAction) Process(s interfaces.MasterServer, m interfaces.
 
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
-			Data:    &protocol.ListLobbyPlayersResponseMessage{Players:playerNames},
+			Data:    &protocol.ListLobbyPlayersResponseMessage{Players: playerNames},
+			Status:  true,
+			Message: "",
+		},
+		Targets: []interfaces.Player{m.GetPlayer()},
+	}
+}
+
+func (a GameReconnectAvailableAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
+	return ActionResponse{
+		ServerMessage: tcp.ServerMessage{
+			Data: &protocol.GameReconnectAvailableResponseMessage{
+				Available: m.GetPlayer().GetGameServer() != nil,
+			},
+			Status:  true,
+			Message: "",
+		},
+		Targets: []interfaces.Player{m.GetPlayer()},
+	}
+}
+
+
+func (a ReconnectAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
+	return ActionResponse{
+		ServerMessage: tcp.ServerMessage{
+			Data: &protocol.GameReconnectAvailableResponseMessage{
+				Available: m.GetPlayer().GetGameServer() != nil,
+			},
 			Status:  true,
 			Message: "",
 		},

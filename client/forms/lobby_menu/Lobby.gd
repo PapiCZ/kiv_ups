@@ -3,12 +3,11 @@ extends VBoxContainer
 var lobby_name
 var InGame = preload("res://InGame.tscn")
 
-onready var Spaceship = preload("res://objects/SpaceShip.tscn")
-
 func _load():
 	Network.send({}, MessageTypes.LIST_LOBBY_PLAYERS, self, "_on_lobby_players_loaded")
 
 	Network.connect_message(MessageTypes.START_GAME_RESPONSE, self, "_start_game")
+	Network.connect_message(MessageTypes.LOBBY_PLAYER_CONNECTED, self, "_player_connected")
 
 func _on_lobby_players_loaded(data):
 	if data[0].response.status:
@@ -20,22 +19,25 @@ func _on_Start_pressed():
 	Network.send({}, MessageTypes.START_GAME, self, "_start_game")
 
 func _start_game(data):
-	Menu.hide_and_reset_stack()
-
+	Menu.hide_current()
+	
 	var ingame = InGame.instance()
-	var i = 0
-	for player in $FormContainer/PlayersContainer.players:
-		i += 1
-		var spaceship = Spaceship.instance()
-		spaceship.player_name = player.name
-		spaceship.position.x = 100 * i
-		spaceship.position.y = 500
-		ingame.add_child(spaceship)
-
+	ingame.set_name("InGame")
+	Network.connect_message(MessageTypes.UPDATE_STATE, ingame, "_update_state")
+	Network.connect_message(MessageTypes.GAME_END, self, "_end_game")
+	Network.connect_message(MessageTypes.PLAYER_DISCONNECTED, ingame, "_player_disconnected")
 	get_parent().get_parent().get_parent().add_child(ingame)
+
+func _player_connected(data):
+	$FormContainer/PlayersContainer.add_player(data[0].response.data.name)
 
 func _on_Back_pressed():
 	Network.send({
 		"name": lobby_name
 	}, MessageTypes.DELETE_LOBBY)
 	Menu.back()
+
+func _end_game(data):
+	get_tree().get_root().find_node("InGame", true, false).queue_free()
+	Menu.hide_and_reset_stack()
+	Menu.go(Menu.MENU_LEVEL.END_GAME)

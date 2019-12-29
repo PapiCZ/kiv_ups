@@ -58,7 +58,7 @@ func send(message, type, \
 	proto_message.request_id = Utils.random_request_id()
 
 	var data = GameProtocol.encode(proto_message)
-	network_debug.log("Sent %s" % data.get_string_from_utf8())
+	# network_debug.log("Sent %s" % data.get_string_from_utf8())
 
 	if response_callback_obj != null or timeout_callback_obj != null:
 		var pr = PendingRequest.new()
@@ -113,8 +113,12 @@ func recv_message_loop():
 			return
 
 		var available_bytes = client.get_available_bytes()
-		if available_bytes or len(buff):
+		var buff_len = len(buff)
+		if available_bytes or buff_len:
 			if available_bytes:
+				if buff_len + available_bytes > pow(2, 15):
+					available_bytes = pow(2, 15) - buff_len
+
 				var data_result = client.get_data(available_bytes)
 				mutex.unlock()
 				buff.append_array(data_result[1])
@@ -127,7 +131,7 @@ func recv_message_loop():
 			if proto_message == null:
 				continue
 
-			network_debug.log("Received: %d %s %s" % [proto_message.type, proto_message.request_id, proto_message.message])
+			# network_debug.log("Received: %d %s %s" % [proto_message.type, proto_message.request_id, proto_message.message])
 
 			mutex.lock()
 			if pending_requests.has(proto_message.request_id):
@@ -161,7 +165,7 @@ func recv_message_loop():
 					pr.response_time = OS.get_ticks_msec()
 					var response_args = [pr]
 					callback[0].call_deferred(callback[1], response_args)
-					pr.queue_free()
+					pr.call_deferred("free")
 
 			proto_message.queue_free()
 			mutex.unlock()
@@ -176,9 +180,9 @@ func recv_message_loop():
 func set_auth_data(username):
 	self.username = username
 
-func auth():
+func auth(response_callback_obj=null, response_callback_func=null):
 	mutex.lock()
-	send({"name": username}, MessageTypes.AUTHENTICATE)
+	send({"name": username}, MessageTypes.AUTHENTICATE, response_callback_obj, response_callback_func)
 	mutex.unlock()
 
 func start_thread(host, port):

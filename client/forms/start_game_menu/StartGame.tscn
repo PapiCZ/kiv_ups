@@ -52,3 +52,6 @@ margin_bottom = 300.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "Back"
+[connection signal="pressed" from="FormContainer/CreateLobby" to="." method="_on_CreateLobby_pressed"]
+[connection signal="pressed" from="FormContainer/JoinLobby" to="." method="_on_JoinLobby_pressed"]
+[connection signal="pressed" from="FormContainer/Back" to="." method="_on_Back_pressed"]

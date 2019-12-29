@@ -81,7 +81,6 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 
 		return nil
 	}
-
 	action := s.ActionDefinition.GetAction(message.Message.GetTypeId(), player.GetContext())
 
 	if action == nil {
@@ -106,6 +105,10 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 	s.SendMessage(sm, message.RequestId, actionResponse.Targets...)
 
 	return
+}
+
+func (s *Server) SendMessageWithoutRequest(sm tcp.ServerMessage, player ...interfaces.Player) {
+	s.SendMessage(sm, "", player...)
 }
 
 func (s *Server) SendMessage(sm tcp.ServerMessage, requestId protocol.RequestId, player ...interfaces.Player) {

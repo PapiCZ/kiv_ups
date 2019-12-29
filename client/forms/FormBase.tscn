@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://forms/Background.gd" type="Script" id=1]
-[ext_resource path="res://sprites/PIA17016.jpg" type="Texture" id=2]
+[ext_resource path="res://sprites/background.jpg" type="Texture" id=2]
 [ext_resource path="res://forms/FormWrapper.gd" type="Script" id=3]
 
 [node name="FormBase" type="Node2D"]
@@ -12,8 +12,8 @@ script = ExtResource( 1 )
 [node name="ParallaxBackground" type="ParallaxBackground" parent="Background"]
 
 [node name="Sprite" type="Sprite" parent="Background/ParallaxBackground"]
-position = Vector2( 793.374, 636.891 )
-scale = Vector2( 0.503907, 0.503907 )
+position = Vector2( 977.977, 599.801 )
+scale = Vector2( 0.329969, 0.329969 )
 texture = ExtResource( 2 )
 
 [node name="AsteroidParent" type="Node2D" parent="Background/ParallaxBackground"]

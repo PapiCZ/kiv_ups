@@ -8,7 +8,8 @@ enum MENU_LEVEL {
 	START_GAME,
 	CREATE_LOBBY,
 	LOBBY,
-	JOIN_LOBBY
+	JOIN_LOBBY,
+	END_GAME,
 }
 
 var menus = {
@@ -18,6 +19,7 @@ var menus = {
 	MENU_LEVEL.CREATE_LOBBY : preload("res://forms/create_lobby_menu/CreateLobby.tscn").instance(),
 	MENU_LEVEL.LOBBY : preload("res://forms/lobby_menu/Lobby.tscn").instance(),
 	MENU_LEVEL.JOIN_LOBBY : preload("res://forms/join_lobby_menu/JoinLobby.tscn").instance(),
+	MENU_LEVEL.END_GAME : preload("res://forms/end_game_menu/EndGame.tscn").instance(),
 }
 
 var menu_stack = []
@@ -42,6 +44,10 @@ func reset(menu):
 	menus[menu] = menu_obj
 	emit_signal("menu_added", menu_obj)
 
+func reset_all():
+	for menu in menus:
+		reset(menu)
+
 func go(menu):
 	var menu_obj = get(menu)
 	menu_stack.append(menu_obj)
@@ -51,6 +57,18 @@ func back():
 	if len(menu_stack) >= 2:
 		menu_stack.pop_back()
 		emit_signal("change_menu", menu_stack.back())
+
+func hide(menu):
+	menu.visible = false
+
+func hide_current():
+	hide(menu_stack[len(menu_stack) - 1])
+
+func show(menu):
+	menu.visible = true
+
+func show_current():
+	show(menu_stack[len(menu_stack) - 1])
 
 func hide_and_reset_stack():
 	menu_stack = []

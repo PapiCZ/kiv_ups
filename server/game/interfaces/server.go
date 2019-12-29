@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"kiv_ups_server/net/tcp"
+	"kiv_ups_server/net/tcp/protocol"
 )
 
 type Lobby struct {
@@ -45,6 +46,8 @@ type MasterServer interface {
 	GetLobby(name string) (*Lobby, error)
 	GetLobbies() []*Lobby
 	AddGameServer(server GameServer)
+	SendMessageWithoutRequest(sm tcp.ServerMessage, player ...Player)
+	SendMessage(sm tcp.ServerMessage, requestId protocol.RequestId, player ...Player)
 }
 
 type GameServer interface {
