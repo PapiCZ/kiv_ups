@@ -24,11 +24,12 @@ func _connect_lobby(lobby_name):
 
 
 func _on_lobby_connected(data):
-	var menu = Menu.get(Menu.MENU_LEVEL.LOBBY, false)
-	menu.lobby_name = data[1]
-	menu.get_node("Label").text = "Lobby " + data[1]
-	Menu.go(Menu.MENU_LEVEL.LOBBY)
-	Menu.reset(Menu.MENU_LEVEL.LOBBY)
+	if data[0].response.status:
+		var menu = Menu.get(Menu.MENU_LEVEL.LOBBY, false)
+		menu.lobby_name = data[1]
+		menu.get_node("Label").text = "Lobby " + data[1]
+		Menu.go(Menu.MENU_LEVEL.LOBBY)
+		Menu.reset(Menu.MENU_LEVEL.LOBBY)
 
 func _on_Back_pressed():
 	Menu.back()

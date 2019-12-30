@@ -8,12 +8,14 @@ func _load():
 
 	Network.connect_message(MessageTypes.START_GAME_RESPONSE, self, "_start_game")
 	Network.connect_message(MessageTypes.LOBBY_PLAYER_CONNECTED, self, "_player_connected")
+	Network.connect_message(MessageTypes.LOBBY_PLAYER_DISCONNECTED, self, "_player_disconnected")
 	Network.connect("disconnected", self, "_network_disconnected", [], Network.CONNECT_ONESHOT)
 
 func _network_disconnected():
 	print("network_error")
 	Network.disconnect_message(MessageTypes.START_GAME_RESPONSE)
 	Network.disconnect_message(MessageTypes.LOBBY_PLAYER_CONNECTED)
+	Network.disconnect_message(MessageTypes.LOBBY_PLAYER_DISCONNECTED)
 	Menu.go(Menu.MENU_LEVEL.MAIN)
 
 func _on_lobby_players_loaded(data):
@@ -28,6 +30,7 @@ func _on_Start_pressed():
 func _start_game(data):
 	Network.disconnect_message(MessageTypes.START_GAME_RESPONSE)
 	Network.disconnect_message(MessageTypes.LOBBY_PLAYER_CONNECTED)
+	Network.disconnect_message(MessageTypes.LOBBY_PLAYER_DISCONNECTED)
 
 	Menu.hide_current()
 	
@@ -41,10 +44,11 @@ func _start_game(data):
 func _player_connected(data):
 	$FormContainer/PlayersContainer.add_player(data[0].response.data.name)
 
+func _player_disconnected(data):
+	$FormContainer/PlayersContainer.remove_player(data[0].response.data.name)
+
 func _on_Back_pressed():
-	Network.send({
-		"name": lobby_name
-	}, MessageTypes.DELETE_LOBBY)
+	Network.send({}, MessageTypes.LEAVE_LOBBY)
 	Menu.back()
 
 func _end_game(data):

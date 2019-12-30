@@ -179,6 +179,18 @@ func (m LeaveGameResponseMessage) GetTypeId() MessageType {
 	return 313
 }
 
+type LeaveLobbyMessage struct{}
+
+func (m LeaveLobbyMessage) GetTypeId() MessageType {
+	return 214
+}
+
+type LeaveLobbyResponseMessage struct{}
+
+func (m LeaveLobbyResponseMessage) GetTypeId() MessageType {
+	return 314
+}
+
 type PlayerMoveMessage struct {
 	PlayerName string  `json:"player_name"`
 	PosX       float64 `json:"pos_x"`
@@ -240,6 +252,8 @@ func RegisterAllMessages(definition *Definition) {
 	definition.Register(ReconnectResponseMessage{})
 	definition.Register(LeaveGameMessage{})
 	definition.Register(LeaveGameResponseMessage{})
+	definition.Register(LeaveLobbyMessage{})
+	definition.Register(LeaveLobbyResponseMessage{})
 	definition.Register(PlayerMoveMessage{})
 	definition.Register(ShootProjectileMessage{})
 	definition.Register(UpdateStateMessage{})

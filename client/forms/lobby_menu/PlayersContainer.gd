@@ -2,11 +2,7 @@ extends HBoxContainer
 
 var players = []
 
-func add_player(player_name):
-	players.append({
-		"name": player_name
-	})
-	
+func add_player(player_name):	
 	var player_container = VBoxContainer.new()
 	
 	var icon = TextureRect.new()
@@ -20,3 +16,15 @@ func add_player(player_name):
 	player_container.add_child(player_name_label)
 
 	add_child(player_container)
+
+	players.append({
+		"name": player_name,
+		"node": player_container
+	})
+
+func remove_player(player_name):
+	for player in players:
+		if player_name == player.name:
+			players.erase(player)
+			player.node.queue_free()
+			break

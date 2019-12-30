@@ -42,7 +42,7 @@ func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.Play
 		if player.GetName() == authenticateData.Name {
 			player.SetTCPClient(m.GetPlayer().GetTCPClient())
 			connectedPlayer = player
-			if !player.GetGameServer().IsRunning() {
+			if player.GetGameServer() != nil && !player.GetGameServer().IsRunning() {
 				player.SetGameServer(nil)
 				player.SetConnectedLobby(nil)
 			}
@@ -155,7 +155,7 @@ func (a ListLobbiesAction) Process(s interfaces.MasterServer, m interfaces.Playe
 func (a JoinLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	joinLobbyData := m.GetMessage().Message.(*protocol.JoinLobbyMessage)
 	lobby, err := s.GetLobby(joinLobbyData.Name)
-	if err != nil {
+	if err != nil || len(lobby.Players) >= lobby.PlayersLimit {
 		return ActionResponse{
 			ServerMessage: tcp.ServerMessage{
 				Data:    &protocol.JoinLobbyResponseMessage{},
@@ -179,6 +179,43 @@ func (a JoinLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
 			Data:    &protocol.JoinLobbyResponseMessage{},
+			Status:  true,
+			Message: "",
+		},
+		Targets: []interfaces.Player{m.GetPlayer()},
+	}
+}
+
+func (a LeaveLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
+	playerLobby := m.GetPlayer().GetConnectedLobby()
+	if playerLobby == nil {
+		return ActionResponse{
+			ServerMessage: tcp.ServerMessage{
+				Data:    &protocol.LeaveLobbyResponseMessage{},
+				Status:  false,
+				Message: "",
+			},
+			Targets: []interfaces.Player{m.GetPlayer()},
+		}
+	}
+
+	playerLobby.RemovePlayer(m.GetPlayer())
+	m.GetPlayer().SetConnectedLobby(nil)
+	m.GetPlayer().SetContext(LoggedInMenuContext)
+
+	if len(playerLobby.Players) == 0 {
+		s.DeleteLobby(playerLobby.Name)
+	} else {
+		s.SendMessageWithoutRequest(tcp.ServerMessage{
+			Data:    &protocol.LobbyPlayerDisconnectedMessage{Name: m.GetPlayer().GetName()},
+			Status:  true,
+			Message: "",
+		}, playerLobby.GetPlayers()...)
+	}
+
+	return ActionResponse{
+		ServerMessage: tcp.ServerMessage{
+			Data:    &protocol.LeaveLobbyResponseMessage{},
 			Status:  true,
 			Message: "",
 		},

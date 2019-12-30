@@ -11,15 +11,15 @@ import (
 
 const (
 	DefaultContext      = interfaces.PlayerContext(0)
-	InGameContext       = interfaces.PlayerContext(1)
-	LoggedInMenuContext = interfaces.PlayerContext(2)
-	LobbyContext        = interfaces.PlayerContext(3)
+	LoggedInMenuContext = interfaces.PlayerContext(1)
+	LobbyContext        = interfaces.PlayerContext(2)
+	InGameContext       = interfaces.PlayerContext(3)
 )
 
 type KeepAliveAction struct{}
 
 func (a KeepAliveAction) GetPlayerContexts() []interfaces.PlayerContext {
-	return []interfaces.PlayerContext{DefaultContext, InGameContext, LoggedInMenuContext, LobbyContext}
+	return []interfaces.PlayerContext{DefaultContext, LoggedInMenuContext, LobbyContext, InGameContext}
 }
 
 func (a KeepAliveAction) GetMessage() protocol.Message {
@@ -126,6 +126,16 @@ func (a LeaveGameAction) GetMessage() protocol.Message {
 	return protocol.LeaveGameMessage{}
 }
 
+type LeaveLobbyAction struct{}
+
+func (a LeaveLobbyAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LobbyContext}
+}
+
+func (a LeaveLobbyAction) GetMessage() protocol.Message {
+	return protocol.LeaveLobbyMessage{}
+}
+
 func RegisterAllActions(actionDefinition *ActionDefinition) {
 	actionDefinition.Register(KeepAliveAction{})
 	actionDefinition.Register(AuthenticateAction{})
@@ -138,4 +148,5 @@ func RegisterAllActions(actionDefinition *ActionDefinition) {
 	actionDefinition.Register(GameReconnectAvailableAction{})
 	actionDefinition.Register(ReconnectAction{})
 	actionDefinition.Register(LeaveGameAction{})
+	actionDefinition.Register(LeaveLobbyAction{})
 }

@@ -127,6 +127,13 @@ messages:
       - InGameContext
   - name: LeaveGameResponse
     type: 313
+  - name: LeaveLobby
+    action: true
+    type: 214
+    contexts:
+      - LobbyContext
+  - name: LeaveLobbyResponse
+    type: 314
   - name: PlayerMove
     type: 400
     fields:

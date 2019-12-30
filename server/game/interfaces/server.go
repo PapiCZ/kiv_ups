@@ -16,6 +16,10 @@ func (l *Lobby) AddPlayer(player Player) {
 	l.Players[player.GetUID()] = player
 }
 
+func (l *Lobby) RemovePlayer(player Player) {
+	delete(l.Players, player.GetUID())
+}
+
 func (l *Lobby) GetPlayers() []Player {
 	players := make([]Player, 0)
 
