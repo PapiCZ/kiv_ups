@@ -218,6 +218,7 @@ func (s *Server) Kick(clientMessageChan chan ClientMessage, client *Client) {
 	close(client.MessageChan)
 	_ = client.decodeReader.Close()
 	_ = client.decodeWriter.Close()
+	_ = syscall.Close(client.TCP.FD)
 
 	delete(s.Clients, client.TCP.FD)
 }

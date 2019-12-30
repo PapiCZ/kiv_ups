@@ -21,12 +21,17 @@ func encode(proto_message):
 func decode(buff):
 	var proto_message = null
 	var offset = 0
+	var buff_len = len(buff)
 
 	# Read delimiter
+	if offset >= buff_len:
+		return [null, null]
 	if buff[offset] == DELIMITER_CHARACTER:
 		offset += 1
 	
 	# Read message type
+	if offset >= buff_len:
+		return [null, null]
 	var ascii_number = read_ascii_number_until_delimiter(buff, offset)
 	if ascii_number[0] == null:
 		return [null, null]
@@ -34,10 +39,14 @@ func decode(buff):
 	var type = int(ascii_number[1].get_string_from_utf8())
 
 	# Read delimiter
+	if offset >= buff_len:
+		return [null, null]
 	if buff[offset] == DELIMITER_CHARACTER:
 		offset += 1
 
 	# Read JSON len
+	if offset >= buff_len:
+		return [null, null]
 	var json_len_ascii = read_ascii_number_until_delimiter(buff, offset)
 	if json_len_ascii[0] == null:
 		return [null, null]
@@ -45,10 +54,14 @@ func decode(buff):
 	var json_len = int(json_len_ascii[1].get_string_from_utf8())
 
 	# Read delimiter
+	if offset >= buff_len:
+		return [null, null]
 	if buff[offset] == DELIMITER_CHARACTER:
 		offset += 1
 
 	# Read request ID
+	if offset >= buff_len:
+		return [null, null]
 	var request_id_ascii = read_ascii_word_until_delimiter(buff, offset)
 	if request_id_ascii[0] == null:
 		return [null, null]
@@ -56,10 +69,14 @@ func decode(buff):
 	var request_id = request_id_ascii[1].get_string_from_utf8()
 
 	# Read delimiter
+	if offset >= buff_len:
+		return [null, null]
 	if buff[0] == DELIMITER_CHARACTER:
 		offset += 1
 
 	# Read JSON
+	if offset >= buff_len:
+		return [null, null]
 	if offset + json_len - 1 >= len(buff):
 		return [null, null]
 

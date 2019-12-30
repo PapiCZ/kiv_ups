@@ -25,15 +25,23 @@ align = 1
 margin_left = 147.0
 margin_top = 306.0
 margin_right = 1147.0
-margin_bottom = 888.0
+margin_bottom = 956.0
 rect_min_size = Vector2( 1000, 140 )
 size_flags_horizontal = 4
 size_flags_vertical = 0
 custom_constants/separation = 20
 
-[node name="PanelContainer" type="PanelContainer" parent="FormContainer"]
+[node name="Refresh" type="Button" parent="FormContainer"]
+margin_left = 785.0
 margin_right = 1000.0
-margin_bottom = 514.0
+margin_bottom = 48.0
+size_flags_horizontal = 8
+text = "Refresh"
+
+[node name="PanelContainer" type="PanelContainer" parent="FormContainer"]
+margin_top = 68.0
+margin_right = 1000.0
+margin_bottom = 582.0
 
 [node name="ScrollContainer" type="ScrollContainer" parent="FormContainer/PanelContainer"]
 margin_left = 7.0
@@ -54,9 +62,10 @@ size_flags_vertical = 3
 custom_constants/separation = 10
 
 [node name="Back" type="Button" parent="FormContainer"]
-margin_top = 534.0
+margin_top = 602.0
 margin_right = 1000.0
-margin_bottom = 582.0
+margin_bottom = 650.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "Back"
+[connection signal="pressed" from="FormContainer/Refresh" to="." method="_on_Refresh_pressed"]

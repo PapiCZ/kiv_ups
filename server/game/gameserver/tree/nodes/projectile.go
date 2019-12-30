@@ -4,7 +4,6 @@ import (
 	"kiv_ups_server/game/gameserver/tree"
 	"kiv_ups_server/game/interfaces"
 	"kiv_ups_server/net/tcp/protocol"
-	"math"
 )
 
 type Projectile struct {
@@ -30,11 +29,17 @@ func (p *Projectile) Process(playerMessages []interfaces.PlayerMessage, delta fl
 		return
 	}
 
+	// Check collision with asteroid
 	for _, node := range p.Node.GetRoot().FindAllChildrenByType("asteroid") {
 		asteroid := node.Value.(*Asteroid)
-		result := math.Sqrt(math.Pow(p.PosX-asteroid.PosX, 2) + math.Pow(p.PosY-asteroid.PosY, 2))
 
-		if result < 100*asteroid.Scale {
+		asteroidCollider := Circle{
+			asteroid.PosX,
+			asteroid.PosY,
+			asteroid.Radius,
+		}
+
+		if asteroidCollider.IsPointInside(p.PosX, p.PosY) {
 			node.Destroy()
 			p.Node.Destroy()
 			p.AddPlayerScore(p.Player, asteroid.Value)
@@ -74,9 +79,33 @@ func (p *Projectile) Process(playerMessages []interfaces.PlayerMessage, delta fl
 				node.Parent.Children = append(node.Parent.Children, &node2)
 			}
 
-			return
+			break
 		}
 	}
+
+	// Check collision with enemy spaceship
+	for _, node := range p.Node.GetRoot().FindAllChildrenByType("spaceship") {
+		spaceship := node.Value.(*Spaceship)
+
+		if spaceship.Player == p.Player {
+			// Player cant kill himself
+			continue
+		}
+
+		spaceshipCollider := Circle{
+			spaceship.PosX,
+			spaceship.PosY,
+			spaceship.Radius,
+		}
+
+		if spaceshipCollider.IsPointInside(p.PosX, p.PosY) {
+			spaceship.Die()
+			p.AddPlayerScor e(p.Player, 1000)
+
+			break
+		}
+	}
+
 }
 
 func (p *Projectile) AddPlayerScore(player interfaces.Player, score int) {

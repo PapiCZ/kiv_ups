@@ -34,3 +34,8 @@ func _on_lobby_connected(data):
 func _on_Back_pressed():
 	Menu.back()
 	Menu.reset(Menu.MENU_LEVEL.JOIN_LOBBY)
+
+func _on_Refresh_pressed():
+	for i in range(0, $FormContainer/PanelContainer/ScrollContainer/LobbyList.get_child_count()):
+		$FormContainer/PanelContainer/ScrollContainer/LobbyList.get_child(i).queue_free()
+	Network.send({}, MessageTypes.LIST_LOBBIES, self, "_on_lobbies_loaded")

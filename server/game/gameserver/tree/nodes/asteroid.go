@@ -87,12 +87,14 @@ type Asteroid struct {
 	Rotation  float64    `json:"rotation"`
 	Scale     float64    `json:"scale"`
 	Value     int        `json:"value"`
+	Radius    float64    `json:"-"`
 	Node      *tree.Node `json:"-"`
 }
 
 func (a *Asteroid) Init(node *tree.Node) {
 	a.Node = node
-	a.Value = int(100 * a.Scale) * 100
+	a.Value = int(100 * a.Scale)
+	a.Radius = 100 * a.Scale
 }
 
 func (a *Asteroid) Process(playerMessages []interfaces.PlayerMessage, delta float64) {

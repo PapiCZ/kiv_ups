@@ -22,6 +22,7 @@ var GameProtocol = preload("res://networking/GameProtocol.gd").new()
 var ProtoMessage = preload("res://networking/ProtoMessage.gd")
 var KeepAlive = preload("res://networking/KeepAlive.gd").new()
 var Utils = preload("res://networking/Utils.gd")
+
 onready var status_sprite = get_tree().get_root().get_node("Game/NetworkStatus/Sprite")
 onready var network_debug = get_tree().get_root().get_node("Game/NetworkDebug")
 onready var network_ping = get_tree().get_root().get_node("Game/NetworkPing")
@@ -90,7 +91,9 @@ func send(message, type, \
 		if client.get_status() != 2:
 			pr.request.queue_free()
 			pr._timeout_timer.queue_free()
-			pr.queue_free()
+			if pr._timeout_callback_obj != null and pr._timeout_callback_func != null:
+				pr._timeout_callback_obj.call_deferred(pr._timeout_callback_func, _timeout_args)
+			pr.call_deferred("free")
 			return
 
 		mutex.lock()

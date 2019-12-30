@@ -26,3 +26,13 @@ func (v Vector) Rotated(rad float64) Vector {
 
 	return v
 }
+
+type Circle struct {
+	X      float64
+	Y      float64
+	Radius float64
+}
+
+func (c Circle) IsPointInside(x float64, y float64) bool {
+	return c.Radius > math.Sqrt(math.Pow(c.X-x, 2)+math.Pow(c.Y-y, 2))
+}

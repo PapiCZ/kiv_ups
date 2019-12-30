@@ -64,6 +64,15 @@ func create_spaceship(node):
 	return spaceship
 
 func update_spaceship(spaceship, node):
+	if node.value.reload_position:
+		spaceship.position = Vector2(node.value.pos_x, node.value.pos_y)
+		spaceship.speed = 0
+
+	if node.value.immune:
+		spaceship.modulate = Color(1, 1, 1, 0.5)
+	else:
+		spaceship.modulate = Color(1, 1, 1, 1)
+
 	if node.value.player_name == Network.username:
 		return
 
