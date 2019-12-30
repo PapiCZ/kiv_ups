@@ -53,6 +53,7 @@ type MasterServer interface {
 type GameServer interface {
 	Start()
 	AddPlayer(player Player)
+	RemovePlayer(player Player)
 	GetPlayers() []Player
 	GetRequestMessageChan() chan PlayerMessage
 }

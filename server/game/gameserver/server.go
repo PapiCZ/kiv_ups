@@ -1,6 +1,7 @@
 package gameserver
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"kiv_ups_server/game/gameserver/tree"
 	"kiv_ups_server/game/gameserver/tree/nodes"
@@ -158,6 +159,8 @@ func (gs *GameServer) ManageGame() {
 
 			for _, player := range gs.Players {
 				player.SetGameServer(nil)
+				player.SetLoggedInMenuContext()
+				player.SetConnectedLobby(nil)
 				_ = player.GetTCPClient().Send(protocol.ProtoMessage{
 					Message: &tcp.ServerMessage{
 						Data:    protocol.GameEndMessage{ScoreSummary: scoreSummary},
@@ -193,7 +196,42 @@ func (gs *GameServer) shareState() {
 
 func (gs *GameServer) AddPlayer(player interfaces.Player) {
 	gs.Players = append(gs.Players, player)
+	player.SetLoggedInMenuContext()
 	player.SetGameServer(gs)
+}
+
+func (gs *GameServer) RemovePlayer(player interfaces.Player) {
+	for i, _player := range gs.Players {
+		if player == _player {
+			gs.Players = append(gs.Players[:i], gs.Players[i+1:]...)
+		}
+	}
+
+	// remove spaceship if game has already started
+	if gs.Run {
+		for _, node := range gs.GameTree.FindAllChildrenByType("spaceship") {
+			spaceship := node.Value.(*nodes.Spaceship)
+
+			if spaceship.Player == player {
+				node.Destroy()
+				break
+			}
+		}
+	}
+
+	// remove score if game has already started
+	if gs.Run {
+		for _, node := range gs.GameTree.FindAllChildrenByType("score") {
+			score := node.Value.(*nodes.Score)
+
+			fmt.Printf("%#v\n", score)
+
+			if score.Player == player {
+				node.Destroy()
+				break
+			}
+		}
+	}
 }
 
 func (gs *GameServer) GetPlayers() []interfaces.Player {
@@ -244,5 +282,5 @@ func FilterMessagesByTypes(playerMessages []interfaces.PlayerMessage, types []pr
 type PlayerScoreSummary struct {
 	PlayerName string `json:"player_name"`
 	Score      int    `json:"score"`
-	Winner     bool
+	Winner     bool   `json:"winner"`
 }

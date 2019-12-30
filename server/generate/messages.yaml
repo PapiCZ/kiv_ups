@@ -119,6 +119,14 @@ messages:
       - LoggedInMenuContext
   - name: ReconnectResponse
     type: 312
+  - name: LeaveGame
+    type: 213
+    action: true
+    contexts:
+      - LoggedInMenuContext
+      - InGameContext
+  - name: LeaveGameResponse
+    type: 313
   - name: PlayerMove
     type: 400
     fields:

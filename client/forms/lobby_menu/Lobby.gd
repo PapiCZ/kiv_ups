@@ -19,6 +19,9 @@ func _on_Start_pressed():
 	Network.send({}, MessageTypes.START_GAME, self, "_start_game")
 
 func _start_game(data):
+	Network.disconnect_message(MessageTypes.START_GAME_RESPONSE)
+	Network.disconnect_message(MessageTypes.LOBBY_PLAYER_CONNECTED)
+
 	Menu.hide_current()
 	
 	var ingame = InGame.instance()
@@ -38,6 +41,11 @@ func _on_Back_pressed():
 	Menu.back()
 
 func _end_game(data):
+	Network.disconnect_message(MessageTypes.UPDATE_STATE)
+	Network.disconnect_message(MessageTypes.GAME_END)
+	Network.disconnect_message(MessageTypes.PLAYER_DISCONNECTED)
+
 	get_tree().get_root().find_node("InGame", true, false).queue_free()
-	Menu.hide_and_reset_stack()
+	Menu.reset_all()
+	Menu.get(Menu.MENU_LEVEL.END_GAME, false).score_summary = data[0].response.data.score_summary
 	Menu.go(Menu.MENU_LEVEL.END_GAME)

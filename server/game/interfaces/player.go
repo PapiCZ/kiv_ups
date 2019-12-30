@@ -20,8 +20,10 @@ type Player interface {
 	SetConnectedLobby(*Lobby)
 	GetGameServer() GameServer
 	SetGameServer(gs GameServer)
+	LeaveGame()
 	IsConnected() bool
 	RefreshKeepAlive()
+	SetLoggedInMenuContext()
 }
 
 type PlayerMessage interface {

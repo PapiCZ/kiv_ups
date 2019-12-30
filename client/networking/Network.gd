@@ -1,5 +1,8 @@
 extends Node
 
+signal disconnected
+signal connected
+
 var host = ""
 var port = 0
 
@@ -58,7 +61,7 @@ func send(message, type, \
 	proto_message.request_id = Utils.random_request_id()
 
 	var data = GameProtocol.encode(proto_message)
-	# network_debug.log("Sent %s" % data.get_string_from_utf8())
+	network_debug.log("Sent %s" % data.get_string_from_utf8())
 
 	if response_callback_obj != null or timeout_callback_obj != null:
 		var pr = PendingRequest.new()
@@ -72,24 +75,29 @@ func send(message, type, \
 		pr._timeout_callback_func = timeout_callback_func
 		pr._timeout_args = timeout_args
 
-		if pr._timeout != null:
-			pr._timeout_timer = Timer.new()
-			add_child(pr._timeout_timer)
-			pr._timeout_timer.set_wait_time(pr._timeout)
-			var _timeout_args = [pr]
-			if pr._timeout_args != null:
-				for arg in pr._timeout_args:
-					_timeout_args.append(arg)
-			if pr._timeout_callback_obj != null and pr._timeout_callback_func != null:
-				pr._timeout_timer.connect("timeout", pr._timeout_callback_obj, pr._timeout_callback_func, _timeout_args)
-			pr._timeout_timer.connect("timeout", self, "_on_RequestTimeoutTimer_timeout", [pr])
-			pr._timeout_timer.start()
+		pr._timeout_timer = Timer.new()
+		add_child(pr._timeout_timer)
+		pr._timeout_timer.set_wait_time(pr._timeout)
+		var _timeout_args = [pr]
+		if pr._timeout_args != null:
+			for arg in pr._timeout_args:
+				_timeout_args.append(arg)
+		if pr._timeout_callback_obj != null and pr._timeout_callback_func != null:
+			pr._timeout_timer.connect("timeout", pr._timeout_callback_obj, pr._timeout_callback_func, _timeout_args)
+		pr._timeout_timer.connect("timeout", self, "_on_RequestTimeoutTimer_timeout", [pr])
+		pr._timeout_timer.start()
+
+		if client.get_status() != 2:
+			return
 
 		mutex.lock()
 		pending_requests[pr.id] = pr
 		client.put_data(data)
 		mutex.unlock()
 	else:
+		if client.get_status() != 2:
+			return
+
 		proto_message.queue_free()
 		client.put_data(data)
 	
@@ -131,7 +139,7 @@ func recv_message_loop():
 			if proto_message == null:
 				continue
 
-			# network_debug.log("Received: %d %s %s" % [proto_message.type, proto_message.request_id, proto_message.message])
+			network_debug.log("Received: %d %s %s" % [proto_message.type, proto_message.request_id, proto_message.message])
 
 			mutex.lock()
 			if pending_requests.has(proto_message.request_id):
@@ -199,6 +207,7 @@ func _start(data):
 	client.connect_to_host(host, port)
 
 	if client.get_status() != 2:
+		emit_signal("disconnected")
 		yield(get_tree().create_timer(1), "timeout")
 		self.call_deferred("reconnect")
 		return
@@ -206,6 +215,7 @@ func _start(data):
 	
 	network_ok()
 	auth()
+	emit_signal("connected")
 
 	mutex.lock()
 	KeepAliveTimer = Timer.new()

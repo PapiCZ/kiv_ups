@@ -4,10 +4,12 @@ import (
 	log "github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 	"kiv_ups_server/game"
+	"net"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 )
@@ -22,14 +24,25 @@ func init() {
 
 func main() {
 	log.Println("Starting pprof at http://localhost:6060/debug/pprof/")
-	go http.ListenAndServe("localhost:6060", nil)
+	go http.ListenAndServe("0.0.0.0:6060", nil)
+
+	if len(os.Args) < 3 {
+		log.Panicln("You need to pass host and port!")
+	}
+
+	host := net.ParseIP(os.Args[1])
+	port, err := strconv.Atoi(os.Args[2])
+
+	if err != nil {
+		log.Panicln(err)
+	}
+
 	sockaddr := syscall.SockaddrInet4{
-		Port: 35000,
-		Addr: [4]byte{127, 0, 0, 1},
+		Port: port,
+		Addr: [...]byte{host[12], host[13], host[14], host[15]},
 	}
 
 	gameServer := game.NewServer(&sockaddr)
-
 
 	sigs := make(chan os.Signal, 1)
 

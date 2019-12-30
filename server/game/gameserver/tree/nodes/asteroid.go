@@ -92,7 +92,7 @@ type Asteroid struct {
 
 func (a *Asteroid) Init(node *tree.Node) {
 	a.Node = node
-	a.Value = int(100 * a.Scale) * 30
+	a.Value = int(100 * a.Scale) * 100
 }
 
 func (a *Asteroid) Process(playerMessages []interfaces.PlayerMessage, delta float64) {

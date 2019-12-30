@@ -12,6 +12,7 @@ func _on_Back_pressed():
 	Menu.reset(Menu.MENU_LEVEL.CREATE_LOBBY)
 
 func _on_CreateLobby_pressed():
+	Menu.reset(Menu.MENU_LEVEL.LOBBY)
 	var lobby_name = $FormContainer/LobbyName.text
 
 	if len(lobby_name):

@@ -1,6 +1,7 @@
 package game
 
 import (
+	"kiv_ups_server/game/actions"
 	"kiv_ups_server/game/interfaces"
 	"kiv_ups_server/net/tcp"
 	"math/rand"
@@ -83,10 +84,20 @@ func (p *Player) GetGameServer() interfaces.GameServer {
 	return p.GameServer
 }
 
+func (p *Player) LeaveGame() {
+	// remove player from game server
+	p.GetGameServer().RemovePlayer(p)
+	p.SetGameServer(nil)
+}
+
 func (p *Player) IsConnected() bool {
 	return time.Now().Unix() < p.LastKeepAlive + 2
 }
 
 func (p *Player) RefreshKeepAlive() {
 	p.LastKeepAlive = time.Now().Unix()
+}
+
+func (p *Player) SetLoggedInMenuContext() {
+	p.SetContext(actions.LoggedInMenuContext)
 }

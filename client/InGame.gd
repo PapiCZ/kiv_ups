@@ -10,6 +10,9 @@ var active_nodes = {}
 var score_offset = 0
 var player_scores = {}
 
+func _ready():
+	Network.connect("disconnected", self, "_network_disconnect")
+
 func update_game_tree(parent_obj, node):
 	var game_node = null
 
@@ -119,3 +122,10 @@ func _player_disconnected(data):
 
 	if player_scores.has(player_name) and player_scores[player_name] != null:
 		player_scores[player_name].set_disconnected()
+
+func _network_disconnect():
+	Network.disconnect_message(MessageTypes.UPDATE_STATE)
+	Network.disconnect_message(MessageTypes.GAME_END)
+	Network.disconnect_message(MessageTypes.PLAYER_DISCONNECTED)
+	queue_free()
+	Menu.go(Menu.MENU_LEVEL.MAIN)

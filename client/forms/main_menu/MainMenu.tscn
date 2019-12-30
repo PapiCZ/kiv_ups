@@ -46,6 +46,15 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "Reconnect"
 
+[node name="LeaveGame" type="Button" parent="FormContainer"]
+visible = false
+margin_top = 136.0
+margin_right = 500.0
+margin_bottom = 184.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Leave game"
+
 [node name="SignOut" type="Button" parent="FormContainer"]
 margin_top = 106.0
 margin_right = 500.0
@@ -63,5 +72,6 @@ size_flags_vertical = 3
 text = "Quit"
 [connection signal="pressed" from="FormContainer/StartGame" to="." method="_on_StartGame_pressed"]
 [connection signal="pressed" from="FormContainer/ReconnectGame" to="." method="_on_ReconnectGame_pressed"]
+[connection signal="pressed" from="FormContainer/LeaveGame" to="." method="_on_LeaveGame_pressed"]
 [connection signal="pressed" from="FormContainer/SignOut" to="." method="_on_SignOut_pressed"]
 [connection signal="pressed" from="FormContainer/Quit" to="." method="_on_Quit_pressed"]

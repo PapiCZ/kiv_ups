@@ -25,15 +25,35 @@ align = 1
 margin_left = 397.0
 margin_top = 306.0
 margin_right = 897.0
-margin_bottom = 606.0
+margin_bottom = 638.0
 rect_min_size = Vector2( 500, 300 )
 size_flags_horizontal = 4
 size_flags_vertical = 5
 custom_constants/separation = 20
 
-[node name="Nickname" type="LineEdit" parent="FormContainer"]
+[node name="Host" type="LineEdit" parent="FormContainer"]
 margin_right = 500.0
-margin_bottom = 86.0
+margin_bottom = 52.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "127.0.0.1"
+clear_button_enabled = true
+placeholder_text = "Host"
+caret_blink = true
+
+[node name="Port" type="SpinBox" parent="FormContainer"]
+margin_top = 72.0
+margin_right = 500.0
+margin_bottom = 124.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+max_value = 65536.0
+value = 35000.0
+
+[node name="Nickname" type="LineEdit" parent="FormContainer"]
+margin_top = 144.0
+margin_right = 500.0
+margin_bottom = 196.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 clear_button_enabled = true
@@ -41,17 +61,19 @@ placeholder_text = "Nickname"
 caret_blink = true
 
 [node name="LoginButton" type="Button" parent="FormContainer"]
-margin_top = 106.0
+margin_top = 216.0
 margin_right = 500.0
-margin_bottom = 192.0
+margin_bottom = 264.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "Login"
 
 [node name="Quit" type="Button" parent="FormContainer"]
-margin_top = 212.0
+margin_top = 284.0
 margin_right = 500.0
-margin_bottom = 300.0
+margin_bottom = 332.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "Quit"
+[connection signal="pressed" from="FormContainer/LoginButton" to="." method="_on_LoginButton_pressed"]
+[connection signal="pressed" from="FormContainer/Quit" to="." method="_on_Quit_pressed"]

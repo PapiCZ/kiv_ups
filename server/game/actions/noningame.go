@@ -238,6 +238,20 @@ func (a ReconnectAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 	}
 }
 
+func (a LeaveGameAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
+	m.GetPlayer().LeaveGame()
+	return ActionResponse{
+		ServerMessage: tcp.ServerMessage{
+			Data: &protocol.GameReconnectAvailableResponseMessage{
+				Available: m.GetPlayer().GetGameServer() != nil,
+			},
+			Status:  true,
+			Message: "",
+		},
+		Targets: []interfaces.Player{m.GetPlayer()},
+	}
+}
+
 func (a StartGameAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	gs := gameserver.NewGameServer()
 
@@ -246,6 +260,7 @@ func (a StartGameAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 		player.SetGameServer(&gs)
 	}
 	go gs.Start()
+	s.DeleteLobby(m.GetPlayer().GetConnectedLobby().Name)
 
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
