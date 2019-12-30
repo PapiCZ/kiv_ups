@@ -100,7 +100,7 @@ func (p *Projectile) Process(playerMessages []interfaces.PlayerMessage, delta fl
 
 		if spaceshipCollider.IsPointInside(p.PosX, p.PosY) {
 			spaceship.Die()
-			p.AddPlayerScor e(p.Player, 1000)
+			p.AddPlayerScore(p.Player, 1000)
 
 			break
 		}
