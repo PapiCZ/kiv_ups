@@ -42,6 +42,10 @@ func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.Play
 		if player.GetName() == authenticateData.Name {
 			player.SetTCPClient(m.GetPlayer().GetTCPClient())
 			connectedPlayer = player
+			if !player.GetGameServer().IsRunning() {
+				player.SetGameServer(nil)
+				player.SetConnectedLobby(nil)
+			}
 			break
 		}
 	}

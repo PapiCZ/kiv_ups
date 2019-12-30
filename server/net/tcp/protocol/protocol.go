@@ -100,7 +100,7 @@ func (gp *GameProtocol) Encode(msg ProtoMessage, writer io.WriteCloser) {
 	}
 
 	// Write JSON
-	_, err = buff.Write(jsonBuff.Bytes()[:jsonBuff.Len() - 1])
+	_, err = buff.Write(jsonBuff.Bytes()[:jsonBuff.Len()-1])
 	if err != nil {
 		log.Errorln(err)
 	}
@@ -112,7 +112,7 @@ func (gp *GameProtocol) Encode(msg ProtoMessage, writer io.WriteCloser) {
 	_ = writer.Close()
 }
 
-func (gp *GameProtocol) InfiniteDecode(reader io.ReadCloser, msgChan chan *ProtoMessage) {
+func (gp *GameProtocol) InfiniteDecode(reader io.ReadCloser, msgChan chan *ProtoMessage, status chan bool) {
 	buffReader := bufio.NewReader(reader)
 
 	for {
@@ -120,14 +120,22 @@ func (gp *GameProtocol) InfiniteDecode(reader io.ReadCloser, msgChan chan *Proto
 		if err != nil {
 			if err == io.ErrClosedPipe {
 				log.Traceln("Closing InfiniteDecode...")
+				close(status)
 				return
 			} else {
 				log.Errorln(err)
+			}
+			select {
+			case status <- false:
+				break
+			default:
+				break
 			}
 
 			continue
 		}
 
+		status <- true
 		msgChan <- msg
 	}
 }
@@ -140,41 +148,25 @@ func (gp *GameProtocol) Decode(buffReader *bufio.Reader) (*ProtoMessage, error) 
 	// Just for sure
 	err = gp.flushInvalidBytes(buffReader)
 	if err != nil {
-		if err == io.ErrClosedPipe {
-			return nil, err
-		} else {
-			log.Errorln(err)
-		}
+		return nil, err
 	}
 
 	// Flush "|" character
 	err = gp.flushUntilDelimiter(buffReader)
 	if err != nil {
-		if err == io.ErrClosedPipe {
-			return nil, err
-		} else {
-			log.Errorln(err)
-		}
+		return nil, err
 	}
 
 	// Read message type and flush delimiter
 	typeInt, err := gp.readAsciiNumberUntilDelimiter(buffReader)
 	if err != nil {
-		if err == io.ErrClosedPipe {
-			return nil, err
-		} else {
-			log.Errorln(err)
-		}
+		return nil, err
 	}
 
 	// Read JSON length and flush delimiter
 	jsonLenInt, err := gp.readAsciiNumberUntilDelimiter(buffReader)
 	if err != nil {
-		if err == io.ErrClosedPipe {
-			return nil, err
-		} else {
-			log.Errorln(err)
-		}
+		return nil, err
 	}
 
 	// Read request ID
@@ -212,8 +204,8 @@ func (gp *GameProtocol) Decode(buffReader *bufio.Reader) (*ProtoMessage, error) 
 	}
 
 	return &ProtoMessage{
-		Message:     msg.(Message),
-		RequestId:   RequestId(requestId),
+		Message:   msg.(Message),
+		RequestId: RequestId(requestId),
 	}, nil
 }
 

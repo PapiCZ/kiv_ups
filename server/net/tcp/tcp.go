@@ -17,7 +17,6 @@ func (t TCP) SendBytes(message []byte) (err error) {
 }
 
 func (t TCP) Close() (err error) {
-	t.SendBytes([]byte("Bye!"))
 	err = syscall.Shutdown(t.FD, syscall.SHUT_RDWR)
 	if err != nil {
 		log.Errorln(err)

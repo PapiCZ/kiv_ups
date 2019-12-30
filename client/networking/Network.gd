@@ -205,8 +205,12 @@ func _start(data):
 
 	client = StreamPeerTCP.new()
 	client.connect_to_host(host, port)
+	
+	while client.get_status() != 2:
+		pass
 
 	if client.get_status() != 2:
+		print("Bad client status. Reconnecting.")
 		emit_signal("disconnected")
 		yield(get_tree().create_timer(1), "timeout")
 		self.call_deferred("reconnect")

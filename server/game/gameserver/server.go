@@ -175,6 +175,19 @@ func (gs *GameServer) ManageGame() {
 			return
 		}
 	}
+
+	// Check if is any player active
+	active := false
+	for _, player := range gs.Players {
+		if player.IsConnected() {
+			active = true
+			break
+		}
+	}
+
+	if !active {
+		gs.Run = false
+	}
 }
 
 func (gs *GameServer) shareState() {
@@ -263,6 +276,10 @@ func (gs *GameServer) IsPlayerDisconnected(player interfaces.Player) bool {
 	}
 
 	return false
+}
+
+func (gs *GameServer) IsRunning() bool {
+	return gs.Run
 }
 
 func FilterMessagesByTypes(playerMessages []interfaces.PlayerMessage, types []protocol.Message) []interfaces.PlayerMessage {

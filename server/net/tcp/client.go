@@ -16,6 +16,7 @@ type Client struct {
 	UID          UID
 	MessageChan  chan *protocol.ProtoMessage
 	Protocol     protocol.GameProtocol
+	failCounter  int
 	decodeReader io.ReadCloser
 	decodeWriter io.WriteCloser
 }

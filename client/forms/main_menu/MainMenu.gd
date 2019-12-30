@@ -3,10 +3,11 @@ extends VBoxContainer
 var InGame = preload("res://InGame.tscn")
 
 func _load():
-	Network.send({}, MessageTypes.GAME_RECONNECT_AVAILABLE, self, "_game_reconnect_available")
+	pass
+	# Network.send({}, MessageTypes.GAME_RECONNECT_AVAILABLE, self, "_game_reconnect_available")
 
-	if Network.client.get_status() != 2:
-		Network.connect("connected", self, "_network_connected")
+	# if Network.client.get_status() != 2:
+	# 	Network.connect("connected", self, "_network_connected")
 
 func _on_StartGame_pressed():
 	Menu.go(Menu.MENU_LEVEL.START_GAME)

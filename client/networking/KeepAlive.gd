@@ -12,5 +12,6 @@ func _check(data):
 		Network.network_error()
 
 func _network_error(data):
+	print("Keep-Alive timeout")
 	Network.network_error()
 	Network.reconnect()

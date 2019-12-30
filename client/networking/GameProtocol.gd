@@ -19,7 +19,6 @@ func encode(proto_message):
 	return data
 
 func decode(buff):
-	# TODO: Make it safe
 	var proto_message = null
 	var offset = 0
 
@@ -61,7 +60,9 @@ func decode(buff):
 		offset += 1
 
 	# Read JSON
-	# print(len(buff.subarray(offset, offset + json_len - 1).get_string_from_utf8()))
+	if offset + json_len - 1 >= len(buff):
+		return [null, null]
+
 	var json_result = JSON.parse(buff.subarray(offset, offset + json_len - 1).get_string_from_utf8())
 	if json_result.error == OK:
 		proto_message = ProtoMessage.new()

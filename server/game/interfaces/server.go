@@ -56,4 +56,5 @@ type GameServer interface {
 	RemovePlayer(player Player)
 	GetPlayers() []Player
 	GetRequestMessageChan() chan PlayerMessage
+	IsRunning() bool
 }

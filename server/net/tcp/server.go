@@ -8,10 +8,11 @@ import (
 	"unsafe"
 )
 
+const DecodeErrThreshold = 10
 const FdBits = int(unsafe.Sizeof(0) * 8)
 
 const (
-	BuffLen = 8
+	BuffLen = 1024
 )
 
 type Server struct {
@@ -110,10 +111,11 @@ func (s *Server) Start(clientMessageChan chan ClientMessage) {
 			writers[client.UID] = writer
 			client.decodeReader = reader
 			client.decodeWriter = writer
-			go s.Protocol.InfiniteDecode(reader, client.MessageChan)
+
+			statusChan := make(chan bool)
+			go s.Protocol.InfiniteDecode(reader, client.MessageChan, statusChan)
 
 			go func(messageChan chan ClientMessage, c *Client) {
-				// TODO: This goroutine will never die
 				for {
 					msg, ok := <-c.MessageChan
 
@@ -129,6 +131,27 @@ func (s *Server) Start(clientMessageChan chan ClientMessage) {
 					}
 				}
 			}(clientMessageChan, &client)
+
+			go func(sc chan bool, clientMessageChan chan ClientMessage, c *Client) {
+				for {
+					status, ok := <-sc
+
+					if !ok {
+						return
+					}
+
+					if !status {
+						c.failCounter++
+					} else {
+						c.failCounter = 0
+					}
+
+					if c.failCounter > DecodeErrThreshold {
+						s.Kick(clientMessageChan, c)
+						return
+					}
+				}
+			}(statusChan, clientMessageChan, &client)
 
 			log.Infof("New Client[FD %v]: %v:%v",
 				client.TCP.FD,
@@ -146,24 +169,7 @@ func (s *Server) Start(clientMessageChan chan ClientMessage) {
 					}
 
 					if n == 0 {
-						// Client wanna disconnect
-						log.Infof("Client disconnected [FD %v]: %v:%v",
-							client.TCP.FD,
-							client.TCP.Sockaddr.(*syscall.SockaddrInet4).Addr,
-							client.TCP.Sockaddr.(*syscall.SockaddrInet4).Port,
-						)
-
-						clientMessageChan <- ClientMessage{
-							Message:           nil,
-							RequestId:         "",
-							DisconnectRequest: true,
-							Sender:            client,
-						}
-						close(client.MessageChan)
-						_ = client.decodeReader.Close()
-						_ = client.decodeWriter.Close()
-
-						delete(s.Clients, client.TCP.FD)
+						s.Kick(clientMessageChan, client)
 					} else {
 						// Client wanna talk
 						_, _ = writers[client.UID].Write(buff[:n])
@@ -178,7 +184,7 @@ func (s Server) Close() (err error) {
 	log.Infoln("Shutting down...")
 
 	for _, c := range s.Clients {
-		c.TCP.Close()
+		_ = c.TCP.Close()
 	}
 
 	err = syscall.Shutdown(s.TCP.FD, syscall.SHUT_RDWR)
@@ -193,6 +199,27 @@ func (s Server) Close() (err error) {
 	}
 
 	return
+}
+
+func (s *Server) Kick(clientMessageChan chan ClientMessage, client *Client) {
+	// Client wanna disconnect
+	log.Infof("Client disconnected [FD %v]: %v:%v",
+		client.TCP.FD,
+		client.TCP.Sockaddr.(*syscall.SockaddrInet4).Addr,
+		client.TCP.Sockaddr.(*syscall.SockaddrInet4).Port,
+	)
+
+	clientMessageChan <- ClientMessage{
+		Message:           nil,
+		RequestId:         "",
+		DisconnectRequest: true,
+		Sender:            client,
+	}
+	close(client.MessageChan)
+	_ = client.decodeReader.Close()
+	_ = client.decodeWriter.Close()
+
+	delete(s.Clients, client.TCP.FD)
 }
 
 func FD_SET(p *syscall.FdSet, fd int) {
