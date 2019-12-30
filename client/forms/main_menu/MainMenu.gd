@@ -3,10 +3,13 @@ extends VBoxContainer
 var InGame = preload("res://InGame.tscn")
 
 func _load():
-	Network.send({}, MessageTypes.GAME_RECONNECT_AVAILABLE, self, "_game_reconnect_available")
+	if Network.authenticated:
+		Network.send({}, MessageTypes.GAME_RECONNECT_AVAILABLE, self, "_game_reconnect_available")
+	else:
+		Network.connect("authenticated", self, "_network_authenticated")
 
-	if Network.client.get_status() != 2:
-		Network.connect("connected", self, "_network_connected")
+func _network_authenticated():
+	Network.send({}, MessageTypes.GAME_RECONNECT_AVAILABLE, self, "_game_reconnect_available")
 
 func _on_StartGame_pressed():
 	Menu.go(Menu.MENU_LEVEL.START_GAME)
@@ -24,9 +27,6 @@ func _game_reconnect_available(data):
 		$FormContainer/ReconnectGame.visible = true
 		$FormContainer/LeaveGame.visible = true
 		$FormContainer/StartGame.visible = false
-
-func _network_connected():
-	Network.send({}, MessageTypes.GAME_RECONNECT_AVAILABLE, self, "_game_reconnect_available")
 
 func _on_ReconnectGame_pressed():
 	Menu.hide_current()

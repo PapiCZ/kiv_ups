@@ -7,6 +7,7 @@ import (
 	"kiv_ups_server/game/interfaces"
 	"kiv_ups_server/net/tcp"
 	"kiv_ups_server/net/tcp/protocol"
+	"strconv"
 	"syscall"
 )
 
@@ -93,7 +94,8 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 			RequestId: message.RequestId,
 		})
 
-		return errors.New("invalid action")
+		return errors.New("invalid action: " + strconv.Itoa(int(message.Message.GetTypeId())) +
+			", player context: " + strconv.Itoa(int(player.GetContext())))
 	}
 
 	actionResponse := action.Process(s, &PlayerMessage{

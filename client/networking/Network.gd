@@ -2,6 +2,7 @@ extends Node
 
 signal disconnected
 signal connected
+signal authenticated
 
 var host = ""
 var port = 0
@@ -11,6 +12,7 @@ var username = null
 var client = null
 var mutex = null
 var thread = null
+var authenticated = false
 var _kill_thread = false
 var pending_requests = {}
 
@@ -202,30 +204,39 @@ func auth(response_callback_obj=null, response_callback_func=null):
 
 func start_thread(host, port):
 	print("Spawned new network thread")
+	init(host, port)
 	thread = Thread.new()
-	thread.start(self, "_start", [host, port])
+	thread.start(self, "_start")
 
-func _start(data):
+func init(host, port):
 	mutex.lock()
-	host = data[0]
-	port = data[1]
+	self.host = host
+	self.port = port
 
 	client = StreamPeerTCP.new()
-	client.connect_to_host(host, port)
-	print("Connecting to host")
-	
+	client.connect_to_host(self.host, self.port)
+	authenticated = false
 	mutex.unlock()
+	print("Connecting to host")
+	yield(get_tree().create_timer(0.2), "timeout")
 	
 	network_ok()
-	auth()
+	auth(self, "_auth_callback")
 	emit_signal("connected")
 
+func _auth_callback(data):
+	mutex.lock()
+	authenticated = true
+	mutex.unlock()
+	emit_signal("authenticated")
+
+func _start(params):
 	mutex.lock()
 	KeepAliveTimer = Timer.new()
-	add_child(KeepAliveTimer)
 	KeepAliveTimer.set_wait_time(KEEP_ALIVE_INVERVAL)
 	KeepAliveTimer.connect("timeout", self, "_on_KeepAliveTimer_timeout")
 	KeepAliveTimer.start()
+	get_tree().get_root().add_child(KeepAliveTimer)
 	mutex.unlock()
 
 	recv_message_loop()
@@ -258,6 +269,7 @@ func reconnect():
 	self.start_thread(host, port)
 
 func _on_KeepAliveTimer_timeout():
+	print("Sending Keep-Alive")
 	mutex.lock()
 	KeepAlive.send()
 	mutex.unlock()

@@ -8,9 +8,10 @@ size = 130
 font_data = ExtResource( 2 )
 
 [node name="JoinLobby" type="VBoxContainer"]
-margin_left = 2.3916
-margin_right = 1298.39
-margin_bottom = 606.0
+margin_left = 3.3916
+margin_top = -1.0
+margin_right = 1299.39
+margin_bottom = 955.0
 custom_constants/separation = 150
 script = ExtResource( 1 )
 
