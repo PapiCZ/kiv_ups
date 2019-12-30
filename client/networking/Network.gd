@@ -88,6 +88,9 @@ func send(message, type, \
 		pr._timeout_timer.start()
 
 		if client.get_status() != 2:
+			pr.request.queue_free()
+			pr._timeout_timer.queue_free()
+			pr.queue_free()
 			return
 
 		mutex.lock()
@@ -95,10 +98,11 @@ func send(message, type, \
 		client.put_data(data)
 		mutex.unlock()
 	else:
+		proto_message.queue_free()
+
 		if client.get_status() != 2:
 			return
 
-		proto_message.queue_free()
 		client.put_data(data)
 	
 	return data
@@ -205,16 +209,8 @@ func _start(data):
 
 	client = StreamPeerTCP.new()
 	client.connect_to_host(host, port)
+	print("Connecting to host")
 	
-	while client.get_status() != 2:
-		pass
-
-	if client.get_status() != 2:
-		print("Bad client status. Reconnecting.")
-		emit_signal("disconnected")
-		yield(get_tree().create_timer(1), "timeout")
-		self.call_deferred("reconnect")
-		return
 	mutex.unlock()
 	
 	network_ok()
@@ -232,6 +228,7 @@ func _start(data):
 	recv_message_loop()
 	
 func stop():
+	emit_signal("disconnected")
 	_kill_thread = true
 	thread.wait_to_finish()
 	_kill_thread = false
@@ -240,16 +237,19 @@ func stop():
 
 	for pr in pending_requests.values():
 		pr._timeout_timer.stop()
-		remove_child(pr._timeout_timer)
+		pr._timeout_timer.queue_free()
+		pr.request.queue_free()
+		pr.queue_free()
 
 	mutex = Mutex.new()
 	pending_requests.clear()
 	if KeepAliveTimer != null:
 		KeepAliveTimer.stop()
-		remove_child(KeepAliveTimer)
+		KeepAliveTimer.queue_free()
 		KeepAliveTimer = null
 
 func reconnect():
+	print("Reconnecting")
 	stop()
 	print("Killed network thread")
 	self.start_thread(host, port)

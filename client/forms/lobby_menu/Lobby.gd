@@ -8,6 +8,13 @@ func _load():
 
 	Network.connect_message(MessageTypes.START_GAME_RESPONSE, self, "_start_game")
 	Network.connect_message(MessageTypes.LOBBY_PLAYER_CONNECTED, self, "_player_connected")
+	Network.connect("disconnected", self, "_network_disconnected", [], Network.CONNECT_ONESHOT)
+
+func _network_disconnected():
+	print("network_error")
+	Network.disconnect_message(MessageTypes.START_GAME_RESPONSE)
+	Network.disconnect_message(MessageTypes.LOBBY_PLAYER_CONNECTED)
+	Menu.go(Menu.MENU_LEVEL.MAIN)
 
 func _on_lobby_players_loaded(data):
 	if data[0].response.status:
