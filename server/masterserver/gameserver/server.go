@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+const MaxScore = 10000
+
 // GameServer is a structure that handles all data about ingame instance.
 type GameServer struct {
 	Tps                 int
@@ -154,10 +156,10 @@ func (gs *GameServer) Start() {
 
 // ManageGame is primarily used to check whether gameloop should stop
 func (gs *GameServer) ManageGame() {
-	// Check if someone has over 50000
+	// Check if someone has over MaxScore
 	for _, node := range gs.GameTree.FindAllChildrenByType("score") {
 		score := node.Value.(*nodes.Score)
-		if score.Score > 50000 {
+		if score.Score > MaxScore {
 			// Build score summary
 			scoreSummary := make([]PlayerScoreSummary, 0)
 			for _, _node := range gs.GameTree.FindAllChildrenByType("score") {
