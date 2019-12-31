@@ -1,16 +1,23 @@
-package game
+package masterserver
 
 import (
 	"errors"
 	log "github.com/sirupsen/logrus"
-	"kiv_ups_server/game/actions"
-	"kiv_ups_server/game/interfaces"
+	"kiv_ups_server/masterserver/actions"
+	"kiv_ups_server/masterserver/interfaces"
 	"kiv_ups_server/net/tcp"
 	"kiv_ups_server/net/tcp/protocol"
 	"strconv"
 	"syscall"
 )
 
+const (
+	GameServerTypeMin = 400
+	GameServerTypeMax = 599
+)
+
+// Server structure is a structure for master server that handles connected
+// players, game servers and data for routing incoming messages
 type Server struct {
 	TCPServer        *tcp.Server
 	Players          map[tcp.UID]interfaces.Player
@@ -19,6 +26,7 @@ type Server struct {
 	GameServers      []interfaces.GameServer
 }
 
+// NewServer creates and initializes master server
 func NewServer(sockaddr syscall.Sockaddr) (ms Server) {
 	server, err := tcp.NewServer(sockaddr)
 
@@ -39,6 +47,7 @@ func NewServer(sockaddr syscall.Sockaddr) (ms Server) {
 	return
 }
 
+// Start starts master server and makes it ready for incoming messages
 func (s *Server) Start() (err error) {
 	clientMessageChan := make(chan tcp.ClientMessage)
 
@@ -53,35 +62,39 @@ func (s *Server) Start() (err error) {
 	}
 }
 
+// RunAction routes incoming messages to its actions and returns response to clients.
 func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 	p, ok := s.Players[message.Sender.UID]
 	var player interfaces.Player
 	if ok {
 		player = p
 	} else {
+		// Client isn't authenticated. We need to create ShadowPlayer.
 		pl := NewShadowPlayer(message.Sender, "", interfaces.PlayerContext(0))
 		player = &pl
 	}
 
 	if message.DisconnectRequest {
+		// Disconnect player
 		s.OnPlayerDisconnected(player)
 
 		return nil
 	}
 
-	if message.GetTypeId() >= 300 && message.GetTypeId() <= 500 {
+	if message.GetTypeId() >= GameServerTypeMin && message.GetTypeId() <= GameServerTypeMax {
 		gameServer := player.GetGameServer()
 		if gameServer != nil {
+			// Forward message to game server
 			gameServer.GetRequestMessageChan() <- &PlayerMessage{
 				ClientMessage: &message,
 				Player:        player,
 			}
-		} else {
-			// TODO: error
 		}
 
 		return nil
 	}
+
+	// Get action according to message type and player's context
 	action := s.ActionDefinition.GetAction(message.Message.GetTypeId(), player.GetContext())
 
 	if action == nil {
@@ -104,15 +117,18 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 	})
 	sm := actionResponse.ServerMessage
 
+	// Send response to all targets
 	s.SendMessage(sm, message.RequestId, actionResponse.Targets...)
 
 	return
 }
 
+// SendMessageWithoutRequest allows to send message from server without request ID
 func (s *Server) SendMessageWithoutRequest(sm tcp.ServerMessage, player ...interfaces.Player) {
 	s.SendMessage(sm, "", player...)
 }
 
+// SendMessage sends ServerMessage to all given players
 func (s *Server) SendMessage(sm tcp.ServerMessage, requestId protocol.RequestId, player ...interfaces.Player) {
 	for _, p := range player {
 		log.Tracef("Server answers to client %d: %#v | Data: %#v", p.GetUID(), sm, sm.Data)
@@ -128,39 +144,42 @@ func (s *Server) SendMessage(sm tcp.ServerMessage, requestId protocol.RequestId,
 }
 
 func (s *Server) OnPlayerDisconnected(player interfaces.Player) {
-	if player.GetConnectedLobby() != nil && player.GetConnectedLobby().Owner == player {
-		s.DeleteLobby(player.GetConnectedLobby().Name)
-	}
 
-	// TODO: Kick players from lobby
 }
 
+// Stop stops mater server
 func (s *Server) Stop() (err error) {
 	return s.TCPServer.Close()
 }
 
+// GetTCPServer is getter for tcp server
 func (s *Server) GetTCPServer() *tcp.Server {
 	return s.TCPServer
 }
 
+// GetPlayers is getter for players
 func (s *Server) GetPlayers() map[tcp.UID]interfaces.Player {
 	return s.Players
 }
 
+// Authenticate authenticates given player
 func (s *Server) Authenticate(player interfaces.Player) {
 	s.Players[player.GetTCPClient().UID] = player
 
 	log.Infoln("Authenticated player", player.GetName())
 }
 
+// AddLobby adds lobby to master server
 func (s *Server) AddLobby(lobby *interfaces.Lobby) {
 	s.Lobbies[lobby.Name] = lobby
 }
 
+// DeleteLobby deletes lobby by its name
 func (s *Server) DeleteLobby(name string) {
 	delete(s.Lobbies, name)
 }
 
+// GetLobby returns lobby by its name.
 func (s *Server) GetLobby(name string) (*interfaces.Lobby, error) {
 	lobby, ok := s.Lobbies[name]
 
@@ -168,9 +187,10 @@ func (s *Server) GetLobby(name string) (*interfaces.Lobby, error) {
 		return lobby, nil
 	}
 
-	return &interfaces.Lobby{}, errors.New("unknown lobby")
+	return nil, errors.New("unknown lobby")
 }
 
+// GetLobbies is getter for all lobbies
 func (s *Server) GetLobbies() []*interfaces.Lobby {
 	v := make([]*interfaces.Lobby, 0, len(s.Lobbies))
 
@@ -181,6 +201,7 @@ func (s *Server) GetLobbies() []*interfaces.Lobby {
 	return v
 }
 
+// AddGameServer adds game server to master server
 func (s *Server) AddGameServer(gs interfaces.GameServer) {
 	s.GameServers = append(s.GameServers, gs)
 }

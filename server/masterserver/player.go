@@ -1,13 +1,15 @@
-package game
+package masterserver
 
 import (
-	"kiv_ups_server/game/actions"
-	"kiv_ups_server/game/interfaces"
+	"kiv_ups_server/masterserver/actions"
+	"kiv_ups_server/masterserver/interfaces"
 	"kiv_ups_server/net/tcp"
-	"math/rand"
 	"time"
 )
 
+// Player structure is a structure that handles that handles
+// player's TCP client, name, connected lobby, connected GameServer and last
+// keep-alive timestamp that is used to indicate whether is player still connected
 type Player struct {
 	tcpClient      *tcp.Client
 	UID            interfaces.PlayerUID
@@ -18,15 +20,8 @@ type Player struct {
 	LastKeepAlive  int64
 }
 
-func NewPlayer(client *tcp.Client, name string, context interfaces.PlayerContext) Player {
-	return Player{
-		tcpClient: client,
-		UID:       interfaces.PlayerUID(rand.Int()),
-		Name:      name,
-		Context:   context,
-	}
-}
-
+// NewShadowPlayer creates and initializes Player structure with UID 0,
+// that is reserved for player that isn't authenticated
 func NewShadowPlayer(client *tcp.Client, name string, context interfaces.PlayerContext) Player {
 	return Player{
 		tcpClient: client,

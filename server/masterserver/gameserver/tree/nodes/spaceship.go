@@ -1,8 +1,8 @@
 package nodes
 
 import (
-	"kiv_ups_server/game/gameserver/tree"
-	"kiv_ups_server/game/interfaces"
+	"kiv_ups_server/masterserver/gameserver/tree"
+	"kiv_ups_server/masterserver/interfaces"
 	"kiv_ups_server/net/tcp/protocol"
 	"math/rand"
 )
@@ -14,11 +14,11 @@ type Spaceship struct {
 	VelocityY      float64           `json:"velocity_y"`
 	Rotation       float64           `json:"rotation"`
 	PlayerName     string            `json:"player_name"`
+	Immune         bool              `json:"immune"`
+	ReloadPosition bool              `json:"reload_position"`
 	Player         interfaces.Player `json:"-"`
 	Score          *Score            `json:"-"`
-	Immune         bool              `json:"immune"`
 	ImmuneTime     float64           `json:"-"`
-	ReloadPosition bool              `json:"reload_position"`
 	Radius         float64           `json:"-"`
 	Node           *tree.Node        `json:"-"`
 }

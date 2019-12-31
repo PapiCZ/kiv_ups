@@ -1,8 +1,8 @@
 package nodes
 
 import (
-	"kiv_ups_server/game/gameserver/tree"
-	"kiv_ups_server/game/interfaces"
+	"kiv_ups_server/masterserver/gameserver/tree"
+	"kiv_ups_server/masterserver/interfaces"
 	"kiv_ups_server/net/tcp/protocol"
 )
 
@@ -45,6 +45,8 @@ func (p *Projectile) Process(playerMessages []interfaces.PlayerMessage, delta fl
 			p.AddPlayerScore(p.Player, asteroid.Value)
 
 			if asteroid.Scale > 0.4 {
+				// Create 2 new asteroids with rotated velocity about 0.3 and -0.3rad
+				// of origin asteroid
 				v := Vector{asteroid.VelocityX, asteroid.VelocityY}
 
 				newAsteroid1 := Asteroid{
@@ -88,7 +90,7 @@ func (p *Projectile) Process(playerMessages []interfaces.PlayerMessage, delta fl
 		spaceship := node.Value.(*Spaceship)
 
 		if spaceship.Player == p.Player {
-			// Player cant kill himself
+			// Player cant kill itself
 			continue
 		}
 
@@ -108,6 +110,7 @@ func (p *Projectile) Process(playerMessages []interfaces.PlayerMessage, delta fl
 
 }
 
+// AddPlayerScore adds given amount of score to given player
 func (p *Projectile) AddPlayerScore(player interfaces.Player, score int) {
 	for _, node := range p.Node.GetRoot().FindAllChildrenByType("score") {
 		scoreGameNode := node.Value.(*Score)

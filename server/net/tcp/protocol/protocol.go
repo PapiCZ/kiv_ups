@@ -20,32 +20,32 @@ type Message interface {
 
 type RequestId string
 
+// ProtoMessage is used as structure for protocol data
 type ProtoMessage struct {
 	Message
 	RequestId
 }
 
+// Definition stores specific definition of protocol (specific messages, etc.)
 type Definition struct {
 	types map[MessageType]Message
 }
 
+// NewDefinition creates initialized definition instance
 func NewDefinition() Definition {
 	return Definition{types: make(map[MessageType]Message)}
 }
 
+// Register adds new message type to the definition
 func (md *Definition) Register(type_ Message) {
 	md.types[type_.GetTypeId()] = type_
-}
-
-type Protocol interface {
-	Encode(Message, io.Writer)
-	Decode(io.Reader) Message
 }
 
 type GameProtocol struct {
 	Def Definition
 }
 
+// Encode encodes given ProtoMessage and writes it to given writer
 func (gp *GameProtocol) Encode(msg ProtoMessage, writer io.WriteCloser) {
 	var err error
 	buff := bufio.NewWriter(writer)
@@ -112,6 +112,8 @@ func (gp *GameProtocol) Encode(msg ProtoMessage, writer io.WriteCloser) {
 	_ = writer.Close()
 }
 
+// InfinityDecode indefinitely decoding data from reader and sends ProtoMessages to given channel.
+// Status channel is used to notify outside world about status of decoding.
 func (gp *GameProtocol) InfiniteDecode(reader io.ReadCloser, msgChan chan *ProtoMessage, status chan bool) {
 	buffReader := bufio.NewReader(reader)
 
@@ -125,6 +127,8 @@ func (gp *GameProtocol) InfiniteDecode(reader io.ReadCloser, msgChan chan *Proto
 			} else {
 				log.Errorln(err)
 			}
+
+			// Try to write to status channel
 			select {
 			case status <- false:
 				break
@@ -140,8 +144,8 @@ func (gp *GameProtocol) InfiniteDecode(reader io.ReadCloser, msgChan chan *Proto
 	}
 }
 
+// Decode decodes data from given reader and returns ProtoMessage
 func (gp *GameProtocol) Decode(buffReader *bufio.Reader) (*ProtoMessage, error) {
-	// TODO: Make it more strict
 	// This shouldn't work.. |100|15|{"ping":"pong"} (missing request ID)
 	var err error
 
@@ -152,7 +156,7 @@ func (gp *GameProtocol) Decode(buffReader *bufio.Reader) (*ProtoMessage, error) 
 	}
 
 	// Flush "|" character
-	err = gp.flushUntilDelimiter(buffReader)
+	err = gp.flushDelimiter(buffReader)
 	if err != nil {
 		return nil, err
 	}
@@ -209,6 +213,8 @@ func (gp *GameProtocol) Decode(buffReader *bufio.Reader) (*ProtoMessage, error) 
 	}, nil
 }
 
+// flushInvalidBytes flushes all chars except delimiter. This function can be
+// used to find start of message.
 func (gp *GameProtocol) flushInvalidBytes(reader *bufio.Reader) error {
 	for {
 		delimiterBuff := make([]byte, 1)
@@ -227,21 +233,8 @@ func (gp *GameProtocol) flushInvalidBytes(reader *bufio.Reader) error {
 	}
 }
 
-func (gp *GameProtocol) flushUntilDelimiter(reader io.Reader) error {
-	for {
-		delimiterBuff := make([]byte, 1)
-		_, err := io.ReadFull(reader, delimiterBuff)
-		if err != nil {
-			return err
-		}
-		if delimiterBuff[0] != DelimiterCharacter {
-			return UnexpectedCharacter{Character: delimiterBuff[0]}
-		}
-
-		return nil
-	}
-}
-
+// flushDelimiter flushes DelimiterCharacter and returns error if was read
+// something else
 func (gp *GameProtocol) flushDelimiter(reader io.Reader) error {
 	delimiterBuff := make([]byte, 1)
 	_, err := io.ReadFull(reader, delimiterBuff)
@@ -255,6 +248,7 @@ func (gp *GameProtocol) flushDelimiter(reader io.Reader) error {
 	return nil
 }
 
+// readAsciiNumberUntilDelimiter reads n bytes from reader and converts it to integer
 func (gp *GameProtocol) readAsciiNumberUntilDelimiter(reader *bufio.Reader) (int, error) {
 	var asciiNumberBuff []byte
 	asciiDigitBuff := make([]byte, 1)
@@ -276,6 +270,8 @@ func (gp *GameProtocol) readAsciiNumberUntilDelimiter(reader *bufio.Reader) (int
 	}
 }
 
+// readAsciiWordUntilDelimiter reads n bytes from reader and returns them as string.
+// Valid word characters are a-z, A-Z and 0-9.
 func (gp *GameProtocol) readAsciiWordUntilDelimiter(reader *bufio.Reader) (string, error) {
 	var asciiWordBuff []byte
 	asciiDigitBuff := make([]byte, 1)

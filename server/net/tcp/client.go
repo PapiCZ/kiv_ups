@@ -9,8 +9,10 @@ import (
 	"syscall"
 )
 
+// Unique identifier of client. This can be used as map key.
 type UID int
 
+// Client structure stores basic data about TCP client
 type Client struct {
 	TCP          *TCP
 	UID          UID
@@ -21,6 +23,7 @@ type Client struct {
 	decodeWriter io.WriteCloser
 }
 
+// newClient initializes new client
 func newClient(fd int, sockaddr syscall.Sockaddr, protocol protocol.GameProtocol,
 	messageChan chan *protocol.ProtoMessage) Client {
 	return Client{
@@ -34,6 +37,7 @@ func newClient(fd int, sockaddr syscall.Sockaddr, protocol protocol.GameProtocol
 	}
 }
 
+// Send encodes given message and sends it to client
 func (c Client) Send(message protocol.ProtoMessage) (err error) {
 	reader, writer := io.Pipe()
 
@@ -50,6 +54,8 @@ func (c Client) Send(message protocol.ProtoMessage) (err error) {
 	return
 }
 
+// SendBytes allows to send binary data to client.
+// You shouldn't need to do it, this function is primarily for TCP server.
 func (c *Client) SendBytes(message []byte) (err error) {
 	_, err = syscall.Write(c.TCP.FD, message)
 
@@ -60,5 +66,8 @@ type ClientMessage struct {
 	protocol.Message
 	protocol.RequestId
 	Sender            *Client
+
+	// DisconnectRequest is used to notify master server about
+	// client disconnection
 	DisconnectRequest bool
 }

@@ -1,7 +1,7 @@
 package tree
 
 import (
-	"kiv_ups_server/game/interfaces"
+	"kiv_ups_server/masterserver/interfaces"
 	"kiv_ups_server/net/tcp/protocol"
 	"math/rand"
 	"reflect"
@@ -9,7 +9,10 @@ import (
 )
 
 const NodeRandomIdLength = 10
+const NodeRandomIdValidChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+// Node is basic element of game tree. It is used to handle all game objects in
+// a tree structure.
 type Node struct {
 	Parent   *Node    `json:"-"`
 	Children []*Node  `json:"children"`
@@ -18,6 +21,7 @@ type Node struct {
 	Id       string   `json:"id"`
 }
 
+// NewNode creates and initializes new node with given value.
 func NewNode(parent *Node, value GameNode) Node {
 	return Node{
 		Parent:   parent,
@@ -26,17 +30,19 @@ func NewNode(parent *Node, value GameNode) Node {
 	}
 }
 
+// Init initializes node's type and unique identifier
 func (n *Node) Init() {
 	if n.Value != nil {
 		n.Type = strings.ToLower(reflect.TypeOf(n.Value).Elem().Name())
 	}
 
 	n.Id = n.Type + "_" + RandomString(
-		[]rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+		[]rune(NodeRandomIdValidChars),
 		NodeRandomIdLength,
 	)
 }
 
+// GetRoot returns root of tree (node that doesn't have parent)
 func (n *Node) GetRoot() *Node {
 	node := n
 
@@ -47,6 +53,7 @@ func (n *Node) GetRoot() *Node {
 	return node
 }
 
+// AddChildren adds given children to node
 func (n *Node) AddChildren(children ...*Node) {
 	for _, child := range children {
 		child.Parent = n
@@ -54,6 +61,7 @@ func (n *Node) AddChildren(children ...*Node) {
 	}
 }
 
+// AddGameNodes adds game nodes to node
 func (n *Node) AddGameNodes(gameNodes ...GameNode) {
 	for _, gameNode := range gameNodes {
 		newNode := NewNode(n, gameNode)
@@ -62,6 +70,7 @@ func (n *Node) AddGameNodes(gameNodes ...GameNode) {
 	}
 }
 
+// GetAllChildren returns all children of tree (recursively)
 func (n *Node) GetAllChildren() []*Node {
 	nodes := make([]*Node, 0)
 	nodes = append(nodes, n.Children...)
@@ -75,6 +84,8 @@ func (n *Node) GetAllChildren() []*Node {
 	return nodes
 }
 
+// FindAllChildrenByType finds all child nodes in the tree
+// by given type (recursively)
 func (n *Node) FindAllChildrenByType(type_ string) []*Node {
 	out := make([]*Node, 0)
 	for _, node := range n.GetAllChildren() {
@@ -85,6 +96,7 @@ func (n *Node) FindAllChildrenByType(type_ string) []*Node {
 	return out
 }
 
+// Destroy removes itself from parent node
 func (n *Node) Destroy() {
 	// find node in parent node
 	if n.Parent != nil {
@@ -97,6 +109,7 @@ func (n *Node) Destroy() {
 	}
 }
 
+// RandomString build string from randomly chosen characters of given length
 func RandomString(charset []rune, length int) string {
 	b := make([]rune, length)
 	for i := range b {
@@ -105,6 +118,10 @@ func RandomString(charset []rune, length int) string {
 	return string(b)
 }
 
+// GameNode is interface for all in-game objects. Function Process is called
+// every game tick. Function ListenMessages is used to tell game server for
+// what messages object want to listen and function Filter can be used to
+// add custom filtering given message instances.
 type GameNode interface {
 	Init(node *Node)
 	Process(playerMessages []interfaces.PlayerMessage, delta float64) // Called every tick

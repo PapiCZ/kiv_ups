@@ -3,15 +3,16 @@ package gameserver
 import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
-	"kiv_ups_server/game/gameserver/tree"
-	"kiv_ups_server/game/gameserver/tree/nodes"
-	"kiv_ups_server/game/interfaces"
+	"kiv_ups_server/masterserver/gameserver/tree"
+	"kiv_ups_server/masterserver/gameserver/tree/nodes"
+	"kiv_ups_server/masterserver/interfaces"
 	"kiv_ups_server/net/tcp"
 	"kiv_ups_server/net/tcp/protocol"
 	"reflect"
 	"time"
 )
 
+// GameServer is a structure that handles all data about ingame instance.
 type GameServer struct {
 	Tps                 int
 	tickDuration        int64
@@ -23,6 +24,7 @@ type GameServer struct {
 	Run                 bool
 }
 
+// NewGameServer creates and initializes new
 func NewGameServer() GameServer {
 	return GameServer{
 		Tps:                30,
@@ -36,11 +38,15 @@ func NewGameServer() GameServer {
 	}
 }
 
+// getElapsedMillis get number of milliseconds that has elapsed from GameServer
+// start
 func (gs *GameServer) getElapsedMillis() int64 {
 	return time.Since(gs.startTime).Milliseconds()
 }
 
-func (gs *GameServer) readRequestChanToList() []interfaces.PlayerMessage {
+// readRequestChanToSlice converts channel data to slice. The purpose is to
+// make it possible to read every message multiple times.
+func (gs *GameServer) readRequestChanToSlice() []interfaces.PlayerMessage {
 	requests := make([]interfaces.PlayerMessage, 0, 10)
 
 	done := false
@@ -64,6 +70,7 @@ func (gs *GameServer) readRequestChanToList() []interfaces.PlayerMessage {
 	return requests
 }
 
+// buildTree adds all required nodes to game tree
 func (gs *GameServer) buildTree() {
 	for _, player := range gs.GetPlayers() {
 		score := nodes.Score{
@@ -74,6 +81,7 @@ func (gs *GameServer) buildTree() {
 	gs.GameTree.AddGameNodes(&nodes.AsteroidWrapper{})
 }
 
+// initTree initializes all nodes in tree
 func (gs *GameServer) initTree() {
 	gs.GameTree.Init()
 
@@ -83,6 +91,8 @@ func (gs *GameServer) initTree() {
 	}
 }
 
+// Start initializes game tree and other values, and starts gameloop
+// that process all the magic in the game
 func (gs *GameServer) Start() {
 	log.Infoln("Starting game server...")
 
@@ -100,7 +110,7 @@ func (gs *GameServer) Start() {
 
 	// gameloop
 	for gs.Run {
-		playerMessagesBuffer = append(playerMessagesBuffer, gs.readRequestChanToList()...)
+		playerMessagesBuffer = append(playerMessagesBuffer, gs.readRequestChanToSlice()...)
 
 		for gs.getElapsedMillis() > nextGameTickTime {
 			// update game
@@ -142,11 +152,13 @@ func (gs *GameServer) Start() {
 	}
 }
 
+// ManageGame is primarily used to check whether gameloop should stop
 func (gs *GameServer) ManageGame() {
 	// Check if someone has over 50000
 	for _, node := range gs.GameTree.FindAllChildrenByType("score") {
 		score := node.Value.(*nodes.Score)
 		if score.Score > 50000 {
+			// Build score summary
 			scoreSummary := make([]PlayerScoreSummary, 0)
 			for _, _node := range gs.GameTree.FindAllChildrenByType("score") {
 				_score := _node.Value.(*nodes.Score)
@@ -157,6 +169,7 @@ func (gs *GameServer) ManageGame() {
 				})
 			}
 
+			// Reset certain variables and send score summary to all players
 			for _, player := range gs.Players {
 				player.SetGameServer(nil)
 				player.SetLoggedInMenuContext()
@@ -171,6 +184,7 @@ func (gs *GameServer) ManageGame() {
 				})
 			}
 
+			// Shutdown gameloop
 			gs.Run = false
 			return
 		}
@@ -190,6 +204,7 @@ func (gs *GameServer) ManageGame() {
 	}
 }
 
+// shareState sends current state of game tree to all players
 func (gs *GameServer) shareState() {
 	for _, player := range gs.GetPlayers() {
 		err := player.GetTCPClient().Send(protocol.ProtoMessage{
@@ -207,12 +222,14 @@ func (gs *GameServer) shareState() {
 	}
 }
 
+// AddPlayer adds player to game server
 func (gs *GameServer) AddPlayer(player interfaces.Player) {
 	gs.Players = append(gs.Players, player)
 	player.SetLoggedInMenuContext()
 	player.SetGameServer(gs)
 }
 
+// RemovePlayer removes player from game server
 func (gs *GameServer) RemovePlayer(player interfaces.Player) {
 	for i, _player := range gs.Players {
 		if player == _player {
@@ -247,18 +264,22 @@ func (gs *GameServer) RemovePlayer(player interfaces.Player) {
 	}
 }
 
+// GetPlayers is getter for players
 func (gs *GameServer) GetPlayers() []interfaces.Player {
 	return gs.Players
 }
 
+// GetRequestMessageChan is getter for request message channel
 func (gs *GameServer) GetRequestMessageChan() chan interfaces.PlayerMessage {
 	return gs.RequestMessageChan
 }
 
+// AddDisconnectedPlayer adds player to slice of disconnected players
 func (gs *GameServer) AddDisconnectedPlayer(player interfaces.Player) {
 	gs.DisconnectedPlayers = append(gs.DisconnectedPlayers, player)
 }
 
+// RemoveDisconnectedPlayer removes player from slice of disconnected players
 func (gs *GameServer) RemoveDisconnectedPlayer(player interfaces.Player) {
 	for i, disconnectedPlayer := range gs.DisconnectedPlayers {
 		if player == disconnectedPlayer {
@@ -268,6 +289,7 @@ func (gs *GameServer) RemoveDisconnectedPlayer(player interfaces.Player) {
 	}
 }
 
+// IsPlayerDisconnected checks if player is in slice of disconnected players
 func (gs *GameServer) IsPlayerDisconnected(player interfaces.Player) bool {
 	for _, disconnectedPlayer := range gs.DisconnectedPlayers {
 		if player == disconnectedPlayer {
@@ -278,10 +300,13 @@ func (gs *GameServer) IsPlayerDisconnected(player interfaces.Player) bool {
 	return false
 }
 
+// Checks if gameloop is running
 func (gs *GameServer) IsRunning() bool {
 	return gs.Run
 }
 
+// FilterMessagesByTypes filters given messages by given types and
+// returns slice of filtered messages
 func FilterMessagesByTypes(playerMessages []interfaces.PlayerMessage, types []protocol.Message) []interfaces.PlayerMessage {
 	filteredMessages := make([]interfaces.PlayerMessage, 0)
 

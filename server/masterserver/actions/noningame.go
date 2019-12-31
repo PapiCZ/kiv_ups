@@ -2,8 +2,8 @@ package actions
 
 import (
 	log "github.com/sirupsen/logrus"
-	"kiv_ups_server/game/gameserver"
-	"kiv_ups_server/game/interfaces"
+	"kiv_ups_server/masterserver/gameserver"
+	"kiv_ups_server/masterserver/interfaces"
 	"kiv_ups_server/net/tcp"
 	"kiv_ups_server/net/tcp/protocol"
 )

@@ -1,8 +1,8 @@
 package nodes
 
 import (
-	"kiv_ups_server/game/gameserver/tree"
-	"kiv_ups_server/game/interfaces"
+	"kiv_ups_server/masterserver/gameserver/tree"
+	"kiv_ups_server/masterserver/interfaces"
 	"kiv_ups_server/net/tcp/protocol"
 	"math/rand"
 )
@@ -11,6 +11,7 @@ const Width = 1920
 const Height = 1080
 const Margin = 100
 const BorderWidth = 100
+const AsteroidsLimit = 50
 
 type AsteroidWrapper struct {
 	Node *tree.Node `json:"-"`
@@ -21,7 +22,7 @@ func (a *AsteroidWrapper) Init(node *tree.Node) {
 }
 
 func (a *AsteroidWrapper) Process(playerMessages []interfaces.PlayerMessage, delta float64) {
-	if len(a.Node.Children) < 50 {
+	if len(a.Node.Children) < AsteroidsLimit {
 		// create new asteroid
 		// randomize pos x
 		var minX, maxX, minY, maxY int
@@ -52,6 +53,7 @@ func (a *AsteroidWrapper) Process(playerMessages []interfaces.PlayerMessage, del
 			maxY = Width + Margin + BorderWidth
 		}
 
+		// Create new asteroid at random position of random scale
 		posX := rand.Intn(maxX-minX) + minX
 		posY := rand.Intn(maxY-minY) + minY
 		node := tree.NewNode(a.Node, &Asteroid{

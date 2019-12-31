@@ -3,7 +3,7 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
-	"kiv_ups_server/game"
+	"kiv_ups_server/masterserver"
 	"net"
 	"net/http"
 	_ "net/http/pprof"
@@ -42,7 +42,7 @@ func main() {
 		Addr: [...]byte{host[12], host[13], host[14], host[15]},
 	}
 
-	gameServer := game.NewServer(&sockaddr)
+	gameServer := masterserver.NewServer(&sockaddr)
 
 	sigs := make(chan os.Signal, 1)
 

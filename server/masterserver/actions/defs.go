@@ -1,7 +1,7 @@
 package actions
 
 import (
-	interfaces "kiv_ups_server/game/interfaces"
+	interfaces "kiv_ups_server/masterserver/interfaces"
 	protocol "kiv_ups_server/net/tcp/protocol"
 )
 

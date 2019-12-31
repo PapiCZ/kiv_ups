@@ -1,8 +1,8 @@
 package nodes
 
 import (
-	"kiv_ups_server/game/gameserver/tree"
-	"kiv_ups_server/game/interfaces"
+	"kiv_ups_server/masterserver/gameserver/tree"
+	"kiv_ups_server/masterserver/interfaces"
 	"kiv_ups_server/net/tcp/protocol"
 )
 
