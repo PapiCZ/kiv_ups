@@ -41,6 +41,8 @@ func (s *Spaceship) Process(playerMessages []interfaces.PlayerMessage, delta flo
 	for _, playerMessage := range playerMessages {
 		message := playerMessage.GetMessage().Message
 		if v, ok := message.(*protocol.PlayerMoveMessage); ok {
+			// TODO: Player can cheat
+
 			s.PosX = v.PosX
 			s.PosY = v.PosY
 			s.VelocityX = v.VelocityX
