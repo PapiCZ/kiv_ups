@@ -11,6 +11,7 @@ import (
 func (a KeepAliveAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	keepAliveData := m.GetMessage().Message.(*protocol.KeepAliveMessage)
 
+	// Check if player sent valid data
 	if keepAliveData.Ping == "pong" {
 		m.GetPlayer().RefreshKeepAlive()
 		return ActionResponse{
@@ -40,6 +41,7 @@ func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.Play
 	// Reconnect?
 	for _, player := range s.GetPlayers() {
 		if player.GetName() == authenticateData.Name {
+			// Set new TCP client to old, disconnected player
 			player.SetTCPClient(m.GetPlayer().GetTCPClient())
 			connectedPlayer = player
 			if player.GetGameServer() != nil && !player.GetGameServer().IsRunning() {
@@ -50,6 +52,7 @@ func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.Play
 		}
 	}
 
+	// Authenticate player
 	s.Authenticate(ConvertShadowPlayerToPlayer(connectedPlayer, authenticateData.Name))
 	connectedPlayer.SetContext(LoggedInMenuContext)
 
@@ -65,7 +68,7 @@ func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.Play
 
 func (a CreateLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	if m.GetPlayer().GetConnectedLobby() == nil {
-
+		// Create new lobby and add it to server
 		createLobbyData := m.GetMessage().Message.(*protocol.CreateLobbyMessage)
 		lobby := interfaces.Lobby{
 			Name:         createLobbyData.Name,
@@ -74,10 +77,13 @@ func (a CreateLobbyAction) Process(s interfaces.MasterServer, m interfaces.Playe
 			PlayersLimit: createLobbyData.PlayersLimit,
 		}
 		s.AddLobby(&lobby)
+
+		// Add lobby owner to lobby
 		lobby.AddPlayer(m.GetPlayer())
 
 		log.Infof("Added lobby %s", createLobbyData.Name)
 
+		// Move player to lobby context
 		m.GetPlayer().SetContext(LobbyContext)
 		m.GetPlayer().SetConnectedLobby(&lobby)
 		return ActionResponse{
@@ -104,6 +110,7 @@ func (a DeleteLobbyAction) Process(s interfaces.MasterServer, m interfaces.Playe
 	deleteLobbyData := m.GetMessage().Message.(*protocol.DeleteLobbyMessage)
 	lobby, err := s.GetLobby(deleteLobbyData.Name)
 
+	// Delete lobby by given name
 	if err != nil || lobby.Owner != m.GetPlayer() {
 		return ActionResponse{
 			ServerMessage: tcp.ServerMessage{
@@ -156,6 +163,8 @@ func (a JoinLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 	joinLobbyData := m.GetMessage().Message.(*protocol.JoinLobbyMessage)
 	lobby, err := s.GetLobby(joinLobbyData.Name)
 	if err != nil || len(lobby.Players) >= lobby.PlayersLimit {
+		// Send error if lobby doesn't exist or lobby contains maximum
+		// number of players
 		return ActionResponse{
 			ServerMessage: tcp.ServerMessage{
 				Data:    &protocol.JoinLobbyResponseMessage{},
@@ -166,6 +175,7 @@ func (a JoinLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 		}
 	}
 
+	// Notify all players about new player
 	s.SendMessageWithoutRequest(tcp.ServerMessage{
 		Data:    &protocol.LobbyPlayerConnectedMessage{Name: m.GetPlayer().GetName()},
 		Status:  true,
@@ -199,13 +209,16 @@ func (a LeaveLobbyAction) Process(s interfaces.MasterServer, m interfaces.Player
 		}
 	}
 
+	// Remove player from lobby and change its context
 	playerLobby.RemovePlayer(m.GetPlayer())
 	m.GetPlayer().SetConnectedLobby(nil)
 	m.GetPlayer().SetContext(LoggedInMenuContext)
 
 	if len(playerLobby.Players) == 0 {
+		// Delete lobby if all players has disconnected
 		s.DeleteLobby(playerLobby.Name)
 	} else {
+		// Notify all remaining player about disconnection
 		s.SendMessageWithoutRequest(tcp.ServerMessage{
 			Data:    &protocol.LobbyPlayerDisconnectedMessage{Name: m.GetPlayer().GetName()},
 			Status:  true,
@@ -237,6 +250,7 @@ func (a ListLobbyPlayersAction) Process(s interfaces.MasterServer, m interfaces.
 		}
 	}
 
+	// Convert all connected players to slice
 	playerNames := make([]string, 0)
 	for _, player := range lobby.GetPlayers() {
 		playerNames = append(playerNames, player.GetName())
@@ -253,6 +267,7 @@ func (a ListLobbyPlayersAction) Process(s interfaces.MasterServer, m interfaces.
 }
 
 func (a GameReconnectAvailableAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
+	// Check if player can reconnect to game
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
 			Data: &protocol.GameReconnectAvailableResponseMessage{
@@ -267,6 +282,7 @@ func (a GameReconnectAvailableAction) Process(s interfaces.MasterServer, m inter
 
 
 func (a ReconnectAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
+	// Reconnect player to game
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
 			Data: &protocol.GameReconnectAvailableResponseMessage{
@@ -281,6 +297,7 @@ func (a ReconnectAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 
 func (a LeaveGameAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	m.GetPlayer().LeaveGame()
+	// Remove player from game
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
 			Data: &protocol.GameReconnectAvailableResponseMessage{
@@ -296,6 +313,7 @@ func (a LeaveGameAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 func (a StartGameAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	gs := gameserver.NewGameServer()
 
+	// Add all players to game server and start the game
 	for _, player := range m.GetPlayer().GetConnectedLobby().GetPlayers() {
 		gs.AddPlayer(player)
 		player.SetGameServer(&gs)

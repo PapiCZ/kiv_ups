@@ -18,6 +18,7 @@ func _on_lobbies_loaded(data):
 		$FormContainer/PanelContainer/ScrollContainer/LobbyList.add_child(button)
 
 func _connect_lobby(lobby_name):
+	Menu.reset(Menu.MENU_LEVEL.LOBBY)
 	Network.send({
 		"name": lobby_name
 	}, MessageTypes.JOIN_LOBBY, self, "_on_lobby_connected", [lobby_name])

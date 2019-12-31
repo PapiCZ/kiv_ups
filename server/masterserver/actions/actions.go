@@ -25,6 +25,7 @@ func NewDefinition() ActionDefinition {
 	return ActionDefinition{actionMap: make(map[interfaces.PlayerContext]map[protocol.MessageType]Action)}
 }
 
+// Register registers given action according to message type ID and message contexts
 func (ad *ActionDefinition) Register(action Action) {
 	for _, ctx := range action.GetPlayerContexts() {
 		playerCtx := ctx
@@ -37,6 +38,7 @@ func (ad *ActionDefinition) Register(action Action) {
 	}
 }
 
+// GetAction returns action according to given message type and context
 func (ad *ActionDefinition) GetAction(messageType protocol.MessageType, context interfaces.PlayerContext) Action {
 	return ad.actionMap[context][messageType]
 }

@@ -144,7 +144,21 @@ func (s *Server) SendMessage(sm tcp.ServerMessage, requestId protocol.RequestId,
 }
 
 func (s *Server) OnPlayerDisconnected(player interfaces.Player) {
+	lobby := player.GetConnectedLobby()
+	if lobby != nil {
+		lobby.RemovePlayer(player)
 
+		// Notify all players in lobby about disconnection
+		s.SendMessageWithoutRequest(tcp.ServerMessage{
+			Data:    &protocol.LobbyPlayerDisconnectedMessage{Name: player.GetName()},
+			Status:  true,
+			Message: "",
+		}, lobby.GetPlayers()...)
+
+		if len(lobby.Players) == 0 {
+			s.DeleteLobby(lobby.Name)
+		}
+	}
 }
 
 // Stop stops mater server
