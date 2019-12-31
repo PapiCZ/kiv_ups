@@ -89,6 +89,7 @@ func _physics_process(delta):
 			"rotation": rotation,
 		}, MessageTypes.PLAYER_MOVE)
 
+
 	nlast_position = position
 	nlast_velocity = velocity
 	nlast_rotation = rotation

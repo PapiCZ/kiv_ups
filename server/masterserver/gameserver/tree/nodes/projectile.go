@@ -8,13 +8,13 @@ import (
 )
 
 type Projectile struct {
-	PosX      float64           `json:"pos_x"`
-	PosY      float64           `json:"pos_y"`
-	VelocityX float64           `json:"velocity_x"`
-	VelocityY float64           `json:"velocity_y"`
-	Rotation  float64           `json:"rotation"`
-	Player    interfaces.Player `json:"-"`
-	Node      *tree.Node        `json:"-"`
+	PosX             float64           `json:"pos_x"`
+	PosY             float64           `json:"pos_y"`
+	VelocityX        float64           `json:"velocity_x"`
+	VelocityY        float64           `json:"velocity_y"`
+	Rotation         float64           `json:"rotation"`
+	Player           interfaces.Player `json:"-"`
+	Node             *tree.Node        `json:"-"`
 }
 
 func (p *Projectile) Init(node *tree.Node) {
@@ -22,8 +22,6 @@ func (p *Projectile) Init(node *tree.Node) {
 }
 
 func (p *Projectile) Process(playerMessages []interfaces.PlayerMessage, delta float64) {
-	// TODO: player can shoot how much projectiles he want
-
 	p.PosX += p.VelocityX * delta
 	p.PosY += p.VelocityY * delta
 

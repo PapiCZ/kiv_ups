@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const KeepaliveTimeoutTolerance = 2
+
 // Player structure is a structure that handles that handles
 // player's TCP client, name, connected lobby, connected GameServer and last
 // keep-alive timestamp that is used to indicate whether is player still connected
@@ -86,7 +88,7 @@ func (p *Player) LeaveGame() {
 }
 
 func (p *Player) IsConnected() bool {
-	return time.Now().Unix() < p.LastKeepAlive + 2
+	return time.Now().Unix() < p.LastKeepAlive +KeepaliveTimeoutTolerance
 }
 
 func (p *Player) RefreshKeepAlive() {

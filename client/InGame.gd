@@ -66,7 +66,9 @@ func create_spaceship(node):
 func update_spaceship(spaceship, node):
 	if node.value.reload_position:
 		spaceship.position = Vector2(node.value.pos_x, node.value.pos_y)
-		spaceship.speed = 0
+		spaceship.speed = Vector2(node.value.velocity_x, node.value.velocity_y).length() - spaceship.velocity.length()
+		spaceship.velocity = Vector2(node.value.velocity_x, node.value.velocity_y)
+		spaceship.rotation = node.value.rotation
 
 	if node.value.immune:
 		spaceship.modulate = Color(1, 1, 1, 0.5)
