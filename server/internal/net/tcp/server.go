@@ -3,7 +3,7 @@ package tcp
 import (
 	log "github.com/sirupsen/logrus"
 	"io"
-	"kiv_ups_server/net/tcp/protocol"
+	protocol2 "kiv_ups_server/internal/net/tcp/protocol"
 	"syscall"
 	"unsafe"
 )
@@ -25,7 +25,7 @@ const (
 type Server struct {
 	TCP      *TCP
 	Clients  map[int]*Client
-	Protocol protocol.GameProtocol
+	Protocol protocol2.GameProtocol
 }
 
 // NewServer initializes TCP server
@@ -59,9 +59,9 @@ func NewServer(sockaddr syscall.Sockaddr) (server *Server, err error) {
 	err = nil
 
 	// Initialize protocol and its definition
-	def := protocol.NewDefinition()
-	protocol.RegisterAllMessages(&def)
-	proto := protocol.GameProtocol{Def: def}
+	def := protocol2.NewDefinition()
+	protocol2.RegisterAllMessages(&def)
+	proto := protocol2.GameProtocol{Def: def}
 
 	// Initialize Server structure
 	server = &Server{
@@ -121,7 +121,7 @@ func (s *Server) Start(clientMessageChan chan ClientMessage) {
 			}
 
 			// Initialize new client and
-			client := newClient(clientFd, sockaddr, s.Protocol, make(chan *protocol.ProtoMessage))
+			client := newClient(clientFd, sockaddr, s.Protocol, make(chan *protocol2.ProtoMessage))
 			s.Clients[client.TCP.FD] = &client
 			reader, writer := io.Pipe()
 			if err != nil {
@@ -269,11 +269,11 @@ func FD_ZERO(p *syscall.FdSet) {
 }
 
 type ServerMessage struct {
-	Status  bool             `json:"status"`
-	Message string           `json:"message"`
-	Data    protocol.Message `json:"data"`
+	Status  bool              `json:"status"`
+	Message string            `json:"message"`
+	Data    protocol2.Message `json:"data"`
 }
 
-func (sm ServerMessage) GetTypeId() protocol.MessageType {
+func (sm ServerMessage) GetTypeId() protocol2.MessageType {
 	return sm.Data.GetTypeId()
 }

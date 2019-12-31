@@ -1,7 +1,7 @@
 package interfaces
 
 import (
-	"kiv_ups_server/net/tcp"
+	"kiv_ups_server/internal/net/tcp"
 )
 
 type PlayerContext int

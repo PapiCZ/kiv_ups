@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"io"
-	"kiv_ups_server/net/tcp/protocol"
+	"kiv_ups_server/internal/net/tcp/protocol"
 	"sync"
 	"testing"
 )
@@ -73,7 +73,7 @@ func TestSimpleDecode(t *testing.T) {
 func TestEncodeAndDecode(t *testing.T) {
 	def := protocol.NewDefinition()
 	def.Register(FooMessage{})
-	proto := protocol.GameProtocol{Def:def}
+	proto := protocol.GameProtocol{Def: def}
 	reader, writer := io.Pipe()
 
 	wg := sync.WaitGroup{}
@@ -113,7 +113,7 @@ func TestEncodeAndDecode(t *testing.T) {
 func TestDecodeAndEncode(t *testing.T) {
 	def := protocol.NewDefinition()
 	def.Register(FooMessage{})
-	proto := protocol.GameProtocol{Def:def}
+	proto := protocol.GameProtocol{Def: def}
 	reader, writer := io.Pipe()
 
 	wg := sync.WaitGroup{}

@@ -3,10 +3,10 @@ package masterserver
 import (
 	"errors"
 	log "github.com/sirupsen/logrus"
-	"kiv_ups_server/masterserver/actions"
-	"kiv_ups_server/masterserver/interfaces"
-	"kiv_ups_server/net/tcp"
-	"kiv_ups_server/net/tcp/protocol"
+	actions2 "kiv_ups_server/internal/masterserver/actions"
+	interfaces2 "kiv_ups_server/internal/masterserver/interfaces"
+	"kiv_ups_server/internal/net/tcp"
+	"kiv_ups_server/internal/net/tcp/protocol"
 	"strconv"
 	"syscall"
 )
@@ -20,10 +20,10 @@ const (
 // players, game servers and data for routing incoming messages
 type Server struct {
 	TCPServer        *tcp.Server
-	Players          map[tcp.UID]interfaces.Player
-	ActionDefinition actions.ActionDefinition
-	Lobbies          map[string]*interfaces.Lobby
-	GameServers      []interfaces.GameServer
+	Players          map[tcp.UID]interfaces2.Player
+	ActionDefinition actions2.ActionDefinition
+	Lobbies          map[string]*interfaces2.Lobby
+	GameServers      []interfaces2.GameServer
 }
 
 // NewServer creates and initializes master server
@@ -36,13 +36,13 @@ func NewServer(sockaddr syscall.Sockaddr) (ms Server) {
 
 	ms = Server{
 		TCPServer:        server,
-		Players:          make(map[tcp.UID]interfaces.Player),
-		ActionDefinition: actions.NewDefinition(),
-		Lobbies:          make(map[string]*interfaces.Lobby),
-		GameServers:      make([]interfaces.GameServer, 0),
+		Players:          make(map[tcp.UID]interfaces2.Player),
+		ActionDefinition: actions2.NewDefinition(),
+		Lobbies:          make(map[string]*interfaces2.Lobby),
+		GameServers:      make([]interfaces2.GameServer, 0),
 	}
 
-	actions.RegisterAllActions(&ms.ActionDefinition)
+	actions2.RegisterAllActions(&ms.ActionDefinition)
 
 	return
 }
@@ -65,12 +65,12 @@ func (s *Server) Start() (err error) {
 // RunAction routes incoming messages to its actions and returns response to clients.
 func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 	p, ok := s.Players[message.Sender.UID]
-	var player interfaces.Player
+	var player interfaces2.Player
 	if ok {
 		player = p
 	} else {
 		// Client isn't authenticated. We need to create ShadowPlayer.
-		pl := NewShadowPlayer(message.Sender, "", interfaces.PlayerContext(0))
+		pl := NewShadowPlayer(message.Sender, "", interfaces2.PlayerContext(0))
 		player = &pl
 	}
 
@@ -124,12 +124,12 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 }
 
 // SendMessageWithoutRequest allows to send message from server without request ID
-func (s *Server) SendMessageWithoutRequest(sm tcp.ServerMessage, player ...interfaces.Player) {
+func (s *Server) SendMessageWithoutRequest(sm tcp.ServerMessage, player ...interfaces2.Player) {
 	s.SendMessage(sm, "", player...)
 }
 
 // SendMessage sends ServerMessage to all given players
-func (s *Server) SendMessage(sm tcp.ServerMessage, requestId protocol.RequestId, player ...interfaces.Player) {
+func (s *Server) SendMessage(sm tcp.ServerMessage, requestId protocol.RequestId, player ...interfaces2.Player) {
 	for _, p := range player {
 		log.Tracef("Server answers to client %d: %#v | Data: %#v", p.GetUID(), sm, sm.Data)
 		err := p.GetTCPClient().Send(protocol.ProtoMessage{
@@ -143,7 +143,7 @@ func (s *Server) SendMessage(sm tcp.ServerMessage, requestId protocol.RequestId,
 	}
 }
 
-func (s *Server) OnPlayerDisconnected(player interfaces.Player) {
+func (s *Server) OnPlayerDisconnected(player interfaces2.Player) {
 	lobby := player.GetConnectedLobby()
 	if lobby != nil {
 		lobby.RemovePlayer(player)
@@ -172,19 +172,19 @@ func (s *Server) GetTCPServer() *tcp.Server {
 }
 
 // GetPlayers is getter for players
-func (s *Server) GetPlayers() map[tcp.UID]interfaces.Player {
+func (s *Server) GetPlayers() map[tcp.UID]interfaces2.Player {
 	return s.Players
 }
 
 // Authenticate authenticates given player
-func (s *Server) Authenticate(player interfaces.Player) {
+func (s *Server) Authenticate(player interfaces2.Player) {
 	s.Players[player.GetTCPClient().UID] = player
 
 	log.Infoln("Authenticated player", player.GetName())
 }
 
 // AddLobby adds lobby to master server
-func (s *Server) AddLobby(lobby *interfaces.Lobby) {
+func (s *Server) AddLobby(lobby *interfaces2.Lobby) {
 	s.Lobbies[lobby.Name] = lobby
 }
 
@@ -194,7 +194,7 @@ func (s *Server) DeleteLobby(name string) {
 }
 
 // GetLobby returns lobby by its name.
-func (s *Server) GetLobby(name string) (*interfaces.Lobby, error) {
+func (s *Server) GetLobby(name string) (*interfaces2.Lobby, error) {
 	lobby, ok := s.Lobbies[name]
 
 	if ok {
@@ -205,8 +205,8 @@ func (s *Server) GetLobby(name string) (*interfaces.Lobby, error) {
 }
 
 // GetLobbies is getter for all lobbies
-func (s *Server) GetLobbies() []*interfaces.Lobby {
-	v := make([]*interfaces.Lobby, 0, len(s.Lobbies))
+func (s *Server) GetLobbies() []*interfaces2.Lobby {
+	v := make([]*interfaces2.Lobby, 0, len(s.Lobbies))
 
 	for _, value := range s.Lobbies {
 		v = append(v, value)
@@ -216,19 +216,19 @@ func (s *Server) GetLobbies() []*interfaces.Lobby {
 }
 
 // AddGameServer adds game server to master server
-func (s *Server) AddGameServer(gs interfaces.GameServer) {
+func (s *Server) AddGameServer(gs interfaces2.GameServer) {
 	s.GameServers = append(s.GameServers, gs)
 }
 
 type PlayerMessage struct {
 	*tcp.ClientMessage
-	interfaces.Player
+	interfaces2.Player
 }
 
 func (p *PlayerMessage) GetMessage() *tcp.ClientMessage {
 	return p.ClientMessage
 }
 
-func (p PlayerMessage) GetPlayer() interfaces.Player {
+func (p PlayerMessage) GetPlayer() interfaces2.Player {
 	return p.Player
 }

@@ -1,9 +1,9 @@
 package masterserver
 
 import (
-	"kiv_ups_server/masterserver/actions"
-	"kiv_ups_server/masterserver/interfaces"
-	"kiv_ups_server/net/tcp"
+	actions2 "kiv_ups_server/internal/masterserver/actions"
+	interfaces2 "kiv_ups_server/internal/masterserver/interfaces"
+	"kiv_ups_server/internal/net/tcp"
 	"time"
 )
 
@@ -12,17 +12,17 @@ import (
 // keep-alive timestamp that is used to indicate whether is player still connected
 type Player struct {
 	tcpClient      *tcp.Client
-	UID            interfaces.PlayerUID
+	UID            interfaces2.PlayerUID
 	Name           string
-	Context        interfaces.PlayerContext
-	ConnectedLobby *interfaces.Lobby
-	GameServer     interfaces.GameServer
+	Context        interfaces2.PlayerContext
+	ConnectedLobby *interfaces2.Lobby
+	GameServer     interfaces2.GameServer
 	LastKeepAlive  int64
 }
 
 // NewShadowPlayer creates and initializes Player structure with UID 0,
 // that is reserved for player that isn't authenticated
-func NewShadowPlayer(client *tcp.Client, name string, context interfaces.PlayerContext) Player {
+func NewShadowPlayer(client *tcp.Client, name string, context interfaces2.PlayerContext) Player {
 	return Player{
 		tcpClient: client,
 		UID:       0,
@@ -39,11 +39,11 @@ func (p *Player) GetTCPClient() *tcp.Client {
 	return p.tcpClient
 }
 
-func (p *Player) SetUID(uid interfaces.PlayerUID) {
+func (p *Player) SetUID(uid interfaces2.PlayerUID) {
 	p.UID = uid
 }
 
-func (p *Player) GetUID() interfaces.PlayerUID {
+func (p *Player) GetUID() interfaces2.PlayerUID {
 	return p.UID
 }
 
@@ -55,27 +55,27 @@ func (p *Player) GetName() string {
 	return p.Name
 }
 
-func (p *Player) GetContext() interfaces.PlayerContext {
+func (p *Player) GetContext() interfaces2.PlayerContext {
 	return p.Context
 }
 
-func (p *Player) SetContext(ctx interfaces.PlayerContext) {
+func (p *Player) SetContext(ctx interfaces2.PlayerContext) {
 	p.Context = ctx
 }
 
-func (p *Player) SetConnectedLobby(lobby *interfaces.Lobby) {
+func (p *Player) SetConnectedLobby(lobby *interfaces2.Lobby) {
 	p.ConnectedLobby = lobby
 }
 
-func (p *Player) GetConnectedLobby() *interfaces.Lobby {
+func (p *Player) GetConnectedLobby() *interfaces2.Lobby {
 	return p.ConnectedLobby
 }
 
-func (p *Player) SetGameServer(gs interfaces.GameServer) {
+func (p *Player) SetGameServer(gs interfaces2.GameServer) {
 	p.GameServer = gs
 }
 
-func (p *Player) GetGameServer() interfaces.GameServer {
+func (p *Player) GetGameServer() interfaces2.GameServer {
 	return p.GameServer
 }
 
@@ -94,5 +94,5 @@ func (p *Player) RefreshKeepAlive() {
 }
 
 func (p *Player) SetLoggedInMenuContext() {
-	p.SetContext(actions.LoggedInMenuContext)
+	p.SetContext(actions2.LoggedInMenuContext)
 }

@@ -1,26 +1,26 @@
 package nodes
 
 import (
-	"kiv_ups_server/masterserver/gameserver/tree"
-	"kiv_ups_server/masterserver/interfaces"
-	"kiv_ups_server/net/tcp/protocol"
+	tree2 "kiv_ups_server/internal/masterserver/gameserver/tree"
+	interfaces2 "kiv_ups_server/internal/masterserver/interfaces"
+	"kiv_ups_server/internal/net/tcp/protocol"
 )
 
 type Projectile struct {
-	PosX      float64           `json:"pos_x"`
-	PosY      float64           `json:"pos_y"`
-	VelocityX float64           `json:"velocity_x"`
-	VelocityY float64           `json:"velocity_y"`
-	Rotation  float64           `json:"rotation"`
-	Player    interfaces.Player `json:"-"`
-	Node      *tree.Node        `json:"-"`
+	PosX      float64            `json:"pos_x"`
+	PosY      float64            `json:"pos_y"`
+	VelocityX float64            `json:"velocity_x"`
+	VelocityY float64            `json:"velocity_y"`
+	Rotation  float64            `json:"rotation"`
+	Player    interfaces2.Player `json:"-"`
+	Node      *tree2.Node        `json:"-"`
 }
 
-func (p *Projectile) Init(node *tree.Node) {
+func (p *Projectile) Init(node *tree2.Node) {
 	p.Node = node
 }
 
-func (p *Projectile) Process(playerMessages []interfaces.PlayerMessage, delta float64) {
+func (p *Projectile) Process(playerMessages []interfaces2.PlayerMessage, delta float64) {
 	p.PosX += p.VelocityX * delta
 	p.PosY += p.VelocityY * delta
 
@@ -71,10 +71,10 @@ func (p *Projectile) Process(playerMessages []interfaces.PlayerMessage, delta fl
 					Node:      nil,
 				}
 
-				node1 := tree.NewNode(node.Parent, &newAsteroid1)
+				node1 := tree2.NewNode(node.Parent, &newAsteroid1)
 				node1.Init()
 				node1.Value.Init(&node1)
-				node2 := tree.NewNode(node.Parent, &newAsteroid2)
+				node2 := tree2.NewNode(node.Parent, &newAsteroid2)
 				node2.Init()
 				node2.Value.Init(&node2)
 				node.Parent.Children = append(node.Parent.Children, &node1)
@@ -111,7 +111,7 @@ func (p *Projectile) Process(playerMessages []interfaces.PlayerMessage, delta fl
 }
 
 // AddPlayerScore adds given amount of score to given player
-func (p *Projectile) AddPlayerScore(player interfaces.Player, score int) {
+func (p *Projectile) AddPlayerScore(player interfaces2.Player, score int) {
 	for _, node := range p.Node.GetRoot().FindAllChildrenByType("score") {
 		scoreGameNode := node.Value.(*Score)
 
@@ -126,6 +126,6 @@ func (p *Projectile) ListenMessages() []protocol.Message {
 	return []protocol.Message{}
 }
 
-func (p *Projectile) Filter(playerMessages []interfaces.PlayerMessage) []interfaces.PlayerMessage {
+func (p *Projectile) Filter(playerMessages []interfaces2.PlayerMessage) []interfaces2.PlayerMessage {
 	return playerMessages
 }
