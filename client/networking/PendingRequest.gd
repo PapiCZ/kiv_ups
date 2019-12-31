@@ -15,5 +15,5 @@ var _response_args
 var _timeout_callback_obj = null
 var _timeout_callback_func = null
 var _timeout_args
-var _timeout = 0.3 # seconds
+var _timeout = 1 # seconds
 var _timeout_timer = null

@@ -11,7 +11,7 @@ import (
 	"math/rand"
 )
 
-const ShootTimeout = 0.2
+const ShootTimeout = 0.15
 const Friction = 0.7
 const MaxSpeed = 500
 const RotationSpeed = 200
@@ -193,13 +193,14 @@ func (s *Spaceship) PositionAntiCheat(m *protocol.PlayerMoveMessage, delta float
 		IsNumberInTolerance(m.PosX, settings.Width, AntiCheatPositionTolerance) ||
 		IsNumberInTolerance(m.PosY, 0, AntiCheatPositionTolerance) ||
 		IsNumberInTolerance(m.PosY, settings.Height, AntiCheatPositionTolerance)) {
-		logrus.Errorln(m.PosX, m.PosY)
+		logrus.Errorln("Invalid speed")
 		return false
 	}
 
 	// m.VelocityX and m.VelocityY contains valid values, it's safe to use
 	validArea := Circle{s.PosX, s.PosY, Vector{m.VelocityX, m.VelocityY}.Length() + AntiCheatTolerance}
 	if !validArea.IsPointInside(m.PosX, m.PosY) {
+        logrus.Errorln("Invalid position")
 		return false
 	}
 
@@ -209,7 +210,7 @@ func (s *Spaceship) PositionAntiCheat(m *protocol.PlayerMoveMessage, delta float
 func IsNumberInTolerance(shouldBe float64, number float64, tolerance float64) bool {
 	min := shouldBe - tolerance
 	max := shouldBe + tolerance
-	fmt.Println(min, "<", number, "&&", number, "<", max)
+	//fmt.Println(min, "<", number, "&&", number, "<", max)
 
 	return min < number && number < max
 }
