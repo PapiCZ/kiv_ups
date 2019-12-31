@@ -1,30 +1,30 @@
 package nodes
 
 import (
-	"kiv_ups_server/internal/masterserver/gameserver/settings"
-	tree2 "kiv_ups_server/internal/masterserver/gameserver/tree"
-	interfaces2 "kiv_ups_server/internal/masterserver/interfaces"
-	"kiv_ups_server/internal/net/tcp/protocol"
+	settings2 "kiv_ups_server/masterserver/gameserver/settings"
+	"kiv_ups_server/masterserver/gameserver/tree"
+	"kiv_ups_server/masterserver/interfaces"
+	"kiv_ups_server/net/tcp/protocol"
 	"math/rand"
 )
 
 type Spaceship struct {
-	PosX           float64            `json:"pos_x"`
-	PosY           float64            `json:"pos_y"`
-	VelocityX      float64            `json:"velocity_x"`
-	VelocityY      float64            `json:"velocity_y"`
-	Rotation       float64            `json:"rotation"`
-	PlayerName     string             `json:"player_name"`
-	Immune         bool               `json:"immune"`
-	ReloadPosition bool               `json:"reload_position"`
-	Player         interfaces2.Player `json:"-"`
-	Score          *Score             `json:"-"`
-	ImmuneTime     float64            `json:"-"`
-	Radius         float64            `json:"-"`
-	Node           *tree2.Node        `json:"-"`
+	PosX           float64           `json:"pos_x"`
+	PosY           float64           `json:"pos_y"`
+	VelocityX      float64           `json:"velocity_x"`
+	VelocityY      float64           `json:"velocity_y"`
+	Rotation       float64           `json:"rotation"`
+	PlayerName     string            `json:"player_name"`
+	Immune         bool              `json:"immune"`
+	ReloadPosition bool              `json:"reload_position"`
+	Player         interfaces.Player `json:"-"`
+	Score          *Score            `json:"-"`
+	ImmuneTime     float64           `json:"-"`
+	Radius         float64           `json:"-"`
+	Node           *tree.Node        `json:"-"`
 }
 
-func (s *Spaceship) Init(node *tree2.Node) {
+func (s *Spaceship) Init(node *tree.Node) {
 	s.Node = node
 	s.Radius = 50
 
@@ -33,7 +33,7 @@ func (s *Spaceship) Init(node *tree2.Node) {
 	}
 }
 
-func (s *Spaceship) Process(playerMessages []interfaces2.PlayerMessage, delta float64) {
+func (s *Spaceship) Process(playerMessages []interfaces.PlayerMessage, delta float64) {
 	if s.ReloadPosition {
 		s.ReloadPosition = false
 	}
@@ -51,7 +51,7 @@ func (s *Spaceship) Process(playerMessages []interfaces2.PlayerMessage, delta fl
 			velocity := Vector{0, -1}
 			velocity = velocity.Rotated(s.Rotation).Normalized()
 
-			node := tree2.NewNode(s.Node.Parent, &Projectile{
+			node := tree.NewNode(s.Node.Parent, &Projectile{
 				PosX:      s.PosX,
 				PosY:      s.PosY,
 				VelocityX: velocity.X * 600,
@@ -96,8 +96,8 @@ func (s *Spaceship) ListenMessages() []protocol.Message {
 	return []protocol.Message{protocol.PlayerMoveMessage{}, protocol.ShootProjectileMessage{}}
 }
 
-func (s *Spaceship) Filter(playerMessages []interfaces2.PlayerMessage) []interfaces2.PlayerMessage {
-	filteredPlayerMessages := make([]interfaces2.PlayerMessage, 0)
+func (s *Spaceship) Filter(playerMessages []interfaces.PlayerMessage) []interfaces.PlayerMessage {
+	filteredPlayerMessages := make([]interfaces.PlayerMessage, 0)
 
 	for _, playerMessage := range playerMessages {
 		if _, ok := playerMessage.GetMessage().Message.(*protocol.PlayerMoveMessage); ok &&
@@ -117,8 +117,8 @@ func (s *Spaceship) Filter(playerMessages []interfaces2.PlayerMessage) []interfa
 }
 
 func (s *Spaceship) RandomizePosition() {
-	s.PosX = float64(rand.Intn(settings.Width))
-	s.PosY = float64(rand.Intn(settings.Height))
+	s.PosX = float64(rand.Intn(settings2.Width))
+	s.PosY = float64(rand.Intn(settings2.Height))
 	s.ReloadPosition = true
 }
 

@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"io"
 	"io/ioutil"
-	protocol2 "kiv_ups_server/internal/net/tcp/protocol"
+	"kiv_ups_server/net/tcp/protocol"
 	"math/rand"
 	"syscall"
 )
@@ -16,16 +16,16 @@ type UID int
 type Client struct {
 	TCP          *TCP
 	UID          UID
-	MessageChan  chan *protocol2.ProtoMessage
-	Protocol     protocol2.GameProtocol
+	MessageChan  chan *protocol.ProtoMessage
+	Protocol     protocol.GameProtocol
 	failCounter  int
 	decodeReader io.ReadCloser
 	decodeWriter io.WriteCloser
 }
 
 // newClient initializes new client
-func newClient(fd int, sockaddr syscall.Sockaddr, protocol protocol2.GameProtocol,
-	messageChan chan *protocol2.ProtoMessage) Client {
+func newClient(fd int, sockaddr syscall.Sockaddr, protocol protocol.GameProtocol,
+	messageChan chan *protocol.ProtoMessage) Client {
 	return Client{
 		TCP: &TCP{
 			FD:       fd,
@@ -38,7 +38,7 @@ func newClient(fd int, sockaddr syscall.Sockaddr, protocol protocol2.GameProtoco
 }
 
 // Send encodes given message and sends it to client
-func (c Client) Send(message protocol2.ProtoMessage) (err error) {
+func (c Client) Send(message protocol.ProtoMessage) (err error) {
 	reader, writer := io.Pipe()
 
 	go c.Protocol.Encode(message, writer)
@@ -63,8 +63,8 @@ func (c *Client) SendBytes(message []byte) (err error) {
 }
 
 type ClientMessage struct {
-	protocol2.Message
-	protocol2.RequestId
+	protocol.Message
+	protocol.RequestId
 	Sender            *Client
 
 	// DisconnectRequest is used to notify master server about

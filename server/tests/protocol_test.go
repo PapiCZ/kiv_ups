@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"io"
-	"kiv_ups_server/internal/net/tcp/protocol"
+	"kiv_ups_server/net/tcp/protocol"
 	"sync"
 	"testing"
 )

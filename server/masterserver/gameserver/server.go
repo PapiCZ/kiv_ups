@@ -3,11 +3,11 @@ package gameserver
 import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
-	tree2 "kiv_ups_server/internal/masterserver/gameserver/tree"
-	nodes2 "kiv_ups_server/internal/masterserver/gameserver/tree/nodes"
-	interfaces2 "kiv_ups_server/internal/masterserver/interfaces"
-	"kiv_ups_server/internal/net/tcp"
-	"kiv_ups_server/internal/net/tcp/protocol"
+	"kiv_ups_server/masterserver/gameserver/tree"
+	"kiv_ups_server/masterserver/gameserver/tree/nodes"
+	"kiv_ups_server/masterserver/interfaces"
+	"kiv_ups_server/net/tcp"
+	"kiv_ups_server/net/tcp/protocol"
 	"reflect"
 	"time"
 )
@@ -19,10 +19,10 @@ type GameServer struct {
 	Tps                 int
 	tickDuration        int64
 	startTime           time.Time
-	Players             []interfaces2.Player
-	DisconnectedPlayers []interfaces2.Player
-	RequestMessageChan  chan interfaces2.PlayerMessage
-	GameTree            tree2.Node
+	Players             []interfaces.Player
+	DisconnectedPlayers []interfaces.Player
+	RequestMessageChan  chan interfaces.PlayerMessage
+	GameTree            tree.Node
 	Run                 bool
 }
 
@@ -30,12 +30,12 @@ type GameServer struct {
 func NewGameServer() GameServer {
 	return GameServer{
 		Tps:                30,
-		Players:            make([]interfaces2.Player, 0),
-		RequestMessageChan: make(chan interfaces2.PlayerMessage, 128),
-		GameTree: tree2.Node{
+		Players:            make([]interfaces.Player, 0),
+		RequestMessageChan: make(chan interfaces.PlayerMessage, 128),
+		GameTree: tree.Node{
 			Parent:   nil,
 			Children: nil,
-			Value:    &nodes2.RootNode{},
+			Value:    &nodes.RootNode{},
 		},
 	}
 }
@@ -48,8 +48,8 @@ func (gs *GameServer) getElapsedMillis() int64 {
 
 // readRequestChanToSlice converts channel data to slice. The purpose is to
 // make it possible to read every message multiple times.
-func (gs *GameServer) readRequestChanToSlice() []interfaces2.PlayerMessage {
-	requests := make([]interfaces2.PlayerMessage, 0, 10)
+func (gs *GameServer) readRequestChanToSlice() []interfaces.PlayerMessage {
+	requests := make([]interfaces.PlayerMessage, 0, 10)
 
 	done := false
 	for {
@@ -75,12 +75,12 @@ func (gs *GameServer) readRequestChanToSlice() []interfaces2.PlayerMessage {
 // buildTree adds all required nodes to game tree
 func (gs *GameServer) buildTree() {
 	for _, player := range gs.GetPlayers() {
-		score := nodes2.Score{
+		score := nodes.Score{
 			Player: player,
 		}
-		gs.GameTree.AddGameNodes(&nodes2.Spaceship{Player: player}, &score)
+		gs.GameTree.AddGameNodes(&nodes.Spaceship{Player: player}, &score)
 	}
-	gs.GameTree.AddGameNodes(&nodes2.AsteroidWrapper{})
+	gs.GameTree.AddGameNodes(&nodes.AsteroidWrapper{})
 }
 
 // initTree initializes all nodes in tree
@@ -107,7 +107,7 @@ func (gs *GameServer) Start() {
 
 	nextGameTickTime := gs.getElapsedMillis()
 
-	playerMessagesBuffer := make([]interfaces2.PlayerMessage, 0)
+	playerMessagesBuffer := make([]interfaces.PlayerMessage, 0)
 	lastElapsedMillis := int64(0)
 
 	// gameloop
@@ -149,7 +149,7 @@ func (gs *GameServer) Start() {
 			gs.shareState()
 			lastElapsedMillis = elapsedMillis
 			nextGameTickTime += gs.tickDuration
-			playerMessagesBuffer = make([]interfaces2.PlayerMessage, 0)
+			playerMessagesBuffer = make([]interfaces.PlayerMessage, 0)
 		}
 	}
 }
@@ -158,12 +158,12 @@ func (gs *GameServer) Start() {
 func (gs *GameServer) ManageGame() {
 	// Check if someone has over MaxScore
 	for _, node := range gs.GameTree.FindAllChildrenByType("score") {
-		score := node.Value.(*nodes2.Score)
+		score := node.Value.(*nodes.Score)
 		if score.Score > MaxScore {
 			// Build score summary
 			scoreSummary := make([]PlayerScoreSummary, 0)
 			for _, _node := range gs.GameTree.FindAllChildrenByType("score") {
-				_score := _node.Value.(*nodes2.Score)
+				_score := _node.Value.(*nodes.Score)
 				scoreSummary = append(scoreSummary, PlayerScoreSummary{
 					PlayerName: _score.PlayerName,
 					Score:      _score.Score,
@@ -225,14 +225,14 @@ func (gs *GameServer) shareState() {
 }
 
 // AddPlayer adds player to game server
-func (gs *GameServer) AddPlayer(player interfaces2.Player) {
+func (gs *GameServer) AddPlayer(player interfaces.Player) {
 	gs.Players = append(gs.Players, player)
 	player.SetLoggedInMenuContext()
 	player.SetGameServer(gs)
 }
 
 // RemovePlayer removes player from game server
-func (gs *GameServer) RemovePlayer(player interfaces2.Player) {
+func (gs *GameServer) RemovePlayer(player interfaces.Player) {
 	for i, _player := range gs.Players {
 		if player == _player {
 			gs.Players = append(gs.Players[:i], gs.Players[i+1:]...)
@@ -242,7 +242,7 @@ func (gs *GameServer) RemovePlayer(player interfaces2.Player) {
 	// remove spaceship if game has already started
 	if gs.Run {
 		for _, node := range gs.GameTree.FindAllChildrenByType("spaceship") {
-			spaceship := node.Value.(*nodes2.Spaceship)
+			spaceship := node.Value.(*nodes.Spaceship)
 
 			if spaceship.Player == player {
 				node.Destroy()
@@ -254,7 +254,7 @@ func (gs *GameServer) RemovePlayer(player interfaces2.Player) {
 	// remove score if game has already started
 	if gs.Run {
 		for _, node := range gs.GameTree.FindAllChildrenByType("score") {
-			score := node.Value.(*nodes2.Score)
+			score := node.Value.(*nodes.Score)
 
 			fmt.Printf("%#v\n", score)
 
@@ -267,22 +267,22 @@ func (gs *GameServer) RemovePlayer(player interfaces2.Player) {
 }
 
 // GetPlayers is getter for players
-func (gs *GameServer) GetPlayers() []interfaces2.Player {
+func (gs *GameServer) GetPlayers() []interfaces.Player {
 	return gs.Players
 }
 
 // GetRequestMessageChan is getter for request message channel
-func (gs *GameServer) GetRequestMessageChan() chan interfaces2.PlayerMessage {
+func (gs *GameServer) GetRequestMessageChan() chan interfaces.PlayerMessage {
 	return gs.RequestMessageChan
 }
 
 // AddDisconnectedPlayer adds player to slice of disconnected players
-func (gs *GameServer) AddDisconnectedPlayer(player interfaces2.Player) {
+func (gs *GameServer) AddDisconnectedPlayer(player interfaces.Player) {
 	gs.DisconnectedPlayers = append(gs.DisconnectedPlayers, player)
 }
 
 // RemoveDisconnectedPlayer removes player from slice of disconnected players
-func (gs *GameServer) RemoveDisconnectedPlayer(player interfaces2.Player) {
+func (gs *GameServer) RemoveDisconnectedPlayer(player interfaces.Player) {
 	for i, disconnectedPlayer := range gs.DisconnectedPlayers {
 		if player == disconnectedPlayer {
 			gs.DisconnectedPlayers = append(gs.DisconnectedPlayers[:i], gs.DisconnectedPlayers[i+1:]...)
@@ -292,7 +292,7 @@ func (gs *GameServer) RemoveDisconnectedPlayer(player interfaces2.Player) {
 }
 
 // IsPlayerDisconnected checks if player is in slice of disconnected players
-func (gs *GameServer) IsPlayerDisconnected(player interfaces2.Player) bool {
+func (gs *GameServer) IsPlayerDisconnected(player interfaces.Player) bool {
 	for _, disconnectedPlayer := range gs.DisconnectedPlayers {
 		if player == disconnectedPlayer {
 			return true
@@ -309,8 +309,8 @@ func (gs *GameServer) IsRunning() bool {
 
 // FilterMessagesByTypes filters given messages by given types and
 // returns slice of filtered messages
-func FilterMessagesByTypes(playerMessages []interfaces2.PlayerMessage, types []protocol.Message) []interfaces2.PlayerMessage {
-	filteredMessages := make([]interfaces2.PlayerMessage, 0)
+func FilterMessagesByTypes(playerMessages []interfaces.PlayerMessage, types []protocol.Message) []interfaces.PlayerMessage {
+	filteredMessages := make([]interfaces.PlayerMessage, 0)
 
 	for _, playerMessage := range playerMessages {
 		for _, _type := range types {

@@ -1,8 +1,8 @@
 package tree
 
 import (
-	interfaces2 "kiv_ups_server/internal/masterserver/interfaces"
-	"kiv_ups_server/internal/net/tcp/protocol"
+	"kiv_ups_server/masterserver/interfaces"
+	"kiv_ups_server/net/tcp/protocol"
 	"math/rand"
 	"reflect"
 	"strings"
@@ -124,7 +124,7 @@ func RandomString(charset []rune, length int) string {
 // add custom filtering given message instances.
 type GameNode interface {
 	Init(node *Node)
-	Process(playerMessages []interfaces2.PlayerMessage, delta float64) // Called every tick
+	Process(playerMessages []interfaces.PlayerMessage, delta float64) // Called every tick
 	ListenMessages() []protocol.Message
-	Filter(playerMessages []interfaces2.PlayerMessage) []interfaces2.PlayerMessage
+	Filter(playerMessages []interfaces.PlayerMessage) []interfaces.PlayerMessage
 }

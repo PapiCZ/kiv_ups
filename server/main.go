@@ -3,7 +3,7 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
-	"kiv_ups_server/internal/masterserver"
+	"kiv_ups_server/masterserver"
 	"net"
 	_ "net/http/pprof"
 	"os"

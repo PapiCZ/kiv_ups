@@ -1,8 +1,8 @@
 package interfaces
 
 import (
-	"kiv_ups_server/internal/net/tcp"
-	"kiv_ups_server/internal/net/tcp/protocol"
+	"kiv_ups_server/net/tcp"
+	"kiv_ups_server/net/tcp/protocol"
 )
 
 type Lobby struct {

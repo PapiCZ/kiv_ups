@@ -1,28 +1,28 @@
 package actions
 
 import (
-	interfaces2 "kiv_ups_server/internal/masterserver/interfaces"
-	"kiv_ups_server/internal/net/tcp"
-	"kiv_ups_server/internal/net/tcp/protocol"
+	"kiv_ups_server/masterserver/interfaces"
+	"kiv_ups_server/net/tcp"
+	"kiv_ups_server/net/tcp/protocol"
 )
 
 type ActionResponse struct {
 	ServerMessage tcp.ServerMessage
-	Targets       []interfaces2.Player
+	Targets       []interfaces.Player
 }
 
 type Action interface {
-	Process(interfaces2.MasterServer, interfaces2.PlayerMessage) ActionResponse
-	GetPlayerContexts() []interfaces2.PlayerContext
+	Process(interfaces.MasterServer, interfaces.PlayerMessage) ActionResponse
+	GetPlayerContexts() []interfaces.PlayerContext
 	GetMessage() protocol.Message
 }
 
 type ActionDefinition struct {
-	actionMap map[interfaces2.PlayerContext]map[protocol.MessageType]Action
+	actionMap map[interfaces.PlayerContext]map[protocol.MessageType]Action
 }
 
 func NewDefinition() ActionDefinition {
-	return ActionDefinition{actionMap: make(map[interfaces2.PlayerContext]map[protocol.MessageType]Action)}
+	return ActionDefinition{actionMap: make(map[interfaces.PlayerContext]map[protocol.MessageType]Action)}
 }
 
 // Register registers given action according to message type ID and message contexts
@@ -39,6 +39,6 @@ func (ad *ActionDefinition) Register(action Action) {
 }
 
 // GetAction returns action according to given message type and context
-func (ad *ActionDefinition) GetAction(messageType protocol.MessageType, context interfaces2.PlayerContext) Action {
+func (ad *ActionDefinition) GetAction(messageType protocol.MessageType, context interfaces.PlayerContext) Action {
 	return ad.actionMap[context][messageType]
 }

@@ -2,13 +2,13 @@ package actions
 
 import (
 	log "github.com/sirupsen/logrus"
-	gameserver2 "kiv_ups_server/internal/masterserver/gameserver"
-	interfaces2 "kiv_ups_server/internal/masterserver/interfaces"
-	"kiv_ups_server/internal/net/tcp"
-	"kiv_ups_server/internal/net/tcp/protocol"
+	"kiv_ups_server/masterserver/gameserver"
+	"kiv_ups_server/masterserver/interfaces"
+	"kiv_ups_server/net/tcp"
+	"kiv_ups_server/net/tcp/protocol"
 )
 
-func (a KeepAliveAction) Process(s interfaces2.MasterServer, m interfaces2.PlayerMessage) ActionResponse {
+func (a KeepAliveAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	keepAliveData := m.GetMessage().Message.(*protocol.KeepAliveMessage)
 
 	// Check if player sent valid data
@@ -20,7 +20,7 @@ func (a KeepAliveAction) Process(s interfaces2.MasterServer, m interfaces2.Playe
 				Status:  true,
 				Message: "",
 			},
-			Targets: []interfaces2.Player{m.GetPlayer()},
+			Targets: []interfaces.Player{m.GetPlayer()},
 		}
 	} else {
 		return ActionResponse{
@@ -29,12 +29,12 @@ func (a KeepAliveAction) Process(s interfaces2.MasterServer, m interfaces2.Playe
 				Status:  false,
 				Message: "",
 			},
-			Targets: []interfaces2.Player{m.GetPlayer()},
+			Targets: []interfaces.Player{m.GetPlayer()},
 		}
 	}
 }
 
-func (a AuthenticateAction) Process(s interfaces2.MasterServer, m interfaces2.PlayerMessage) ActionResponse {
+func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	authenticateData := m.GetMessage().Message.(*protocol.AuthenticateMessage)
 	connectedPlayer := m.GetPlayer()
 
@@ -62,18 +62,18 @@ func (a AuthenticateAction) Process(s interfaces2.MasterServer, m interfaces2.Pl
 			Status:  true,
 			Message: "",
 		},
-		Targets: []interfaces2.Player{m.GetPlayer()},
+		Targets: []interfaces.Player{m.GetPlayer()},
 	}
 }
 
-func (a CreateLobbyAction) Process(s interfaces2.MasterServer, m interfaces2.PlayerMessage) ActionResponse {
+func (a CreateLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	if m.GetPlayer().GetConnectedLobby() == nil {
 		// Create new lobby and add it to server
 		createLobbyData := m.GetMessage().Message.(*protocol.CreateLobbyMessage)
-		lobby := interfaces2.Lobby{
+		lobby := interfaces.Lobby{
 			Name:         createLobbyData.Name,
 			Owner:        m.GetPlayer(),
-			Players:      make(map[interfaces2.PlayerUID]interfaces2.Player),
+			Players:      make(map[interfaces.PlayerUID]interfaces.Player),
 			PlayersLimit: createLobbyData.PlayersLimit,
 		}
 		s.AddLobby(&lobby)
@@ -92,7 +92,7 @@ func (a CreateLobbyAction) Process(s interfaces2.MasterServer, m interfaces2.Pla
 				Status:  true,
 				Message: "",
 			},
-			Targets: []interfaces2.Player{m.GetPlayer()},
+			Targets: []interfaces.Player{m.GetPlayer()},
 		}
 	} else {
 		return ActionResponse{
@@ -101,12 +101,12 @@ func (a CreateLobbyAction) Process(s interfaces2.MasterServer, m interfaces2.Pla
 				Status:  false,
 				Message: "You can't create more than one lobby",
 			},
-			Targets: []interfaces2.Player{m.GetPlayer()},
+			Targets: []interfaces.Player{m.GetPlayer()},
 		}
 	}
 }
 
-func (a DeleteLobbyAction) Process(s interfaces2.MasterServer, m interfaces2.PlayerMessage) ActionResponse {
+func (a DeleteLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	deleteLobbyData := m.GetMessage().Message.(*protocol.DeleteLobbyMessage)
 	lobby, err := s.GetLobby(deleteLobbyData.Name)
 
@@ -118,7 +118,7 @@ func (a DeleteLobbyAction) Process(s interfaces2.MasterServer, m interfaces2.Pla
 				Status:  false,
 				Message: "You can't delete this lobby!",
 			},
-			Targets: []interfaces2.Player{m.GetPlayer()},
+			Targets: []interfaces.Player{m.GetPlayer()},
 		}
 	}
 
@@ -132,11 +132,11 @@ func (a DeleteLobbyAction) Process(s interfaces2.MasterServer, m interfaces2.Pla
 			Status:  true,
 			Message: "",
 		},
-		Targets: []interfaces2.Player{m.GetPlayer()},
+		Targets: []interfaces.Player{m.GetPlayer()},
 	}
 }
 
-func (a ListLobbiesAction) Process(s interfaces2.MasterServer, m interfaces2.PlayerMessage) ActionResponse {
+func (a ListLobbiesAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	lobbies := s.GetLobbies()
 	outputLobbies := make([]map[string]interface{}, 0, len(lobbies))
 
@@ -155,11 +155,11 @@ func (a ListLobbiesAction) Process(s interfaces2.MasterServer, m interfaces2.Pla
 			Status:  true,
 			Message: "",
 		},
-		Targets: []interfaces2.Player{m.GetPlayer()},
+		Targets: []interfaces.Player{m.GetPlayer()},
 	}
 }
 
-func (a JoinLobbyAction) Process(s interfaces2.MasterServer, m interfaces2.PlayerMessage) ActionResponse {
+func (a JoinLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	joinLobbyData := m.GetMessage().Message.(*protocol.JoinLobbyMessage)
 	lobby, err := s.GetLobby(joinLobbyData.Name)
 	if err != nil || len(lobby.Players) >= lobby.PlayersLimit {
@@ -171,7 +171,7 @@ func (a JoinLobbyAction) Process(s interfaces2.MasterServer, m interfaces2.Playe
 				Status:  false,
 				Message: "",
 			},
-			Targets: []interfaces2.Player{m.GetPlayer()},
+			Targets: []interfaces.Player{m.GetPlayer()},
 		}
 	}
 
@@ -192,11 +192,11 @@ func (a JoinLobbyAction) Process(s interfaces2.MasterServer, m interfaces2.Playe
 			Status:  true,
 			Message: "",
 		},
-		Targets: []interfaces2.Player{m.GetPlayer()},
+		Targets: []interfaces.Player{m.GetPlayer()},
 	}
 }
 
-func (a LeaveLobbyAction) Process(s interfaces2.MasterServer, m interfaces2.PlayerMessage) ActionResponse {
+func (a LeaveLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	playerLobby := m.GetPlayer().GetConnectedLobby()
 	if playerLobby == nil {
 		return ActionResponse{
@@ -205,7 +205,7 @@ func (a LeaveLobbyAction) Process(s interfaces2.MasterServer, m interfaces2.Play
 				Status:  false,
 				Message: "",
 			},
-			Targets: []interfaces2.Player{m.GetPlayer()},
+			Targets: []interfaces.Player{m.GetPlayer()},
 		}
 	}
 
@@ -232,11 +232,11 @@ func (a LeaveLobbyAction) Process(s interfaces2.MasterServer, m interfaces2.Play
 			Status:  true,
 			Message: "",
 		},
-		Targets: []interfaces2.Player{m.GetPlayer()},
+		Targets: []interfaces.Player{m.GetPlayer()},
 	}
 }
 
-func (a ListLobbyPlayersAction) Process(s interfaces2.MasterServer, m interfaces2.PlayerMessage) ActionResponse {
+func (a ListLobbyPlayersAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	lobby := m.GetPlayer().GetConnectedLobby()
 
 	if lobby == nil {
@@ -246,7 +246,7 @@ func (a ListLobbyPlayersAction) Process(s interfaces2.MasterServer, m interfaces
 				Status:  false,
 				Message: "",
 			},
-			Targets: []interfaces2.Player{m.GetPlayer()},
+			Targets: []interfaces.Player{m.GetPlayer()},
 		}
 	}
 
@@ -262,11 +262,11 @@ func (a ListLobbyPlayersAction) Process(s interfaces2.MasterServer, m interfaces
 			Status:  true,
 			Message: "",
 		},
-		Targets: []interfaces2.Player{m.GetPlayer()},
+		Targets: []interfaces.Player{m.GetPlayer()},
 	}
 }
 
-func (a GameReconnectAvailableAction) Process(s interfaces2.MasterServer, m interfaces2.PlayerMessage) ActionResponse {
+func (a GameReconnectAvailableAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	// Check if player can reconnect to game
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
@@ -276,12 +276,12 @@ func (a GameReconnectAvailableAction) Process(s interfaces2.MasterServer, m inte
 			Status:  true,
 			Message: "",
 		},
-		Targets: []interfaces2.Player{m.GetPlayer()},
+		Targets: []interfaces.Player{m.GetPlayer()},
 	}
 }
 
 
-func (a ReconnectAction) Process(s interfaces2.MasterServer, m interfaces2.PlayerMessage) ActionResponse {
+func (a ReconnectAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	// Reconnect player to game
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
@@ -291,11 +291,11 @@ func (a ReconnectAction) Process(s interfaces2.MasterServer, m interfaces2.Playe
 			Status:  true,
 			Message: "",
 		},
-		Targets: []interfaces2.Player{m.GetPlayer()},
+		Targets: []interfaces.Player{m.GetPlayer()},
 	}
 }
 
-func (a LeaveGameAction) Process(s interfaces2.MasterServer, m interfaces2.PlayerMessage) ActionResponse {
+func (a LeaveGameAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	m.GetPlayer().LeaveGame()
 	// Remove player from game
 	return ActionResponse{
@@ -306,12 +306,12 @@ func (a LeaveGameAction) Process(s interfaces2.MasterServer, m interfaces2.Playe
 			Status:  true,
 			Message: "",
 		},
-		Targets: []interfaces2.Player{m.GetPlayer()},
+		Targets: []interfaces.Player{m.GetPlayer()},
 	}
 }
 
-func (a StartGameAction) Process(s interfaces2.MasterServer, m interfaces2.PlayerMessage) ActionResponse {
-	gs := gameserver2.NewGameServer()
+func (a StartGameAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
+	gs := gameserver.NewGameServer()
 
 	// Add all players to game server and start the game
 	for _, player := range m.GetPlayer().GetConnectedLobby().GetPlayers() {
