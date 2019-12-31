@@ -22,6 +22,8 @@ func (p *Projectile) Init(node *tree.Node) {
 }
 
 func (p *Projectile) Process(playerMessages []interfaces.PlayerMessage, delta float64) {
+	// TODO: player can shoot how much projectiles he want
+
 	p.PosX += p.VelocityX * delta
 	p.PosY += p.VelocityY * delta
 
