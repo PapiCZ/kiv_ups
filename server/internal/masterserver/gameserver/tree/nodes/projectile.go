@@ -1,6 +1,7 @@
 package nodes
 
 import (
+	"kiv_ups_server/internal/masterserver/gameserver/settings"
 	tree2 "kiv_ups_server/internal/masterserver/gameserver/tree"
 	interfaces2 "kiv_ups_server/internal/masterserver/interfaces"
 	"kiv_ups_server/internal/net/tcp/protocol"
@@ -24,7 +25,7 @@ func (p *Projectile) Process(playerMessages []interfaces2.PlayerMessage, delta f
 	p.PosX += p.VelocityX * delta
 	p.PosY += p.VelocityY * delta
 
-	if p.PosX < 0 || p.PosX > 1920 || p.PosY < 0 || p.PosY > 1080 {
+	if p.PosX < 0 || p.PosX > settings.Width || p.PosY < 0 || p.PosY > settings.Height {
 		p.Node.Destroy()
 		return
 	}

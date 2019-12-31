@@ -1,6 +1,7 @@
 package nodes
 
 import (
+	"kiv_ups_server/internal/masterserver/gameserver/settings"
 	tree2 "kiv_ups_server/internal/masterserver/gameserver/tree"
 	interfaces2 "kiv_ups_server/internal/masterserver/interfaces"
 	"kiv_ups_server/internal/net/tcp/protocol"
@@ -116,8 +117,8 @@ func (s *Spaceship) Filter(playerMessages []interfaces2.PlayerMessage) []interfa
 }
 
 func (s *Spaceship) RandomizePosition() {
-	s.PosX = float64(rand.Intn(1920))
-	s.PosY = float64(rand.Intn(1080))
+	s.PosX = float64(rand.Intn(settings.Width))
+	s.PosY = float64(rand.Intn(settings.Height))
 	s.ReloadPosition = true
 }
 

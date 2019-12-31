@@ -5,7 +5,6 @@ import (
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 	"kiv_ups_server/internal/masterserver"
 	"net"
-	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
@@ -23,9 +22,6 @@ func init() {
 }
 
 func main() {
-	log.Println("Starting pprof at http://localhost:6060/debug/pprof/")
-	go http.ListenAndServe("0.0.0.0:6060", nil)
-
 	if len(os.Args) < 3 {
 		log.Panicln("You need to pass host and port!")
 	}
@@ -37,12 +33,16 @@ func main() {
 		log.Panicln(err)
 	}
 
+	if len(host) != 16 {
+		log.Panicln("Invalid host!")
+	}
+
 	sockaddr := syscall.SockaddrInet4{
 		Port: port,
 		Addr: [...]byte{host[12], host[13], host[14], host[15]},
 	}
 
-	gameServer := masterserver.NewServer(&sockaddr)
+	masterServer := masterserver.NewServer(&sockaddr)
 
 	sigs := make(chan os.Signal, 1)
 
@@ -50,7 +50,7 @@ func main() {
 
 	go func() {
 		<-sigs
-		err := gameServer.Stop()
+		err := masterServer.Stop()
 
 		if err != nil {
 			log.Errorln(err)
@@ -59,5 +59,5 @@ func main() {
 		os.Exit(0)
 	}()
 
-	gameServer.Start()
+	masterServer.Start()
 }

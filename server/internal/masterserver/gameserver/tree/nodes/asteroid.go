@@ -1,14 +1,13 @@
 package nodes
 
 import (
+	"kiv_ups_server/internal/masterserver/gameserver/settings"
 	tree2 "kiv_ups_server/internal/masterserver/gameserver/tree"
 	interfaces2 "kiv_ups_server/internal/masterserver/interfaces"
 	"kiv_ups_server/internal/net/tcp/protocol"
 	"math/rand"
 )
 
-const Width = 1920
-const Height = 1080
 const Margin = 100
 const BorderWidth = 100
 const AsteroidsLimit = 50
@@ -30,27 +29,27 @@ func (a *AsteroidWrapper) Process(playerMessages []interfaces2.PlayerMessage, de
 		if side == 0 {
 			// up
 			minX = 0 - Margin - BorderWidth
-			maxX = Width + Margin + BorderWidth
+			maxX = settings.Width + Margin + BorderWidth
 			minY = 0 - Margin - BorderWidth
 			maxY = 0 - Margin
 		} else if side == 1 {
 			// right
-			minX = Width + Margin
-			maxX = Width + Margin + BorderWidth
+			minX = settings.Width + Margin
+			maxX = settings.Width + Margin + BorderWidth
 			minY = 0 - Margin - BorderWidth
-			maxY = Height + Margin + BorderWidth
+			maxY = settings.Height + Margin + BorderWidth
 		} else if side == 2 {
 			// bottom
 			minX = 0 - Margin - BorderWidth
-			maxX = Width + Margin + BorderWidth
-			minY = Height + Margin
-			maxY = Height + Margin + BorderWidth
+			maxX = settings.Width + Margin + BorderWidth
+			minY = settings.Height + Margin
+			maxY = settings.Height + Margin + BorderWidth
 		} else if side == 3 {
 			// left
 			minX = 0 - Margin - BorderWidth
 			maxX = 0 - Margin
 			minY = 0 - Margin - BorderWidth
-			maxY = Width + Margin + BorderWidth
+			maxY = settings.Width + Margin + BorderWidth
 		}
 
 		// Create new asteroid at random position of random scale
@@ -103,8 +102,8 @@ func (a *Asteroid) Process(playerMessages []interfaces2.PlayerMessage, delta flo
 	a.PosX += a.VelocityX * delta
 	a.PosY += a.VelocityY * delta
 
-	if a.PosX < -Margin-BorderWidth || a.PosX > Width+Margin+BorderWidth ||
-		a.PosY < -Margin-BorderWidth || a.PosY > Height+Margin+BorderWidth {
+	if a.PosX < -Margin-BorderWidth || a.PosX > settings.Width+Margin+BorderWidth ||
+		a.PosY < -Margin-BorderWidth || a.PosY > settings.Height+Margin+BorderWidth {
 		a.Node.Destroy()
 		return
 	}

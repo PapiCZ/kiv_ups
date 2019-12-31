@@ -1,3 +1,0 @@
-|100|15|rqid|{"ping":"pong"}
-|200|20|rqid|{"name":"asdfghjkk"}
-|200|20|rqid|{"name":"asdfghjkk"}
