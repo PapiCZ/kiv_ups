@@ -1,7 +1,6 @@
 package nodes
 
 import (
-	"fmt"
 	"github.com/sirupsen/logrus"
 	"kiv_ups_server/masterserver/gameserver/settings"
 	"kiv_ups_server/masterserver/gameserver/tree"
