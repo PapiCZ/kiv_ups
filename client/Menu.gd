@@ -40,20 +40,24 @@ func get(menu, call_load=true):
 	return menu_obj
 
 func reset(menu):
+	# Reload given menu from the scene file
 	var menu_obj = load(get(menu, false).filename).instance()
 	menus[menu] = menu_obj
 	emit_signal("menu_added", menu_obj)
 
 func reset_all():
+	# Reload all menus
 	for menu in menus:
 		reset(menu)
 
 func go(menu):
+	# Change menu
 	var menu_obj = get(menu)
 	menu_stack.append(menu_obj)
 	emit_signal("change_menu", menu_obj)
 
 func back():
+	# Go back
 	if len(menu_stack) >= 2:
 		menu_stack.pop_back()
 		emit_signal("change_menu", menu_stack.back())
@@ -68,6 +72,7 @@ func show(menu):
 	menu.visible = true
 
 func show_current():
+	# Hide menu that is on top of the menu_stack
 	show(menu_stack[len(menu_stack) - 1])
 
 func hide_and_reset_stack():

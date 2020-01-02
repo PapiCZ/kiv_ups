@@ -1,6 +1,7 @@
 extends Node
 
 static func random_request_id(length=5):
+	# List of available charasters for request ID
 	var charset = [
 		"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", 
 		"q", "r", "s", "t", "u", "v", "w", "x", "y", "z", 
@@ -10,9 +11,8 @@ static func random_request_id(length=5):
 	]
 
 	var random_str = ""
-	randomize()
+	randomize() # We need to call this before calling randi()
 
-	#warning-ignore:unused_variable
 	for i in range(length):
 		random_str += charset[randi() % (len(charset))]
 

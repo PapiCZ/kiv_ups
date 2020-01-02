@@ -24,6 +24,7 @@ func _on_Quit_pressed():
 
 func _game_reconnect_available(data):
 	if data[0].response.status and data[0].response.data.available:
+		# Game reconnect is available, let's show or hide some buttons
 		$FormContainer/ReconnectGame.visible = true
 		$FormContainer/LeaveGame.visible = true
 		$FormContainer/StartGame.visible = false
@@ -31,6 +32,7 @@ func _game_reconnect_available(data):
 func _on_ReconnectGame_pressed():
 	Menu.hide_current()
 	
+	# Start game
 	var ingame = InGame.instance()
 	ingame.set_name("InGame")
 	Network.connect_message(MessageTypes.UPDATE_STATE, ingame, "_update_state")
@@ -39,6 +41,8 @@ func _on_ReconnectGame_pressed():
 	get_parent().get_parent().get_parent().add_child(ingame)
 
 func _end_game(data):
+
+	# End game and show winner
 	Network.disconnect_message(MessageTypes.UPDATE_STATE)
 	Network.disconnect_message(MessageTypes.GAME_END)
 	Network.disconnect_message(MessageTypes.PLAYER_DISCONNECTED)
@@ -47,6 +51,7 @@ func _end_game(data):
 	Menu.go(Menu.MENU_LEVEL.END_GAME)
 
 func _on_LeaveGame_pressed():
+	# Definitely leave the game without possibility of reconnecting
 	Network.send({}, MessageTypes.LEAVE_GAME, self, "_leave_game_response")
 
 func _leave_game_response(data):

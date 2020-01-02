@@ -11,7 +11,7 @@ func add_player(player_name):
 	add_child(lobby_player)
 	players.append({
 		"name": player_name,
-		"node": lobby_player
+		"node": lobby_player # We need to know this for player removal
 	})
 
 func remove_player(player_name):

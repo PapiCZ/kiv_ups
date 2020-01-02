@@ -1,0 +1,9 @@
+[gd_scene format=2]
+
+[node name="NetworkDisconnectedDialog" type="AcceptDialog"]
+margin_right = 820.0
+margin_bottom = 250.0
+window_title = "Network error"
+dialog_text = "
+ You have been disconnected
+		      from the server!"

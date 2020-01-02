@@ -197,12 +197,11 @@ func (m LeaveLobbyResponseMessage) GetTypeId() MessageType {
 }
 
 type PlayerMoveMessage struct {
-	PlayerName string  `json:"player_name"`
-	PosX       float64 `json:"pos_x"`
-	PosY       float64 `json:"pos_y"`
-	VelocityX  float64 `json:"velocity_x"`
-	VelocityY  float64 `json:"velocity_y"`
-	Rotation   float64 `json:"rotation"`
+	PosX      float64 `json:"pos_x"`
+	PosY      float64 `json:"pos_y"`
+	VelocityX float64 `json:"velocity_x"`
+	VelocityY float64 `json:"velocity_y"`
+	Rotation  float64 `json:"rotation"`
 }
 
 func (m PlayerMoveMessage) GetTypeId() MessageType {

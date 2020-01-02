@@ -1,10 +1,5 @@
 extends VBoxContainer
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-# warning-ignore:return_value_discarded
-	$FormContainer/Back.connect("pressed", self, "_on_Back_pressed")
-
 func _load():
 	Network.send({}, MessageTypes.LIST_LOBBIES, self, "_on_lobbies_loaded")
 
@@ -25,6 +20,7 @@ func _connect_lobby(lobby_name):
 
 
 func _on_lobby_connected(data):
+	# Move player to the lobby
 	if data[0].response.status:
 		var menu = Menu.get(Menu.MENU_LEVEL.LOBBY, false)
 		menu.lobby_name = data[1]
@@ -37,6 +33,7 @@ func _on_Back_pressed():
 	Menu.reset(Menu.MENU_LEVEL.JOIN_LOBBY)
 
 func _on_Refresh_pressed():
+	# Refresh list of lobbies
 	for i in range(0, $FormContainer/PanelContainer/ScrollContainer/LobbyList.get_child_count()):
 		$FormContainer/PanelContainer/ScrollContainer/LobbyList.get_child(i).queue_free()
 	Network.send({}, MessageTypes.LIST_LOBBIES, self, "_on_lobbies_loaded")

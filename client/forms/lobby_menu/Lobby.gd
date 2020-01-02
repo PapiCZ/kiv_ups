@@ -12,13 +12,13 @@ func _load():
 	Network.connect("disconnected", self, "_network_disconnected", [], Network.CONNECT_ONESHOT)
 
 func _network_disconnected():
-	print("network_error")
 	Network.disconnect_message(MessageTypes.START_GAME_RESPONSE)
 	Network.disconnect_message(MessageTypes.LOBBY_PLAYER_CONNECTED)
 	Network.disconnect_message(MessageTypes.LOBBY_PLAYER_DISCONNECTED)
 	Menu.go(Menu.MENU_LEVEL.MAIN)
 
 func _on_lobby_players_loaded(data):
+	# Show connected players
 	if data[0].response.status:
 		for player_name in data[0].response.data.players:
 			$FormContainer/PlayersContainer.add_player(player_name)
@@ -28,6 +28,7 @@ func _on_Start_pressed():
 	Network.send({}, MessageTypes.START_GAME, self, "_start_game")
 
 func _start_game(data):
+	# Start the game and disconnect from lobby-related message types
 	Network.disconnect_message(MessageTypes.START_GAME_RESPONSE)
 	Network.disconnect_message(MessageTypes.LOBBY_PLAYER_CONNECTED)
 	Network.disconnect_message(MessageTypes.LOBBY_PLAYER_DISCONNECTED)
@@ -36,15 +37,18 @@ func _start_game(data):
 	
 	var ingame = InGame.instance()
 	ingame.set_name("InGame")
+	# Create listeners for in-game-related messages
 	Network.connect_message(MessageTypes.UPDATE_STATE, ingame, "_update_state")
 	Network.connect_message(MessageTypes.GAME_END, self, "_end_game")
 	Network.connect_message(MessageTypes.PLAYER_DISCONNECTED, ingame, "_player_disconnected")
 	get_parent().get_parent().get_parent().add_child(ingame)
 
 func _player_connected(data):
+	# Add palyer to the lobby
 	$FormContainer/PlayersContainer.add_player(data[0].response.data.name)
 
 func _player_disconnected(data):
+	# Remove palyer from the lobby
 	$FormContainer/PlayersContainer.remove_player(data[0].response.data.name)
 
 func _on_Back_pressed():
@@ -52,6 +56,7 @@ func _on_Back_pressed():
 	Menu.back()
 
 func _end_game(data):
+	# End the game and show winner
 	Network.disconnect_message(MessageTypes.UPDATE_STATE)
 	Network.disconnect_message(MessageTypes.GAME_END)
 	Network.disconnect_message(MessageTypes.PLAYER_DISCONNECTED)

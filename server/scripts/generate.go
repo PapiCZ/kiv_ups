@@ -79,7 +79,7 @@ func GenerateMessageTypes(messageMetadata MessageMetadata) {
 	}
 	f.Func().Id("RegisterAllMessages").Params(Id("definition").Id("*Definition")).Block(registerStatements...)
 
-	file, err := os.OpenFile("./internal/net/tcp/protocol/messagetypes.go", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
+	file, err := os.OpenFile("./net/tcp/protocol/messagetypes.go", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 	if err != nil {
 		panic(err)
 	}
@@ -116,7 +116,7 @@ func GenerateActions(messageMetadata MessageMetadata) {
 	allContextStatements := make([]Code, 0)
 	for i, ctx := range allContexts {
 		allContextStatements = append(allContextStatements,
-			Id(ctx).Op("=").Qual("kiv_ups_server/internal/masterserver/interfaces", "PlayerContext").Params(Lit(i)))
+			Id(ctx).Op("=").Qual("kiv_ups_server/masterserver/interfaces", "PlayerContext").Params(Lit(i)))
 	}
 
 	f.Const().Defs(allContextStatements...)
@@ -145,12 +145,12 @@ func GenerateActions(messageMetadata MessageMetadata) {
 		}
 
 		f.Func().Params(Id("a").Id(message.Name+"Action")).Id("GetPlayerContexts").
-			Params().Index().Qual("kiv_ups_server/internal/masterserver/interfaces", "PlayerContext").
-			Block(Return(Index().Qual("kiv_ups_server/internal/masterserver/interfaces", "PlayerContext").Values(contextStatements...)))
+			Params().Index().Qual("kiv_ups_server/masterserver/interfaces", "PlayerContext").
+			Block(Return(Index().Qual("kiv_ups_server/masterserver/interfaces", "PlayerContext").Values(contextStatements...)))
 		f.Empty()
 		f.Func().Params(Id("a").Id(message.Name+"Action")).Id("GetMessage").
-			Params().Qual("kiv_ups_server/internal/net/tcp/protocol", "Message").
-			Block(Return(Qual("kiv_ups_server/internal/net/tcp/protocol", message.Name+"Message{}")))
+			Params().Qual("kiv_ups_server/net/tcp/protocol", "Message").
+			Block(Return(Qual("kiv_ups_server/net/tcp/protocol", message.Name+"Message{}")))
 	}
 	f.Empty()
 	registerStatements := make([]Code, 0)
@@ -165,7 +165,7 @@ func GenerateActions(messageMetadata MessageMetadata) {
 	}
 	f.Func().Id("RegisterAllActions").Params(Id("actionDefinition").Id("*ActionDefinition")).Block(registerStatements...)
 
-	file, err := os.OpenFile("./internal/masterserver/actions/defs.go", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
+	file, err := os.OpenFile("./masterserver/actions/defs.go", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 	if err != nil {
 		panic(err)
 	}

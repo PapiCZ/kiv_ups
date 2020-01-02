@@ -1,8 +1,8 @@
 package actions
 
 import (
-	interfaces2 "kiv_ups_server/masterserver/interfaces"
-	protocol2 "kiv_ups_server/net/tcp/protocol"
+	interfaces "kiv_ups_server/masterserver/interfaces"
+	protocol "kiv_ups_server/net/tcp/protocol"
 )
 
 /*
@@ -15,130 +15,130 @@ import (
 ###############################################################
 */
 const (
-	DefaultContext      = interfaces2.PlayerContext(0)
-	LobbyContext        = interfaces2.PlayerContext(1)
-	InGameContext       = interfaces2.PlayerContext(2)
-	LoggedInMenuContext = interfaces2.PlayerContext(3)
+	DefaultContext      = interfaces.PlayerContext(0)
+	LobbyContext        = interfaces.PlayerContext(1)
+	InGameContext       = interfaces.PlayerContext(2)
+	LoggedInMenuContext = interfaces.PlayerContext(3)
 )
 
 type KeepAliveAction struct{}
 
-func (a KeepAliveAction) GetPlayerContexts() []interfaces2.PlayerContext {
-	return []interfaces2.PlayerContext{DefaultContext, LobbyContext, InGameContext, LoggedInMenuContext}
+func (a KeepAliveAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{DefaultContext, LobbyContext, InGameContext, LoggedInMenuContext}
 }
 
-func (a KeepAliveAction) GetMessage() protocol2.Message {
-	return protocol2.KeepAliveMessage{}
+func (a KeepAliveAction) GetMessage() protocol.Message {
+	return protocol.KeepAliveMessage{}
 }
 
 type AuthenticateAction struct{}
 
-func (a AuthenticateAction) GetPlayerContexts() []interfaces2.PlayerContext {
-	return []interfaces2.PlayerContext{DefaultContext}
+func (a AuthenticateAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{DefaultContext}
 }
 
-func (a AuthenticateAction) GetMessage() protocol2.Message {
-	return protocol2.AuthenticateMessage{}
+func (a AuthenticateAction) GetMessage() protocol.Message {
+	return protocol.AuthenticateMessage{}
 }
 
 type CreateLobbyAction struct{}
 
-func (a CreateLobbyAction) GetPlayerContexts() []interfaces2.PlayerContext {
-	return []interfaces2.PlayerContext{LoggedInMenuContext}
+func (a CreateLobbyAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LoggedInMenuContext}
 }
 
-func (a CreateLobbyAction) GetMessage() protocol2.Message {
-	return protocol2.CreateLobbyMessage{}
+func (a CreateLobbyAction) GetMessage() protocol.Message {
+	return protocol.CreateLobbyMessage{}
 }
 
 type DeleteLobbyAction struct{}
 
-func (a DeleteLobbyAction) GetPlayerContexts() []interfaces2.PlayerContext {
-	return []interfaces2.PlayerContext{LoggedInMenuContext}
+func (a DeleteLobbyAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LoggedInMenuContext}
 }
 
-func (a DeleteLobbyAction) GetMessage() protocol2.Message {
-	return protocol2.DeleteLobbyMessage{}
+func (a DeleteLobbyAction) GetMessage() protocol.Message {
+	return protocol.DeleteLobbyMessage{}
 }
 
 type ListLobbiesAction struct{}
 
-func (a ListLobbiesAction) GetPlayerContexts() []interfaces2.PlayerContext {
-	return []interfaces2.PlayerContext{LoggedInMenuContext}
+func (a ListLobbiesAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LoggedInMenuContext}
 }
 
-func (a ListLobbiesAction) GetMessage() protocol2.Message {
-	return protocol2.ListLobbiesMessage{}
+func (a ListLobbiesAction) GetMessage() protocol.Message {
+	return protocol.ListLobbiesMessage{}
 }
 
 type JoinLobbyAction struct{}
 
-func (a JoinLobbyAction) GetPlayerContexts() []interfaces2.PlayerContext {
-	return []interfaces2.PlayerContext{LoggedInMenuContext}
+func (a JoinLobbyAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LoggedInMenuContext}
 }
 
-func (a JoinLobbyAction) GetMessage() protocol2.Message {
-	return protocol2.JoinLobbyMessage{}
+func (a JoinLobbyAction) GetMessage() protocol.Message {
+	return protocol.JoinLobbyMessage{}
 }
 
 type ListLobbyPlayersAction struct{}
 
-func (a ListLobbyPlayersAction) GetPlayerContexts() []interfaces2.PlayerContext {
-	return []interfaces2.PlayerContext{LobbyContext}
+func (a ListLobbyPlayersAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LobbyContext}
 }
 
-func (a ListLobbyPlayersAction) GetMessage() protocol2.Message {
-	return protocol2.ListLobbyPlayersMessage{}
+func (a ListLobbyPlayersAction) GetMessage() protocol.Message {
+	return protocol.ListLobbyPlayersMessage{}
 }
 
 type StartGameAction struct{}
 
-func (a StartGameAction) GetPlayerContexts() []interfaces2.PlayerContext {
-	return []interfaces2.PlayerContext{LobbyContext}
+func (a StartGameAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LobbyContext}
 }
 
-func (a StartGameAction) GetMessage() protocol2.Message {
-	return protocol2.StartGameMessage{}
+func (a StartGameAction) GetMessage() protocol.Message {
+	return protocol.StartGameMessage{}
 }
 
 type GameReconnectAvailableAction struct{}
 
-func (a GameReconnectAvailableAction) GetPlayerContexts() []interfaces2.PlayerContext {
-	return []interfaces2.PlayerContext{LoggedInMenuContext}
+func (a GameReconnectAvailableAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LoggedInMenuContext}
 }
 
-func (a GameReconnectAvailableAction) GetMessage() protocol2.Message {
-	return protocol2.GameReconnectAvailableMessage{}
+func (a GameReconnectAvailableAction) GetMessage() protocol.Message {
+	return protocol.GameReconnectAvailableMessage{}
 }
 
 type ReconnectAction struct{}
 
-func (a ReconnectAction) GetPlayerContexts() []interfaces2.PlayerContext {
-	return []interfaces2.PlayerContext{LoggedInMenuContext}
+func (a ReconnectAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LoggedInMenuContext}
 }
 
-func (a ReconnectAction) GetMessage() protocol2.Message {
-	return protocol2.ReconnectMessage{}
+func (a ReconnectAction) GetMessage() protocol.Message {
+	return protocol.ReconnectMessage{}
 }
 
 type LeaveGameAction struct{}
 
-func (a LeaveGameAction) GetPlayerContexts() []interfaces2.PlayerContext {
-	return []interfaces2.PlayerContext{LoggedInMenuContext, InGameContext}
+func (a LeaveGameAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LoggedInMenuContext, InGameContext}
 }
 
-func (a LeaveGameAction) GetMessage() protocol2.Message {
-	return protocol2.LeaveGameMessage{}
+func (a LeaveGameAction) GetMessage() protocol.Message {
+	return protocol.LeaveGameMessage{}
 }
 
 type LeaveLobbyAction struct{}
 
-func (a LeaveLobbyAction) GetPlayerContexts() []interfaces2.PlayerContext {
-	return []interfaces2.PlayerContext{LobbyContext}
+func (a LeaveLobbyAction) GetPlayerContexts() []interfaces.PlayerContext {
+	return []interfaces.PlayerContext{LobbyContext}
 }
 
-func (a LeaveLobbyAction) GetMessage() protocol2.Message {
-	return protocol2.LeaveLobbyMessage{}
+func (a LeaveLobbyAction) GetMessage() protocol.Message {
+	return protocol.LeaveLobbyMessage{}
 }
 
 func RegisterAllActions(actionDefinition *ActionDefinition) {

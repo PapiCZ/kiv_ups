@@ -28,7 +28,7 @@ func update_game_tree(parent_obj, node):
 		elif node.type == "score":
 			update_score(game_node, node)
 	else:
-		# create
+		# create and update note
 		print("Creating new node: ", node.id)
 
 		if node.type == "spaceship":
@@ -47,6 +47,7 @@ func update_game_tree(parent_obj, node):
 			game_node = Node2D.new()
 
 		if game_node != null:
+			# Set name of the node and add it to the parent
 			game_node.set_name(node.id)
 			parent_obj.add_child(game_node)
 
@@ -65,11 +66,14 @@ func create_spaceship(node):
 
 func update_spaceship(spaceship, node):
 	if node.value.reload_position:
+		# Force position reload for the current player that don't
+		# usually update position from server.
 		spaceship.position = Vector2(node.value.pos_x, node.value.pos_y)
 		spaceship.speed = Vector2(node.value.velocity_x, node.value.velocity_y).length() - spaceship.velocity.length()
 		spaceship.velocity = Vector2(node.value.velocity_x, node.value.velocity_y)
 		spaceship.rotation = node.value.rotation
 
+	# Set opactity to 0.5 if user is immune
 	if node.value.immune:
 		spaceship.modulate = Color(1, 1, 1, 0.5)
 	else:

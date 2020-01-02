@@ -1,0 +1,12 @@
+\babel@toc {czech}{}
+\contentsline {section}{\numberline {1}Úvod}{2}{section.1}% 
+\contentsline {section}{\numberline {2}Protokol}{2}{section.2}% 
+\contentsline {subsection}{\numberline {2.1}Specifikace}{2}{subsection.2.1}% 
+\contentsline {section}{\numberline {3}Implementace}{2}{section.3}% 
+\contentsline {subsection}{\numberline {3.1}Popis hry}{2}{subsection.3.1}% 
+\contentsline {subsection}{\numberline {3.2}Definice použitých zpráv}{2}{subsection.3.2}% 
+\contentsline {subsubsection}{\numberline {3.2.1}Zprávy zasílané klientem}{3}{subsubsection.3.2.1}% 
+\contentsline {subsubsection}{\numberline {3.2.2}Zprávy zasílané serverem}{7}{subsubsection.3.2.2}% 
+\contentsline {subsection}{\numberline {3.3}Server}{9}{subsection.3.3}% 
+\contentsline {subsubsection}{\numberline {3.3.1}Síť}{9}{subsubsection.3.3.1}% 
+\contentsline {subsection}{\numberline {3.4}Reakce na zprávy}{9}{subsection.3.4}% 

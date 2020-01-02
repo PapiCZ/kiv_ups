@@ -17,5 +17,5 @@ func set_disconnected():
 	$ProgressBar/PlayerNameLabel.add_color_override("font_color", Color(1, 0, 0))
 
 func set_connected():
-	$ProgressBar/PlayerNameLabel.text.erase(0, 2)
+	$ProgressBar/PlayerNameLabel.text.erase(0, 2) # Remove "X " from string
 	$ProgressBar/PlayerNameLabel.set("custom_colors/font_color", null)

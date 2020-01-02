@@ -1,7 +1,5 @@
 extends Node
 
-#warning-ignore-all:unused_class_variable
-
 var id = 0
 var request = null
 var request_time = null

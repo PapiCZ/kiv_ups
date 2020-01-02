@@ -111,7 +111,7 @@ func read_ascii_word_until_delimiter(buff, start=0):
 	var i = start
 	while true:
 		if (buff[i] >= 48 and buff[i] <= 57) or (buff[i] >= 97 and buff[i] <= 122) or (buff[i] >= 65 and buff[i] <= 90):
-			# Between 0 and 9 OR a and z OR A and Z
+			# 0-9 OR a-z OR A-Z
 			ascii_word_buff.append(buff[i])
 		elif buff[i] == DELIMITER_CHARACTER:
 			return [i - start, ascii_word_buff]

@@ -137,8 +137,6 @@ messages:
   - name: PlayerMove
     type: 400
     fields:
-      - name: PlayerName
-        type: string
       - name: PosX
         type: float64
       - name: PosY

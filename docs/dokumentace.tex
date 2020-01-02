@@ -1,0 +1,430 @@
+\documentclass[12pt, a4paper]{article}
+
+\usepackage[czech]{babel}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[hidelinks,unicode]{hyperref}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage[final]{pdfpages}
+\usetikzlibrary{shapes,positioning,matrix,arrows}
+
+\newcommand{\img}[1]{(viz obr. \ref{#1})}
+
+\lstset{basicstyle=\ttfamily,
+showstringspaces=false,
+commentstyle=\color{red},
+keywordstyle=\color{blue}
+}
+
+
+\begin{document}
+    \begin{titlepage}
+
+        \centering
+
+        \vspace*{\baselineskip}
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=7cm]{fav-logo.png}
+        \end{figure}
+
+        \vspace*{1\baselineskip}
+        {\sc Semestrální práce z předmětu KIV/UPS}
+        \vspace*{1\baselineskip}
+
+        \vspace{0.75\baselineskip}
+
+        {\LARGE\sc Realtime online multiplayer hra - Asteroidy \\}
+
+        \vspace{4\baselineskip}
+
+        {\sc\Large Patrik Janoušek \\}
+
+        \vspace{0.5\baselineskip}
+
+        {A17B0231P}\\
+        {janopa@students.zcu.cz}
+
+        \vfill
+
+        {\sc Západočeská univerzita v Plzni\\
+        Fakulta aplikovaných věd}
+
+
+    \end{titlepage}
+
+
+    \tableofcontents
+    \pagebreak
+
+    \newpage
+
+    \section{Úvod}
+    \section{Protokol}
+    \subsection{Specifikace}
+    Protokol byl navržen s ohledem na jednoduchost implementace, ale aby zároveň splnil všechny požadavky, které by aplikace mohla mít.
+    
+    Mezi hlavní požadavky na protokol byla identifikace typu zprávy.
+    Tu je možné provádět pomocí trojciferných číselných identifikátorů.
+    Díky těmto identifikátorů je schopná komunikující protistrana předpokládat strukturu příchozích dat.
+
+    Podporuje tedy identifikaci zpráv, kde si klient může určit vlastní identifikátor zprávy, a server tento identifikátor zapíše i do odpovědi, díky čemuž je klient schopen poznat na jakou zprávu server odpovídá.
+    Tento identifikátor má variabilní délku, tudíž je zde i možnost jeho nepoužití.
+
+    Tělo zprávy je pak zakódované ve formátu JSON, kde je pro klíče použita konvence snake case. 
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|c|}
+            \hline
+            Popis & Délka & Hodnota\\
+            \hline
+            \hline
+            Dělící znak & 1 & \uv{|} \\
+            \hline
+            Typ zprávy & 3 & Číslo v ASCII \\
+            \hline
+            Dělící znak & 1 & \uv{|} \\
+            \hline
+            Délka těla zprávy & variabilní & Číslo v ASCII \\
+            \hline
+            Dělící znak & 1 & \uv{|} \\
+            \hline
+            Identifikátor požadavku & variabilní & Řetězec znaků a-z, A-Z a 0-9 v ASCII \\
+            \hline
+            Dělící znak & 1 & \uv{|} \\
+            \hline
+            Tělo zprávy & variabilní & Data zakódovaná v JSONu \\
+            \hline
+        \end{tabular}
+        \caption{Specifikace protokolu}
+    \end{table}
+
+    \section{Implementace}
+    \subsection{Popis hry}
+
+    \subsection{Definice použitých zpráv}
+    Jak již bylo uvedeno výše, každý typ zprávy má svůj unikátní trojciferný identifikátor.
+    Tento identifikátor může být z hlediska protokolu libovolný, nicméně pro lepší orientaci byla v konkrétní implementaci vytvořena určitá pravidla.
+    
+    A to taková, že identifikátor 1xx je použit pro obecné zprávy, které nemusí přímo souviset se samotnou aplikací (keep-alive, atd\dots).
+    2xx pak slouží pro zprávy zasílané klientem, a 3xx zprávy zasínalé serverem.
+    Zde je ještě dodržováno to, že \uv{xx} je stejné pro klientskou i serverovou zprávu, pokud je serverová zpráva odpovědí na klientský požadavek.
+    Tyto identifikátory jsou použity pro zprávy, které přímo nesouvisí se hrou, ale spíše s její správou (autentizace, založení lobby, získání seznamu hráčů, \dots).
+    Nakonec jsou pak použity identifikátory zpráv 4xx a 5xx, kde 4xx jsou zprávy zasílané klientem, a 5xx zprávy zasílané serverem. Tyto identifikátory jsou použity pro zprávy přímo související se hrou (pohyb hráče po herní ploše, střelba, \dots).
+
+    Všechny zprávy zasílané serverem, jsou obalovány do struktury, která umožňuje k zasílaným datům přidat status, a případně nějakou dodatečnou zprávu. Přenášená zpráva je pak dostupná pod klíčem \uv{data}.
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|}
+            \hline
+            Klíč & Datový typ\\
+            \hline
+            \hline
+            data & object \\
+            \hline
+            message & string \\
+            \hline
+            status & boolean \\
+            \hline
+        \end{tabular}
+        \caption{Obalovací zpráva serveru}
+    \end{table}
+
+    \subsubsection{Zprávy zasílané klientem}
+    \subsubsection*{KeepAlive}
+    Typ zprávy: 100\\\\
+    Tato zpráva je zasílána klientem, aby ověřila funkčnost spojení se serverem, a zároveň schopnost komunikace mezi těmito dvěmi stranamy.
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|}
+            \hline
+            Klíč & Datový typ\\
+            \hline
+            \hline
+            ping & string \\
+            \hline
+        \end{tabular}
+        \caption{Specifikace KeepAlive}
+    \end{table}
+
+    Klient jako hodnotu pole \uv{ping} vyplňuje řetězec \uv{pong}. A server na tuto zprávu odpovídá stejným typem zprávy, jen jako hodnotu pole \uv{ping} vyplňuje řetězec \uv{ping-pong}.
+
+    \subsubsection*{ActionError}
+    Typ zprávy: 101\\\\
+    Zpráva, která je zasílána serverem jako odpověď na typ zprávy, ke které klient nemá oprávnění, nebo daná zpráva neexistuje.
+    Tato zprávy má prázdné tělo a neposílá žádná dodatečná data.
+
+    \subsubsection*{Authenticate}
+    Typ zprávy: 200\\\\
+    Autentizační zpráva musí být klientem zaslána jako první zpráva po připojení k serveru.
+    V případě neposlání této zprávy nemá klient žádné pravomoce, mimo zasílání \textit{KeepAlive}.
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|c|}
+            \hline
+            Klíč & Datový typ & Popis\\
+            \hline
+            \hline
+            name & string & Jméno hráče\\
+            \hline
+        \end{tabular}
+        \caption{Specifikace Authenticate}
+    \end{table}
+
+    \subsubsection*{CreateLobby}
+    Typ zprávy: 201\\\\
+    Zpráva určená k založení lobby.
+    Hráč, který lobby vytváří, je automaticky do lobby připojen a není již potřeba posílat \textit{JoinLobby}.
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|c|}
+            \hline
+            Klíč & Datový typ & Popis\\
+            \hline
+            \hline
+            name & string & Název lobby\\
+            \hline
+            players\_limit & integer & Limit počtu hráčů v lobby\\
+            \hline
+        \end{tabular}
+        \caption{Specifikace Authenticate}
+    \end{table}
+
+    \subsubsection*{DeleteLobby}
+    Typ zprávy: 202\\\\
+    Zpráva určená ke smazání lobby.
+    Ačkoliv zpráva přjímá jako parametr název lobby ke smazání, tak hráč má právo smazat lobby jenom za předpokladu, že je jejím vlastníkem.
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|c|}
+            \hline
+            Klíč & Datový typ & Popis\\
+            \hline
+            \hline
+            name & string & Název lobby ke smazání\\
+            \hline
+        \end{tabular}
+        \caption{Specifikace DeleteLobby}
+    \end{table}
+
+    \subsubsection*{ListLobbies}
+    Typ zprávy: 203\\\\
+    Prázdná zpráva sloužící k získání seznamu všech dostupných lobby.
+
+    \subsubsection*{JoinLobby}
+    Typ zprávy: 204\\\\
+    Zpráva sloužící k připojení do lobby.
+    Připojení je možné pouze za předpokladu, že je v lobby volný slot pro hráče.
+    Tato skutečnost je ověřována serverem, který vyplní patřičný status zprávy.
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|c|}
+            \hline
+            Klíč & Datový typ & Popis\\
+            \hline
+            \hline
+            name & string & Název lobby k připojení\\
+            \hline
+        \end{tabular}
+        \caption{Specifikace JoinLobby}
+    \end{table} 
+
+    \subsubsection*{LeaveLobby}
+    Typ zprávy: 214\\\\
+    Prázdná zpráva, kterou se hráč odpojí z lobby.
+
+    \subsubsection*{ListLobbyPlayers}
+    Typ zprávy: 206\\\\
+    Prázdná zpráva sloužící k získání seznamu hráčů přípojených do lobby.
+
+    \subsubsection*{StartGame}
+    Typ zprávy: 207\\\\
+    Prázdná zpráva pro spuštění hry.
+    Tuto zprávu může poslat libovolný hráč z lobby.
+    Od této chvíle je na serveru vytvořená instance hry, a všichni hráči jsou neustále informováni o jejím stavu.
+
+    \subsubsection*{GameReconnectAvailable}
+    Typ zprávy: 211\\\\
+    Touto prázdnou zprávou si může klient ověřit, zda připojený hráč nepatří do nějaké hry, a tudíž se do ní může opět připojit, nebo se z ní odpojit.
+
+    \subsubsection*{Reconnect}
+    Typ zprávy: 212\\\\
+    Zasláním této prázdné zprávy se hráč připojí zpět do probíhající hry, kterou předtím opustil.
+
+    \subsubsection*{LeaveGame}
+    Typ zprávy: 213\\\\
+    Zasláním této prázdné zprávy hráč definitivně opustí probíhající hru, ze které odešel, a již se do ní nemůže vrátit.
+   
+    \subsubsection*{PlayerMove}
+    Typ zprávy: 400\\\\
+    Zpráva, která informuje server o změně atributů hráče.
+    Tuto zprávu by měl klient posílat při změně své pozice, nebo libovolného atributu svého pohybu (vektor pohybu, rotace, \dots).
+    Zaslané údaje jsou na serveru verifikovány a v případě chybně zaslaných údajů je klient vyžádán k synchronizaci údajů se serverem (viz. \textit{UpdateState}).
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|c|}
+            \hline
+            Klíč & Datový typ & Popis\\
+            \hline
+            \hline
+            pos\_x & double & Pozice na ose X\\
+            \hline
+            pos\_y & double & Pozice na ose Y\\
+            \hline
+            velocity\_x & double & Složka X vektoru pohybu\\
+            \hline
+            velocity\_y & double & Složka Y vektoru pohybu\\
+            \hline
+            rotation & double & Rotace hráče v radiánech\\
+            \hline
+        \end{tabular}
+        \caption{Specifikace PlayerMove}
+    \end{table}
+
+    \subsubsection*{ShootProjectile}
+    Typ zprávy: 401\\\\
+    Prázdná zpráva informující server o vystřelení projektilu
+
+    \subsubsection{Zprávy zasílané serverem}
+    \subsubsection*{CreatedLobbyResponse}
+    Typ zprávy: 301\\\\
+    Prázdná zpráva, kterou je klient informován o založení lobby.
+
+    \subsubsection*{DeleteLobbyResponse}
+    Typ zprávy: 302\\\\
+    Prázdná zpráva, kterou je klient informován o smazání lobby.
+
+    \subsubsection*{ListLobbiesResponse}
+    Typ zprávy: 303\\\\
+    Tuto zprávu server používá pro zaslání seznamu všech dostupných lobby.
+    V kořenu zprávy je jedinný klíč \uv{lobbies}, který má následující strukturu:
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|c|}
+            \hline
+            Klíč & Datový typ & Popis\\
+            \hline
+            \hline
+            name & string & Název lobby\\
+            \hline
+            connected\_players & integer & Počet hráčů připojených do lobby\\
+            \hline
+            players\_limit & integer & Maximální počet připojených hráčů\\
+            \hline
+        \end{tabular}
+        \caption{Specifikace ListLobbiesResponse}
+    \end{table}
+
+    \subsubsection*{JoinLobbyResponse}
+    Typ zprávy: 304\\\\
+    Prázdná zpráva informující klienta o stavu připojení do lobby.
+
+    \subsubsection*{PlayerLobbyJoined}
+    Typ zprávy: 305\\\\
+    Zpráva informující hráče, kteří jsou již připojení v lobby, o připojení nového hráče.
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|c|}
+            \hline
+            Klíč & Datový typ & Popis\\
+            \hline
+            \hline
+            name & string & Jméno hráče\\
+            \hline
+        \end{tabular}
+        \caption{Specifikace ListLobbiesResponse}
+    \end{table}
+
+    \subsubsection*{ListLobbyPlayersResponse}
+    Typ zprávy: 306\\\\
+    Zpráva, kterou server klientovi vrací seznam hráčů připojených do lobby.
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|c|}
+            \hline
+            Klíč & Datový typ & Popis\\
+            \hline
+            \hline
+            players & string[] & Pole jmen hráčů\\
+            \hline
+        \end{tabular}
+        \caption{Specifikace ListLobbyPlayersResponse}
+    \end{table}
+
+    \subsubsection*{StartGameResponse}
+    Typ zprávy: 307\\\\
+    Prázdná zpráva, která se zasílá všem hráčům při startu hry.
+
+    \subsubsection*{LobbyPlayerConnected}
+    Typ zprávy: 308\\\\
+    Zpráva informující ostatní hráče v lobby o připojení nového hráče.
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|c|}
+            \hline
+            Klíč & Datový typ & Popis\\
+            \hline
+            \hline
+            name & string & Jméno příchozího hráče\\
+            \hline
+        \end{tabular}
+        \caption{Specifikace LobbyPlayerConnected}
+    \end{table}
+
+    \subsubsection*{LobbyPlayerDisconnected}
+    Typ zprávy: 309\\\\
+    Zpráva informující ostatní hráče v lobby o odpojení hráče.
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|c|}
+            \hline
+            Klíč & Datový typ & Popis\\
+            \hline
+            \hline
+            name & string & Jméno odpojeného hráče\\
+            \hline
+        \end{tabular}
+        \caption{Specifikace LobbyPlayerConnected}
+    \end{table}
+
+    TODO: 31x
+
+    \subsection{Server}
+    Pro implementaci serveru byl zvolen jazyk go.
+    Jednak z důvodu vyzkoušení nové technologie, ale i z důvodu jeho technologických výhod.
+    Zejména z důvodu jednoduchosti paralelizace a možnosti jednoduché a bezpečné komunikace mezi jednotlivými vlákny (resp. gorutinami), ale i automatické správy paměti.
+
+    \subsubsection{Síť}
+    Síť je v serveru implementována s důrazem na co největší oddělení od zbytku aplikace, a je vedle aplikace v samostatném balíku \uv{net}, který je pojmenován po vzoru stejnojmenného balíku ze standardní knihovny jazyka go.
+    Tento balík obsahuje implementaci jak samotného TCP serveru, tak i protokolu.
+    
+    Protokol je plně oddělen od TCP serveru, se kterým komunikuje pomocí rour.
+    Díky tomu je protokol schopen komunikovat s libovolným binárním streamem dat, který nutně nemusí přijít od TCP serveru.
+    Tato vlastnost ho dělá i samostatně testovatelným.
+    Nevýhodou je, že je díky tomu komunikace s protokolem blokující, a každý klient musí mít pro protokol vlastní gorutinu.
+
+    Pokud tedy přijde zpráva, tak jí TCP server přečte ze socketu, a zapíše jí do patřičné roury připojeného klienta, odkud zprávu začne přečte protokol, a zečne jí zpracovávat.
+    Po tom, co protokol přečte celou zprávu, tak ji naplní do struktury \texttt{ProtoMessage}, a pomocí kanálu ji předá zpět TCP serveru, který tuto zprávu vezme, přidá k ní odesílatele, a skrz další kanál jí předá master serveru, který může zprávu na základě jejího obsahu a typu dále zpracovávat.
+
+    \subsection{Reakce na zprávy}
+
+\end{document}
