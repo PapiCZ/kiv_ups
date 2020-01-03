@@ -69,7 +69,7 @@ func (s *Spaceship) Process(playerMessages []interfaces.PlayerMessage, delta flo
 			}
 		} else if _, ok := message.(*protocol.ShootProjectileMessage); ok {
 			// Check if player can shoot
-			if s.ShootTimeout <= 0 {
+			if s.ShootTimeout <= 0 && !s.Immune {
 				s.ShootTimeout = ShootTimeout
 
 				velocity := Vector{0, -1}

@@ -140,7 +140,8 @@ keywordstyle=\color{blue}
 
     \subsubsection{Zprávy zasílané klientem}
     \subsubsection*{KeepAlive}
-    Typ zprávy: 100\\\\
+    Typ zprávy: 100\\
+
     Tato zpráva je zasílána klientem, aby ověřila funkčnost spojení se serverem, a zároveň schopnost komunikace mezi těmito dvěmi stranamy.
 
     \begin{table}[H]
@@ -159,12 +160,14 @@ keywordstyle=\color{blue}
     Klient jako hodnotu pole \uv{ping} vyplňuje řetězec \uv{pong}. A server na tuto zprávu odpovídá stejným typem zprávy, jen jako hodnotu pole \uv{ping} vyplňuje řetězec \uv{ping-pong}.
 
     \subsubsection*{ActionError}
-    Typ zprávy: 101\\\\
+    Typ zprávy: 101\\
+
     Zpráva, která je zasílána serverem jako odpověď na typ zprávy, ke které klient nemá oprávnění, nebo daná zpráva neexistuje.
     Tato zprávy má prázdné tělo a neposílá žádná dodatečná data.
 
     \subsubsection*{Authenticate}
-    Typ zprávy: 200\\\\
+    Typ zprávy: 200\\
+
     Autentizační zpráva musí být klientem zaslána jako první zpráva po připojení k serveru.
     V případě neposlání této zprávy nemá klient žádné pravomoce, mimo zasílání \textit{KeepAlive}.
 
@@ -182,7 +185,8 @@ keywordstyle=\color{blue}
     \end{table}
 
     \subsubsection*{CreateLobby}
-    Typ zprávy: 201\\\\
+    Typ zprávy: 201\\
+
     Zpráva určená k založení lobby.
     Hráč, který lobby vytváří, je automaticky do lobby připojen a není již potřeba posílat \textit{JoinLobby}.
 
@@ -202,7 +206,8 @@ keywordstyle=\color{blue}
     \end{table}
 
     \subsubsection*{DeleteLobby}
-    Typ zprávy: 202\\\\
+    Typ zprávy: 202\\
+
     Zpráva určená ke smazání lobby.
     Ačkoliv zpráva přjímá jako parametr název lobby ke smazání, tak hráč má právo smazat lobby jenom za předpokladu, že je jejím vlastníkem.
 
@@ -220,11 +225,13 @@ keywordstyle=\color{blue}
     \end{table}
 
     \subsubsection*{ListLobbies}
-    Typ zprávy: 203\\\\
+    Typ zprávy: 203\\
+
     Prázdná zpráva sloužící k získání seznamu všech dostupných lobby.
 
     \subsubsection*{JoinLobby}
-    Typ zprávy: 204\\\\
+    Typ zprávy: 204\\
+
     Zpráva sloužící k připojení do lobby.
     Připojení je možné pouze za předpokladu, že je v lobby volný slot pro hráče.
     Tato skutečnost je ověřována serverem, který vyplní patřičný status zprávy.
@@ -243,11 +250,13 @@ keywordstyle=\color{blue}
     \end{table} 
 
     \subsubsection*{LeaveLobby}
-    Typ zprávy: 214\\\\
+    Typ zprávy: 214\\
+
     Prázdná zpráva, kterou se hráč odpojí z lobby.
 
     \subsubsection*{ListLobbyPlayers}
-    Typ zprávy: 206\\\\
+    Typ zprávy: 206\\
+
     Prázdná zpráva sloužící k získání seznamu hráčů přípojených do lobby.
 
     \subsubsection*{StartGame}
@@ -257,19 +266,23 @@ keywordstyle=\color{blue}
     Od této chvíle je na serveru vytvořená instance hry, a všichni hráči jsou neustále informováni o jejím stavu.
 
     \subsubsection*{GameReconnectAvailable}
-    Typ zprávy: 211\\\\
+    Typ zprávy: 211\\
+
     Touto prázdnou zprávou si může klient ověřit, zda připojený hráč nepatří do nějaké hry, a tudíž se do ní může opět připojit, nebo se z ní odpojit.
 
     \subsubsection*{Reconnect}
-    Typ zprávy: 212\\\\
+    Typ zprávy: 212\\
+
     Zasláním této prázdné zprávy se hráč připojí zpět do probíhající hry, kterou předtím opustil.
 
     \subsubsection*{LeaveGame}
-    Typ zprávy: 213\\\\
+    Typ zprávy: 213\\
+
     Zasláním této prázdné zprávy hráč definitivně opustí probíhající hru, ze které odešel, a již se do ní nemůže vrátit.
    
     \subsubsection*{PlayerMove}
-    Typ zprávy: 400\\\\
+    Typ zprávy: 400\\
+
     Zpráva, která informuje server o změně atributů hráče.
     Tuto zprávu by měl klient posílat při změně své pozice, nebo libovolného atributu svého pohybu (vektor pohybu, rotace, \dots).
     Zaslané údaje jsou na serveru verifikovány a v případě chybně zaslaných údajů je klient vyžádán k synchronizaci údajů se serverem (viz. \textit{UpdateState}).
@@ -296,20 +309,26 @@ keywordstyle=\color{blue}
     \end{table}
 
     \subsubsection*{ShootProjectile}
-    Typ zprávy: 401\\\\
+    Typ zprávy: 401\\
+
     Prázdná zpráva informující server o vystřelení projektilu
 
     \subsubsection{Zprávy zasílané serverem}
     \subsubsection*{CreatedLobbyResponse}
-    Typ zprávy: 301\\\\
+    Typ zprávy: 301\\
+    Odpověď na zprávu: \textit{CreatedLobbyResponse}\\
+
     Prázdná zpráva, kterou je klient informován o založení lobby.
 
     \subsubsection*{DeleteLobbyResponse}
-    Typ zprávy: 302\\\\
+    Typ zprávy: 302\\
+
     Prázdná zpráva, kterou je klient informován o smazání lobby.
 
     \subsubsection*{ListLobbiesResponse}
-    Typ zprávy: 303\\\\
+    Typ zprávy: 303\\
+    Odpověď na zprávu: \textit{ListLobbies}\\
+
     Tuto zprávu server používá pro zaslání seznamu všech dostupných lobby.
     V kořenu zprávy je jedinný klíč \uv{lobbies}, který má následující strukturu:
 
@@ -331,11 +350,14 @@ keywordstyle=\color{blue}
     \end{table}
 
     \subsubsection*{JoinLobbyResponse}
-    Typ zprávy: 304\\\\
+    Typ zprávy: 304\\
+    Odpověď na zprávu: \textit{JoinLobby}\\
+
     Prázdná zpráva informující klienta o stavu připojení do lobby.
 
     \subsubsection*{PlayerLobbyJoined}
-    Typ zprávy: 305\\\\
+    Typ zprávy: 305\\
+
     Zpráva informující hráče, kteří jsou již připojení v lobby, o připojení nového hráče.
 
     \begin{table}[H]
@@ -352,7 +374,9 @@ keywordstyle=\color{blue}
     \end{table}
 
     \subsubsection*{ListLobbyPlayersResponse}
-    Typ zprávy: 306\\\\
+    Typ zprávy: 306\\
+    Odpověď na zprávu: \textit{ListLobbyPlayers}\\
+
     Zpráva, kterou server klientovi vrací seznam hráčů připojených do lobby.
 
     \begin{table}[H]
@@ -369,7 +393,9 @@ keywordstyle=\color{blue}
     \end{table}
 
     \subsubsection*{StartGameResponse}
-    Typ zprávy: 307\\\\
+    Typ zprávy: 307\\
+    Odpověď na zprávu: \textit{StartGame}\\
+
     Prázdná zpráva, která se zasílá všem hráčům při startu hry.
 
     \subsubsection*{LobbyPlayerConnected}
@@ -390,7 +416,8 @@ keywordstyle=\color{blue}
     \end{table}
 
     \subsubsection*{LobbyPlayerDisconnected}
-    Typ zprávy: 309\\\\
+    Typ zprávy: 309\\
+
     Zpráva informující ostatní hráče v lobby o odpojení hráče.
 
     \begin{table}[H]
@@ -406,7 +433,67 @@ keywordstyle=\color{blue}
         \caption{Specifikace LobbyPlayerConnected}
     \end{table}
 
-    TODO: 31x
+    \subsubsection*{GameEnd}
+    Typ zprávy: 310\\
+
+    Tato zpráva je zaslána všem hráčům hry po jejím skončení.
+    V kořenu zprávy obsahuje jediný klíč \uv{score\_summary}, který obsahuje pole s objekty následující struktury:
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|c|}
+            \hline
+            Klíč & Datový typ & Popis\\
+            \hline
+            \hline
+            player\_name & string & Jméno hráče\\
+            \hline
+            score & integer & Dosažené skóre\\
+            \hline
+            winner & boolean & Informaci o tom, zda je daný hráč výherce\\
+            \hline
+        \end{tabular}
+        \caption{Specifikace LobbyPlayerConnected}
+    \end{table}
+
+    \subsubsection*{GameReconnectAvailableResponse}
+    Typ zprávy: 311\\
+    Odpověď na zprávu: GameReconnectAvailable\\
+
+    Zpráva informující o tom, zda je možné se připojit zpět do probíhající hry, ze které se hráč odpojil. Obsahuje pouze jednou hodnotu:
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|l|c|c|}
+            \hline
+            Klíč & Datový typ & Popis\\
+            \hline
+            \hline
+            available & boolean & Dostupnost znovupřipojení se do probíhající hry\\
+            \hline
+        \end{tabular}
+        \caption{Specifikace LobbyPlayerConnected}
+    \end{table}
+
+    \subsubsection*{ReconnectResponse}
+    Typ zprávy: 312\\
+    Odpověď na zprávu: Reconnect\\
+
+    Prázdná zpráva informující klienta o úspěšném znovupřipojení zpět do hry.
+
+
+    \subsubsection*{LeaveGameResponse}
+    Typ zprávy: 313\\
+    Odpověď na zprávu: LeaveGame\\
+
+    Prázdná zpráva informující klienta o úspěšném opuštění probíhající hry.
+
+    \subsubsection*{LeaveLobbyResponse}
+    Typ zprávy: 314\\
+    Odpověď na zprávu: LeaveLobby\\
+
+    Prázdná zpráva informující klienta o úspěšném opuštění lobby.
+
 
     \subsection{Server}
     Pro implementaci serveru byl zvolen jazyk go.

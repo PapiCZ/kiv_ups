@@ -7,6 +7,6 @@
 \contentsline {subsection}{\numberline {3.2}Definice použitých zpráv}{2}{subsection.3.2}% 
 \contentsline {subsubsection}{\numberline {3.2.1}Zprávy zasílané klientem}{3}{subsubsection.3.2.1}% 
 \contentsline {subsubsection}{\numberline {3.2.2}Zprávy zasílané serverem}{7}{subsubsection.3.2.2}% 
-\contentsline {subsection}{\numberline {3.3}Server}{9}{subsection.3.3}% 
-\contentsline {subsubsection}{\numberline {3.3.1}Síť}{9}{subsubsection.3.3.1}% 
-\contentsline {subsection}{\numberline {3.4}Reakce na zprávy}{9}{subsection.3.4}% 
+\contentsline {subsection}{\numberline {3.3}Server}{10}{subsection.3.3}% 
+\contentsline {subsubsection}{\numberline {3.3.1}Síť}{10}{subsubsection.3.3.1}% 
+\contentsline {subsection}{\numberline {3.4}Reakce na zprávy}{11}{subsection.3.4}% 

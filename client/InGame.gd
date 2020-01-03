@@ -73,11 +73,7 @@ func update_spaceship(spaceship, node):
 		spaceship.velocity = Vector2(node.value.velocity_x, node.value.velocity_y)
 		spaceship.rotation = node.value.rotation
 
-	# Set opactity to 0.5 if user is immune
-	if node.value.immune:
-		spaceship.modulate = Color(1, 1, 1, 0.5)
-	else:
-		spaceship.modulate = Color(1, 1, 1, 1)
+	spaceship.immune = node.value.immune
 
 	if node.value.player_name == Network.username:
 		return

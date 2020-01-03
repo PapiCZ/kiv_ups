@@ -12,6 +12,7 @@ var velocity = Vector2()
 var player_name
 var screen_size = null
 var can_shoot = true
+var immune = false
 
 onready var Projectile = preload("res://objects/Projectile.tscn")
 
@@ -81,17 +82,22 @@ func _process(delta):
 		position -= velocity * delta
 		speed = 0
 
-	if Input.is_action_pressed("ui_shoot") and can_shoot:
+	if Input.is_action_pressed("ui_shoot") and can_shoot and not immune:
 		# Shoot
 		$ProjectileTimer.start()
 		can_shoot = false
 
 		Network.send({}, MessageTypes.SHOOT_PROJECTILE)
 
+	if immune:
+		# Set opacity to 0.5 if player is immune
+		modulate = Color(1, 1, 1, 0.5)
+	else:
+		modulate = Color(1, 1, 1, 1)
+
 func _physics_process(delta):
 
 	# Send updated attributes to the server
-
 	if (position != nlast_position or velocity != nlast_velocity or rotation != nlast_rotation) \
 		and Network.username == player_name:
 		Network.send({

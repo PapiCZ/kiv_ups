@@ -43,4 +43,3 @@ custom_fonts/font = SubResource( 2 )
 [node name="NetworkDisconnectedDialog" parent="." instance=ExtResource( 5 )]
 
 [node name="NetworkConnectedDialog" parent="." instance=ExtResource( 6 )]
-visible = false
