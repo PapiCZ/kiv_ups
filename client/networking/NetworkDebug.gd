@@ -13,6 +13,6 @@ func _log(message):
 		# Ignore in-game messages. There are tons of them and it costs a lot of performance.
 		return
 
-	text += str(message) + "\n"
+	# text += str(message) + "\n"
 
 

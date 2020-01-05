@@ -1,12 +1,21 @@
 \babel@toc {czech}{}
-\contentsline {section}{\numberline {1}Úvod}{2}{section.1}% 
+\contentsline {section}{\numberline {1}Popis hry}{2}{section.1}% 
 \contentsline {section}{\numberline {2}Protokol}{2}{section.2}% 
 \contentsline {subsection}{\numberline {2.1}Specifikace}{2}{subsection.2.1}% 
-\contentsline {section}{\numberline {3}Implementace}{2}{section.3}% 
-\contentsline {subsection}{\numberline {3.1}Popis hry}{2}{subsection.3.1}% 
-\contentsline {subsection}{\numberline {3.2}Definice použitých zpráv}{2}{subsection.3.2}% 
-\contentsline {subsubsection}{\numberline {3.2.1}Zprávy zasílané klientem}{3}{subsubsection.3.2.1}% 
-\contentsline {subsubsection}{\numberline {3.2.2}Zprávy zasílané serverem}{7}{subsubsection.3.2.2}% 
-\contentsline {subsection}{\numberline {3.3}Server}{10}{subsection.3.3}% 
-\contentsline {subsubsection}{\numberline {3.3.1}Síť}{10}{subsubsection.3.3.1}% 
-\contentsline {subsection}{\numberline {3.4}Reakce na zprávy}{11}{subsection.3.4}% 
+\contentsline {section}{\numberline {3}Implementace}{3}{section.3}% 
+\contentsline {subsection}{\numberline {3.1}Popis hry}{3}{subsection.3.1}% 
+\contentsline {subsection}{\numberline {3.2}Definice použitých zpráv}{3}{subsection.3.2}% 
+\contentsline {subsubsection}{\numberline {3.2.1}Zprávy zasílané klientem}{4}{subsubsection.3.2.1}% 
+\contentsline {subsubsection}{\numberline {3.2.2}Zprávy zasílané serverem}{8}{subsubsection.3.2.2}% 
+\contentsline {subsection}{\numberline {3.3}Server}{11}{subsection.3.3}% 
+\contentsline {subsubsection}{\numberline {3.3.1}Síť}{11}{subsubsection.3.3.1}% 
+\contentsline {subsubsection}{\numberline {3.3.2}Reakce na zprávy}{12}{subsubsection.3.3.2}% 
+\contentsline {subsubsection}{\numberline {3.3.3}Implementace hry}{12}{subsubsection.3.3.3}% 
+\contentsline {subsubsection}{\numberline {3.3.4}Herní objekty}{13}{subsubsection.3.3.4}% 
+\contentsline {subsubsection}{\numberline {3.3.5}Použité kninhovny}{14}{subsubsection.3.3.5}% 
+\contentsline {subsection}{\numberline {3.4}Klient}{15}{subsection.3.4}% 
+\contentsline {subsubsection}{\numberline {3.4.1}Síť}{15}{subsubsection.3.4.1}% 
+\contentsline {subsubsection}{\numberline {3.4.2}Herní menu}{16}{subsubsection.3.4.2}% 
+\contentsline {subsubsection}{\numberline {3.4.3}Herní část}{16}{subsubsection.3.4.3}% 
+\contentsline {subsection}{\numberline {3.5}Sestavení a spuštění aplikace}{16}{subsection.3.5}% 
+\contentsline {section}{\numberline {4}Závěr a zhodnocení práce}{17}{section.4}% 
