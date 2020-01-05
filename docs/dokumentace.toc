@@ -16,6 +16,6 @@
 \contentsline {subsection}{\numberline {3.4}Klient}{15}{subsection.3.4}% 
 \contentsline {subsubsection}{\numberline {3.4.1}Síť}{15}{subsubsection.3.4.1}% 
 \contentsline {subsubsection}{\numberline {3.4.2}Herní menu}{16}{subsubsection.3.4.2}% 
-\contentsline {subsubsection}{\numberline {3.4.3}Herní část}{16}{subsubsection.3.4.3}% 
+\contentsline {subsubsection}{\numberline {3.4.3}Hra}{16}{subsubsection.3.4.3}% 
 \contentsline {subsection}{\numberline {3.5}Sestavení a spuštění aplikace}{16}{subsection.3.5}% 
 \contentsline {section}{\numberline {4}Závěr a zhodnocení práce}{17}{section.4}% 
