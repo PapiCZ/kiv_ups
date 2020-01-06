@@ -29,7 +29,7 @@ func update_game_tree(parent_obj, node):
 			update_score(game_node, node)
 	else:
 		# create and update note
-		print("Creating new node: ", node.id)
+		# print("Creating new node: ", node.id)
 
 		if node.type == "spaceship":
 			game_node = create_spaceship(node)

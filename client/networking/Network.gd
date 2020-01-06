@@ -118,10 +118,8 @@ func send(message, type, \
 				pr._timeout_callback_obj.call_deferred(pr._timeout_callback_func, _timeout_args)
 			pr.call_deferred("free")
 			return
-		mutex.unlock()
 
 		# Send prepared data to the server and add request to pending requests
-		mutex.lock()
 		pending_requests[pr.id] = pr
 		client.put_data(data)
 		mutex.unlock()
@@ -299,6 +297,7 @@ func _start(params):
 	# Start method that is meant to be started in new thread, because
 	# function recv_message_loop is blocking
 	mutex.lock()
+	KeepAlive.failed = false
 	KeepAliveTimer = Timer.new()
 	KeepAliveTimer.set_wait_time(KEEP_ALIVE_INVERVAL)
 	KeepAliveTimer.connect("timeout", self, "_on_KeepAliveTimer_timeout")
