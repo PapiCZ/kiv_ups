@@ -33,7 +33,7 @@ func decode(buff):
 	if offset >= buff_len:
 		return [null, null]
 	var ascii_number = read_ascii_number_until_delimiter(buff, offset)
-	if ascii_number[0] == null:
+	if ascii_number == null or ascii_number[0] == null:
 		return [null, null]
 	offset += ascii_number[0]
 	var type = int(ascii_number[1].get_string_from_utf8())
@@ -48,7 +48,7 @@ func decode(buff):
 	if offset >= buff_len:
 		return [null, null]
 	var json_len_ascii = read_ascii_number_until_delimiter(buff, offset)
-	if json_len_ascii[0] == null:
+	if json_len_ascii == null or json_len_ascii[0] == null:
 		return [null, null]
 	offset += json_len_ascii[0]
 	var json_len = int(json_len_ascii[1].get_string_from_utf8())
@@ -63,7 +63,7 @@ func decode(buff):
 	if offset >= buff_len:
 		return [null, null]
 	var request_id_ascii = read_ascii_word_until_delimiter(buff, offset)
-	if request_id_ascii[0] == null:
+	if request_id_ascii == null or request_id_ascii[0] == null:
 		return [null, null]
 	offset += request_id_ascii[0]
 	var request_id = request_id_ascii[1].get_string_from_utf8()
@@ -95,6 +95,9 @@ func read_ascii_number_until_delimiter(buff, start=0):
 
 	var i = start
 	while true:
+		if i >= len(buff):
+			return [null, null]
+
 		if buff[i] >= 48 and buff[i] <= 57:
 			# Between 0 and 9
 			ascii_number_buff.append(buff[i])
@@ -110,6 +113,9 @@ func read_ascii_word_until_delimiter(buff, start=0):
 
 	var i = start
 	while true:
+		if i >= len(buff):
+			return [null, null]
+
 		if (buff[i] >= 48 and buff[i] <= 57) or (buff[i] >= 97 and buff[i] <= 122) or (buff[i] >= 65 and buff[i] <= 90):
 			# 0-9 OR a-z OR A-Z
 			ascii_word_buff.append(buff[i])

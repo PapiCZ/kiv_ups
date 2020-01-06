@@ -139,8 +139,19 @@ func (gp *GameProtocol) InfiniteDecode(reader io.ReadCloser, msgChan chan *Proto
 			continue
 		}
 
-		status <- true
-		msgChan <- msg
+		select {
+		case status <- true:
+			break
+		default:
+			break
+		}
+
+		select {
+		case msgChan <- msg:
+			break
+		default:
+			break
+		}
 	}
 }
 

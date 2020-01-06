@@ -107,7 +107,9 @@ func send(message, type, \
 		pr._timeout_timer.connect("timeout", self, "_on_RequestTimeoutTimer_timeout", [pr])
 		pr._timeout_timer.start()
 
+		mutex.lock()
 		if client.get_status() != client.STATUS_CONNECTED:
+			mutex.unlock()
 			# Check if client is still connected to the server
 			# Because we can lose connection between keep-alive messages
 			pr.request.queue_free()
@@ -116,6 +118,7 @@ func send(message, type, \
 				pr._timeout_callback_obj.call_deferred(pr._timeout_callback_func, _timeout_args)
 			pr.call_deferred("free")
 			return
+		mutex.unlock()
 
 		# Send prepared data to the server and add request to pending requests
 		mutex.lock()
@@ -126,10 +129,13 @@ func send(message, type, \
 		# User didn't define any callbacks. We don't need proto_message anymore.
 		proto_message.queue_free()
 
+		mutex.lock()
 		if client.get_status() != client.STATUS_CONNECTED:
+			mutex.unlock()
 			return
 
 		client.put_data(data)
+		mutex.unlock()
 	
 	return data
 
@@ -153,7 +159,10 @@ func recv_message_loop():
 			mutex.unlock()
 			return
 
-		var available_bytes = client.get_available_bytes()
+		var available_bytes = 0
+		if client.get_status() == client.STATUS_CONNECTED:
+			available_bytes = client.get_available_bytes()
+
 		var buff_len = len(buff)
 		if available_bytes or buff_len:
 			# Someone sent us data or we have some unproccessed data
@@ -171,11 +180,12 @@ func recv_message_loop():
 
 			# Try to decode message
 			var result = GameProtocol.decode(buff)
+
+			if result == null or len(result) != 2 or result[0] == null or result[1] == null:
+				continue
+
 			var message_len = result[0]
 			var proto_message = result[1]
-			
-			if proto_message == null:
-				continue
 
 			if DEBUG:
 				network_debug.log("Received: %d %s %s" % [proto_message.type, proto_message.request_id, proto_message.message])
@@ -263,6 +273,11 @@ func init(host, port):
 	authenticated = false
 	mutex.unlock()
 	print("Connecting to host")
+
+	for i in range(3):
+		yield(get_tree().create_timer(1), "timeout")
+		if client.get_status() == client.STATUS_CONNECTED:
+			break
 
 	if client.get_status() != client.STATUS_CONNECTED:
 		return false
