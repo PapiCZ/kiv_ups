@@ -24,6 +24,8 @@ type Player interface {
 	IsConnected() bool
 	RefreshKeepAlive()
 	SetLoggedInMenuContext()
+	IncrementCheatCounter()
+	ResetCheatCounter()
 }
 
 type PlayerMessage interface {

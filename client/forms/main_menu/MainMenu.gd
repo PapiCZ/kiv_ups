@@ -41,13 +41,15 @@ func _on_ReconnectGame_pressed():
 	get_parent().get_parent().get_parent().add_child(ingame)
 
 func _end_game(data):
-
 	# End game and show winner
 	Network.disconnect_message(MessageTypes.UPDATE_STATE)
 	Network.disconnect_message(MessageTypes.GAME_END)
 	Network.disconnect_message(MessageTypes.PLAYER_DISCONNECTED)
+
 	get_tree().get_root().find_node("InGame", true, false).queue_free()
+	Menu.reset_all()
 	Menu.hide_and_reset_stack()
+	Menu.get(Menu.MENU_LEVEL.END_GAME, false).score_summary = data[0].response.data.score_summary
 	Menu.go(Menu.MENU_LEVEL.END_GAME)
 
 func _on_LeaveGame_pressed():

@@ -14,19 +14,23 @@ type UID int
 
 // Client structure stores basic data about TCP client
 type Client struct {
-	TCP          *TCP
-	UID          UID
-	MessageChan  chan *protocol.ProtoMessage
-	Protocol     protocol.GameProtocol
-	failCounter  int
-	decodeReader io.ReadCloser
-	decodeWriter io.WriteCloser
+	Server            *Server
+	TCP               *TCP
+	UID               UID
+	clientMessageChan chan ClientMessage
+	MessageChan       chan *protocol.ProtoMessage
+	Protocol          protocol.GameProtocol
+	failCounter       int
+	decodeReader      io.ReadCloser
+	decodeWriter      io.WriteCloser
 }
 
 // newClient initializes new client
-func newClient(fd int, sockaddr syscall.Sockaddr, protocol protocol.GameProtocol,
+func newClient(s *Server, clientMessageChan chan ClientMessage, fd int, sockaddr syscall.Sockaddr, protocol protocol.GameProtocol,
 	messageChan chan *protocol.ProtoMessage) Client {
 	return Client{
+		Server:            s,
+		clientMessageChan: clientMessageChan,
 		TCP: &TCP{
 			FD:       fd,
 			Sockaddr: sockaddr,
@@ -65,7 +69,7 @@ func (c *Client) SendBytes(message []byte) (err error) {
 type ClientMessage struct {
 	protocol.Message
 	protocol.RequestId
-	Sender            *Client
+	Sender *Client
 
 	// DisconnectRequest is used to notify master server about
 	// client disconnection

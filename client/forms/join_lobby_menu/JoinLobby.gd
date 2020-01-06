@@ -1,7 +1,7 @@
 extends VBoxContainer
 
 func _load():
-	Network.send({}, MessageTypes.LIST_LOBBIES, self, "_on_lobbies_loaded")
+	_on_Refresh_pressed()
 
 func _on_lobbies_loaded(data):
 	

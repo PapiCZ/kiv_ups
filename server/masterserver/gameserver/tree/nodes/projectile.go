@@ -90,7 +90,7 @@ func (p *Projectile) Process(playerMessages []interfaces.PlayerMessage, delta fl
 	for _, node := range p.Node.GetRoot().FindAllChildrenByType("spaceship") {
 		spaceship := node.Value.(*Spaceship)
 
-		if spaceship.Player == p.Player {
+		if spaceship.Player == p.Player || spaceship.Immune {
 			// Player cant kill itself
 			continue
 		}

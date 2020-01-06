@@ -121,7 +121,7 @@ func (s *Server) Start(clientMessageChan chan ClientMessage) {
 			}
 
 			// Initialize new client and
-			client := newClient(clientFd, sockaddr, s.Protocol, make(chan *protocol.ProtoMessage))
+			client := newClient(s, clientMessageChan, clientFd, sockaddr, s.Protocol, make(chan *protocol.ProtoMessage))
 			s.Clients[client.TCP.FD] = &client
 			reader, writer := io.Pipe()
 			if err != nil {
@@ -175,7 +175,7 @@ func (s *Server) Start(clientMessageChan chan ClientMessage) {
 					// Kicks out client if client fail counter is greater than
 					// DecodeErrThreshold
 					if c.failCounter > DecodeErrThreshold {
-						s.Kick(clientMessageChan, c)
+						s.Kick(c)
 						return
 					}
 				}
@@ -199,7 +199,7 @@ func (s *Server) Start(clientMessageChan chan ClientMessage) {
 					}
 
 					if n == 0 {
-						s.Kick(clientMessageChan, client)
+						s.Kick(client)
 					} else {
 						// Write message to client buffer
 						_, _ = writers[client.UID].Write(buff[:n])
@@ -233,14 +233,14 @@ func (s Server) Close() (err error) {
 }
 
 // Kick kicks given client from TCP server and set disconnect notification to master server
-func (s *Server) Kick(clientMessageChan chan ClientMessage, client *Client) {
+func (s *Server) Kick(client *Client) {
 	log.Infof("Client disconnected [FD %v]: %v:%v",
 		client.TCP.FD,
 		client.TCP.Sockaddr.(*syscall.SockaddrInet4).Addr,
 		client.TCP.Sockaddr.(*syscall.SockaddrInet4).Port,
 	)
 
-	clientMessageChan <- ClientMessage{
+	client.clientMessageChan <- ClientMessage{
 		Message:           nil,
 		RequestId:         "",
 		DisconnectRequest: true,
