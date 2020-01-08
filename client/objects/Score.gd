@@ -2,6 +2,7 @@ extends Node2D
 
 var score = 0
 var player_name = ""
+var connected = true
 
 func update_player_name(player_name):
 	self.player_name = player_name
@@ -13,9 +14,15 @@ func update_score(score):
 	$ProgressBar/ScoreLabel.text = str(self.score)
 
 func set_disconnected():
-	$ProgressBar/PlayerNameLabel.text = "X " + $ProgressBar/PlayerNameLabel.text
-	$ProgressBar/PlayerNameLabel.add_color_override("font_color", Color(1, 0, 0))
+	if connected:
+		connected = false
+		print("CONNECTED!")
+		$ProgressBar/PlayerNameLabel.text = "X " + self.player_name
+		$ProgressBar/PlayerNameLabel.add_color_override("font_color", Color(1, 0, 0))
 
 func set_connected():
-	$ProgressBar/PlayerNameLabel.text.erase(0, 2) # Remove "X " from string
-	$ProgressBar/PlayerNameLabel.set("custom_colors/font_color", null)
+	if not connected:
+		print("DISCONNECTED!")
+		connected = true
+		$ProgressBar/PlayerNameLabel.text = self.player_name
+		$ProgressBar/PlayerNameLabel.set("custom_colors/font_color", null)

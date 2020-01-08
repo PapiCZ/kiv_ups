@@ -1,6 +1,6 @@
 extends HBoxContainer
 
-onready var LobbyPlayer = preload("res://forms/lobby_menu/LobbyPlayer.tscn")
+var LobbyPlayer = preload("res://forms/lobby_menu/LobbyPlayer.tscn")
 
 var players = []
 

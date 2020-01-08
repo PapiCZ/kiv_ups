@@ -30,6 +30,8 @@ func _game_reconnect_available(data):
 		$FormContainer/StartGame.visible = false
 
 func _on_ReconnectGame_pressed():
+	Network.send({}, MessageTypes.RECONNECT)
+
 	Menu.hide_current()
 	
 	# Start game
@@ -42,11 +44,14 @@ func _on_ReconnectGame_pressed():
 	get_parent().get_parent().get_parent().add_child(ingame)
 
 func _input(ev):
-	if Input.is_action_pressed("ui_leave_ingame") and not ev.echo:
+	if Input.is_action_pressed("ui_leave_ingame") and get_tree().get_root().find_node("InGame", true, false):
 		# End the game and show winner
 		Network.disconnect_message(MessageTypes.UPDATE_STATE)
 		Network.disconnect_message(MessageTypes.GAME_END)
 		Network.disconnect_message(MessageTypes.PLAYER_DISCONNECTED)
+		Network.disconnect_message(MessageTypes.PLAYER_CONNECTED)
+
+		print(Network.connected_signals)
 
 		get_tree().get_root().find_node("InGame", true, false).queue_free()
 		Menu.reset_all()

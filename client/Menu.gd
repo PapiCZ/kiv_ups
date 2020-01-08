@@ -43,7 +43,6 @@ func reset(menu):
 	# Reload given menu from the scene file
 	var menu_obj = load(get(menu, false).filename).instance()
 	menus[menu] = menu_obj
-	emit_signal("menu_added", menu_obj)
 
 func reset_all():
 	# Reload all menus
@@ -52,7 +51,9 @@ func reset_all():
 
 func go(menu):
 	# Change menu
+	print(menu)
 	var menu_obj = get(menu)
+	print(menu_obj)
 	menu_stack.append(menu_obj)
 	emit_signal("change_menu", menu_obj)
 

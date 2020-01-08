@@ -74,6 +74,7 @@ func update_spaceship(spaceship, node):
 		spaceship.rotation = node.value.rotation
 
 	spaceship.immune = node.value.immune
+	spaceship.visible = !node.value.hidden
 
 	if node.value.player_name == Network.username:
 		return

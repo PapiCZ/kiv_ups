@@ -26,6 +26,7 @@ type Spaceship struct {
 	PlayerName             string            `json:"player_name"`
 	Immune                 bool              `json:"immune"`
 	ReloadPosition         bool              `json:"reload_position"`
+	Hidden                 bool              `json:"hidden"`
 	TeleportAllowedCounter int               `json:"-"` // 0 = teleport is not allowed
 	ShootTimeout           float64           `json:"-"`
 	Player                 interfaces.Player `json:"-"`
@@ -55,6 +56,16 @@ func (s *Spaceship) Process(playerMessages []interfaces.PlayerMessage, delta flo
 	}
 	if s.TeleportAllowedCounter > 0 {
 		s.TeleportAllowedCounter -= 1
+	}
+
+	if !s.Player.IsConnected() {
+		s.Immunity() // Give immunity until player connects
+		s.Hidden = true
+	}
+
+	if s.Player.IsConnected() && s.Hidden {
+		s.Hidden = false
+		s.Immunity()
 	}
 
 	for _, playerMessage := range playerMessages {

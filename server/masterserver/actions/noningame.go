@@ -40,14 +40,11 @@ func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.Play
 
 	// Reconnect?
 	for _, player := range s.GetPlayers() {
-		if player.GetName() == authenticateData.Name {
+		if player.GetName() == authenticateData.Name && player.GetGameServer() != nil &&
+			player.GetGameServer().IsRunning() {
 			// Set new TCP client to old, disconnected player
 			player.SetTCPClient(m.GetPlayer().GetTCPClient())
 			connectedPlayer = player
-			if player.GetGameServer() != nil && !player.GetGameServer().IsRunning() {
-				player.SetGameServer(nil)
-				player.SetConnectedLobby(nil)
-			}
 			break
 		}
 	}
@@ -287,16 +284,11 @@ func (a ReconnectAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 		gs.RemoveDisconnectedPlayer(m.GetPlayer())
 
 		// notify players
-		for _, player := range gs.GetPlayers() {
-			_ = player.GetTCPClient().Send(protocol.ProtoMessage{
-				Message: &tcp.ServerMessage{
-					Status:  true,
-					Message: "",
-					Data:    &protocol.PlayerConnectedMessage{PlayerName: m.GetPlayer().GetName()},
-				},
-				RequestId: "",
-			})
-		}
+		s.SendMessageWithoutRequest(tcp.ServerMessage{
+			Status:  true,
+			Message: "",
+			Data:    &protocol.PlayerConnectedMessage{PlayerName: m.GetPlayer().GetName()},
+		}, gs.GetPlayers()...)
 
 		return ActionResponse{
 			ServerMessage: tcp.ServerMessage{

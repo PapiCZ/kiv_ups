@@ -209,6 +209,10 @@ func (gs *GameServer) ManageGame() {
 // shareState sends current state of game tree to all players
 func (gs *GameServer) shareState() {
 	for _, player := range gs.GetPlayers() {
+		if gs.IsPlayerDisconnected(player) {
+			continue
+		}
+
 		err := player.GetTCPClient().Send(protocol.ProtoMessage{
 			Message: &tcp.ServerMessage{
 				Status:  true,

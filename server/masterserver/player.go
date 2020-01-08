@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const KeepaliveTimeoutTolerance = 2
+const KeepaliveTimeoutTolerance = 3
 const CheatCounterTolerance = 5
 const InvalidMessageTolerance = 5
 

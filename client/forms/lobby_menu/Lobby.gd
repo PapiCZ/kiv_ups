@@ -45,11 +45,12 @@ func _start_game(data):
 	get_parent().get_parent().get_parent().add_child(ingame)
 
 func _input(ev):
-	if Input.is_action_pressed("ui_leave_ingame") and not ev.echo:
+	if Input.is_action_pressed("ui_leave_ingame") and get_tree().get_root().find_node("InGame", true, false):
 		# End the game and show winner
 		Network.disconnect_message(MessageTypes.UPDATE_STATE)
 		Network.disconnect_message(MessageTypes.GAME_END)
 		Network.disconnect_message(MessageTypes.PLAYER_DISCONNECTED)
+		Network.disconnect_message(MessageTypes.PLAYER_CONNECTED)
 
 		get_tree().get_root().find_node("InGame", true, false).queue_free()
 		Menu.reset_all()

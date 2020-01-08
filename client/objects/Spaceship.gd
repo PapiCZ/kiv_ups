@@ -40,6 +40,12 @@ func _process(delta):
 
 	$Particles2D.speed_scale = particles_speed_scale
 
+	if immune:
+		# Set opacity to 0.5 if player is immune
+		modulate = Color(1, 1, 1, 0.5)
+	else:
+		modulate = Color(1, 1, 1, 1)
+
 	if Network.username != player_name:
 		return
 	# Following code is processed only for the current player. Not for enemies. 
@@ -88,12 +94,6 @@ func _process(delta):
 		can_shoot = false
 
 		Network.send({}, MessageTypes.SHOOT_PROJECTILE)
-
-	if immune:
-		# Set opacity to 0.5 if player is immune
-		modulate = Color(1, 1, 1, 0.5)
-	else:
-		modulate = Color(1, 1, 1, 1)
 
 func _physics_process(delta):
 
