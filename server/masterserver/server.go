@@ -49,7 +49,7 @@ func NewServer(sockaddr syscall.Sockaddr) (ms Server) {
 
 // Start starts master server and makes it ready for incoming messages
 func (s *Server) Start() (err error) {
-	clientMessageChan := make(chan tcp.ClientMessage)
+	clientMessageChan := make(chan tcp.ClientMessage, 16)
 
 	go s.TCPServer.Start(clientMessageChan)
 
@@ -107,9 +107,13 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 			RequestId: message.RequestId,
 		})
 
+		player.IncrementInvalidMessageCounter()
+
 		return errors.New("invalid action: " + strconv.Itoa(int(message.Message.GetTypeId())) +
 			", player context: " + strconv.Itoa(int(player.GetContext())))
 	}
+
+	player.ResetInvalidMessageCounter()
 
 	actionResponse := action.Process(s, &PlayerMessage{
 		ClientMessage: &message,

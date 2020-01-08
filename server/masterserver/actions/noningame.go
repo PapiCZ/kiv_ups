@@ -280,18 +280,41 @@ func (a GameReconnectAvailableAction) Process(s interfaces.MasterServer, m inter
 	}
 }
 
-
 func (a ReconnectAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	// Reconnect player to game
-	return ActionResponse{
-		ServerMessage: tcp.ServerMessage{
-			Data: &protocol.GameReconnectAvailableResponseMessage{
-				Available: m.GetPlayer().GetGameServer() != nil,
+	gs := m.GetPlayer().GetGameServer()
+	if gs != nil {
+		gs.RemoveDisconnectedPlayer(m.GetPlayer())
+
+		// notify players
+		for _, player := range gs.GetPlayers() {
+			_ = player.GetTCPClient().Send(protocol.ProtoMessage{
+				Message: &tcp.ServerMessage{
+					Status:  true,
+					Message: "",
+					Data:    &protocol.PlayerConnectedMessage{PlayerName: m.GetPlayer().GetName()},
+				},
+				RequestId: "",
+			})
+		}
+
+		return ActionResponse{
+			ServerMessage: tcp.ServerMessage{
+				Data:    &protocol.ReconnectMessage{},
+				Status:  true,
+				Message: "",
 			},
-			Status:  true,
-			Message: "",
-		},
-		Targets: []interfaces.Player{m.GetPlayer()},
+			Targets: []interfaces.Player{m.GetPlayer()},
+		}
+	} else {
+		return ActionResponse{
+			ServerMessage: tcp.ServerMessage{
+				Data:    &protocol.ReconnectMessage{},
+				Status:  false,
+				Message: "you can't reconnect to the game",
+			},
+			Targets: []interfaces.Player{m.GetPlayer()},
+		}
 	}
 }
 

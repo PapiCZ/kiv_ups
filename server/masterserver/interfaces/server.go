@@ -61,4 +61,6 @@ type GameServer interface {
 	GetPlayers() []Player
 	GetRequestMessageChan() chan PlayerMessage
 	IsRunning() bool
+	AddDisconnectedPlayer(player Player)
+	RemoveDisconnectedPlayer(player Player)
 }

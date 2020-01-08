@@ -230,6 +230,14 @@ func (m PlayerDisconnectedMessage) GetTypeId() MessageType {
 	return 501
 }
 
+type PlayerConnectedMessage struct {
+	PlayerName string `json:"player_name"`
+}
+
+func (m PlayerConnectedMessage) GetTypeId() MessageType {
+	return 502
+}
+
 func RegisterAllMessages(definition *Definition) {
 	definition.Register(KeepAliveMessage{})
 	definition.Register(ActionErrorMessage{})
@@ -262,4 +270,5 @@ func RegisterAllMessages(definition *Definition) {
 	definition.Register(ShootProjectileMessage{})
 	definition.Register(UpdateStateMessage{})
 	definition.Register(PlayerDisconnectedMessage{})
+	definition.Register(PlayerConnectedMessage{})
 }

@@ -44,7 +44,7 @@ func main() {
 
 	masterServer := masterserver.NewServer(&sockaddr)
 
-	sigs := make(chan os.Signal, 1)
+	sigs := make(chan os.Signal, 16)
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 

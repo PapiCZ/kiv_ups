@@ -26,6 +26,8 @@ type Player interface {
 	SetLoggedInMenuContext()
 	IncrementCheatCounter()
 	ResetCheatCounter()
+	IncrementInvalidMessageCounter()
+	ResetInvalidMessageCounter()
 }
 
 type PlayerMessage interface {

@@ -121,7 +121,7 @@ func (s *Server) Start(clientMessageChan chan ClientMessage) {
 			}
 
 			// Initialize new client and
-			client := newClient(s, clientMessageChan, clientFd, sockaddr, s.Protocol, make(chan *protocol.ProtoMessage))
+			client := newClient(s, clientMessageChan, clientFd, sockaddr, s.Protocol, make(chan *protocol.ProtoMessage, 16))
 			s.Clients[client.TCP.FD] = &client
 			reader, writer := io.Pipe()
 			if err != nil {
@@ -133,7 +133,7 @@ func (s *Server) Start(clientMessageChan chan ClientMessage) {
 			client.decodeWriter = writer
 
 			// statusChan is used to receive statuses from decoder
-			statusChan := make(chan bool)
+			statusChan := make(chan bool, 16)
 			go s.Protocol.InfiniteDecode(reader, client.MessageChan, statusChan)
 
 			// Starts goroutine that reads messages from client, and forwards it to game server
@@ -240,18 +240,17 @@ func (s *Server) Kick(client *Client) {
 		client.TCP.Sockaddr.(*syscall.SockaddrInet4).Port,
 	)
 
+	_ = syscall.Close(client.TCP.FD)
+	_ = client.decodeWriter.Close()
+	_ = client.decodeReader.Close()
+	close(client.MessageChan)
+	delete(s.Clients, client.TCP.FD)
 	client.clientMessageChan <- ClientMessage{
 		Message:           nil,
 		RequestId:         "",
 		DisconnectRequest: true,
 		Sender:            client,
 	}
-	close(client.MessageChan)
-	_ = client.decodeReader.Close()
-	_ = client.decodeWriter.Close()
-	_ = syscall.Close(client.TCP.FD)
-
-	delete(s.Clients, client.TCP.FD)
 }
 
 func FD_SET(p *syscall.FdSet, fd int) {

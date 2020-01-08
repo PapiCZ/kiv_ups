@@ -41,7 +41,19 @@ func _start_game(data):
 	Network.connect_message(MessageTypes.UPDATE_STATE, ingame, "_update_state")
 	Network.connect_message(MessageTypes.GAME_END, self, "_end_game")
 	Network.connect_message(MessageTypes.PLAYER_DISCONNECTED, ingame, "_player_disconnected")
+	Network.connect_message(MessageTypes.PLAYER_CONNECTED, ingame, "_player_connected")
 	get_parent().get_parent().get_parent().add_child(ingame)
+
+func _input(ev):
+	if Input.is_action_pressed("ui_leave_ingame") and not ev.echo:
+		# End the game and show winner
+		Network.disconnect_message(MessageTypes.UPDATE_STATE)
+		Network.disconnect_message(MessageTypes.GAME_END)
+		Network.disconnect_message(MessageTypes.PLAYER_DISCONNECTED)
+
+		get_tree().get_root().find_node("InGame", true, false).queue_free()
+		Menu.reset_all()
+		Menu.go(Menu.MENU_LEVEL.MAIN)
 
 func _player_connected(data):
 	# Add palyer to the lobby

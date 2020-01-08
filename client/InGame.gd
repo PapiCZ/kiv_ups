@@ -134,6 +134,12 @@ func _player_disconnected(data):
 	if player_scores.has(player_name) and player_scores[player_name] != null:
 		player_scores[player_name].set_disconnected()
 
+func _player_connected(data):
+	var player_name = data[0].response.data.player_name
+
+	if player_scores.has(player_name) and player_scores[player_name] != null:
+		player_scores[player_name].set_connected()
+
 func _network_disconnect():
 	Network.disconnect_message(MessageTypes.UPDATE_STATE)
 	Network.disconnect_message(MessageTypes.GAME_END)

@@ -165,3 +165,10 @@ messages:
         type: string
     contexts:
       - InGameContext
+  - name: PlayerConnected
+    type: 502
+    fields:
+      - name: PlayerName
+        type: string
+    contexts:
+      - InGameContext

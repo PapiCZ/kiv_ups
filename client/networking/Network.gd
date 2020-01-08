@@ -113,6 +113,7 @@ func send(message, type, \
 			# Check if client is still connected to the server
 			# Because we can lose connection between keep-alive messages
 			pr.request.queue_free()
+			pr._timeout_timer.stop()
 			pr._timeout_timer.queue_free()
 			if pr._timeout_callback_obj != null and pr._timeout_callback_func != null:
 				pr._timeout_callback_obj.call_deferred(pr._timeout_callback_func, _timeout_args)
@@ -307,10 +308,10 @@ func _start(params):
 
 	recv_message_loop()
 	
-func stop():
+func stop(ignore_alert=false):
 	# Show alert dialog
 	var network_disconnected_dialog = get_tree().get_root().get_node("Game/NetworkDisconnectedDialog")
-	if not network_disconnected_dialog.visible and not disconnection_notified:
+	if not network_disconnected_dialog.visible and not disconnection_notified and not ignore_alert:
 		get_tree().get_root().get_node("Game/NetworkConnectedDialog").hide()
 		disconnection_notified = true
 		network_disconnected_dialog.popup_centered()

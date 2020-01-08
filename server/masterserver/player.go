@@ -9,19 +9,21 @@ import (
 
 const KeepaliveTimeoutTolerance = 2
 const CheatCounterTolerance = 5
+const InvalidMessageTolerance = 5
 
 // Player structure is a structure that handles that handles
 // player's TCP client, name, connected lobby, connected GameServer and last
 // keep-alive timestamp that is used to indicate whether is player still connected
 type Player struct {
-	tcpClient      *tcp.Client
-	UID            interfaces.PlayerUID
-	Name           string
-	Context        interfaces.PlayerContext
-	ConnectedLobby *interfaces.Lobby
-	GameServer     interfaces.GameServer
-	LastKeepAlive  int64
-	CheatCounter   int
+	tcpClient             *tcp.Client
+	UID                   interfaces.PlayerUID
+	Name                  string
+	Context               interfaces.PlayerContext
+	ConnectedLobby        *interfaces.Lobby
+	GameServer            interfaces.GameServer
+	LastKeepAlive         int64
+	CheatCounter          int
+	InvalidMessageCounter int
 }
 
 // NewShadowPlayer creates and initializes Player structure with UID 0,
@@ -111,4 +113,16 @@ func (p *Player) IncrementCheatCounter() {
 
 func (p *Player) ResetCheatCounter() {
 	p.CheatCounter = 0
+}
+
+func (p *Player) IncrementInvalidMessageCounter() {
+	if p.InvalidMessageCounter >= InvalidMessageTolerance {
+		p.GetTCPClient().Server.Kick(p.GetTCPClient())
+	}
+
+	p.InvalidMessageCounter += 1
+}
+
+func (p *Player) ResetInvalidMessageCounter() {
+	p.InvalidMessageCounter = 0
 }

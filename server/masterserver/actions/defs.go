@@ -16,15 +16,15 @@ import (
 */
 const (
 	DefaultContext      = interfaces.PlayerContext(0)
-	LobbyContext        = interfaces.PlayerContext(1)
-	InGameContext       = interfaces.PlayerContext(2)
-	LoggedInMenuContext = interfaces.PlayerContext(3)
+	LoggedInMenuContext = interfaces.PlayerContext(1)
+	LobbyContext        = interfaces.PlayerContext(2)
+	InGameContext       = interfaces.PlayerContext(3)
 )
 
 type KeepAliveAction struct{}
 
 func (a KeepAliveAction) GetPlayerContexts() []interfaces.PlayerContext {
-	return []interfaces.PlayerContext{DefaultContext, LobbyContext, InGameContext, LoggedInMenuContext}
+	return []interfaces.PlayerContext{DefaultContext, LoggedInMenuContext, LobbyContext, InGameContext}
 }
 
 func (a KeepAliveAction) GetMessage() protocol.Message {
