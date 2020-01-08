@@ -10,6 +10,3 @@ build:
 clean:
 	$(GOCLEAN)
 	rm -f $(BINARY_NAME)
-run:
-	$(GOBUILD) -o $(BINARY_NAME) -v ./...
-	./$(BINARY_NAME)
