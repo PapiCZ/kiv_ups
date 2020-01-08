@@ -15,7 +15,11 @@ func _network_disconnected():
 	Network.disconnect_message(MessageTypes.START_GAME_RESPONSE)
 	Network.disconnect_message(MessageTypes.LOBBY_PLAYER_CONNECTED)
 	Network.disconnect_message(MessageTypes.LOBBY_PLAYER_DISCONNECTED)
-	Menu.go(Menu.MENU_LEVEL.MAIN)
+
+	if get_tree().get_root().find_node("InGame", true, false):
+		leave()
+	else:
+		Menu.go(Menu.MENU_LEVEL.MAIN)
 
 func _on_lobby_players_loaded(data):
 	# Show connected players
@@ -46,6 +50,9 @@ func _start_game(data):
 
 func _input(ev):
 	if Input.is_action_pressed("ui_leave_ingame") and get_tree().get_root().find_node("InGame", true, false):
+		leave()
+
+func leave():
 		# End the game and show winner
 		Network.disconnect_message(MessageTypes.UPDATE_STATE)
 		Network.disconnect_message(MessageTypes.GAME_END)

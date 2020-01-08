@@ -247,7 +247,7 @@ func auth(response_callback_obj=null, response_callback_func=null):
 
 func start_thread(host, port):
 	print("Spawned new network thread")
-	if init(host, port):
+	if init(host, port) == true:
 		# Intialization of connection was successful
 		if disconnection_notified:
 			get_tree().get_root().get_node("Game/NetworkConnectedDialog").popup_centered()
@@ -273,8 +273,7 @@ func init(host, port):
 	mutex.unlock()
 	print("Connecting to host")
 
-	for i in range(3):
-		yield(get_tree().create_timer(1), "timeout")
+	for i in range(100):
 		if client.get_status() == client.STATUS_CONNECTED:
 			break
 
@@ -285,7 +284,7 @@ func init(host, port):
 	emit_signal("connected")
 	# Try to authenticate
 	auth(self, "_auth_callback")
-	
+
 	return true
 
 func _auth_callback(data):

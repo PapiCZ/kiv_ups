@@ -51,9 +51,7 @@ func reset_all():
 
 func go(menu):
 	# Change menu
-	print(menu)
 	var menu_obj = get(menu)
-	print(menu_obj)
 	menu_stack.append(menu_obj)
 	emit_signal("change_menu", menu_obj)
 
