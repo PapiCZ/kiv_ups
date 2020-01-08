@@ -7,15 +7,16 @@
 \contentsline {subsection}{\numberline {3.2}Definice použitých zpráv}{3}{subsection.3.2}% 
 \contentsline {subsubsection}{\numberline {3.2.1}Zprávy zasílané klientem}{4}{subsubsection.3.2.1}% 
 \contentsline {subsubsection}{\numberline {3.2.2}Zprávy zasílané serverem}{8}{subsubsection.3.2.2}% 
-\contentsline {subsection}{\numberline {3.3}Server}{11}{subsection.3.3}% 
-\contentsline {subsubsection}{\numberline {3.3.1}Síť}{11}{subsubsection.3.3.1}% 
-\contentsline {subsubsection}{\numberline {3.3.2}Reakce na zprávy}{12}{subsubsection.3.3.2}% 
-\contentsline {subsubsection}{\numberline {3.3.3}Implementace hry}{12}{subsubsection.3.3.3}% 
-\contentsline {subsubsection}{\numberline {3.3.4}Herní objekty}{13}{subsubsection.3.3.4}% 
-\contentsline {subsubsection}{\numberline {3.3.5}Použité kninhovny}{14}{subsubsection.3.3.5}% 
-\contentsline {subsection}{\numberline {3.4}Klient}{15}{subsection.3.4}% 
-\contentsline {subsubsection}{\numberline {3.4.1}Síť}{15}{subsubsection.3.4.1}% 
-\contentsline {subsubsection}{\numberline {3.4.2}Herní menu}{16}{subsubsection.3.4.2}% 
-\contentsline {subsubsection}{\numberline {3.4.3}Hra}{16}{subsubsection.3.4.3}% 
-\contentsline {subsection}{\numberline {3.5}Sestavení a spuštění aplikace}{16}{subsection.3.5}% 
-\contentsline {section}{\numberline {4}Závěr a zhodnocení práce}{17}{section.4}% 
+\contentsline {subsubsection}{\numberline {3.2.3}Diagram přechodů mezi kontexty}{12}{subsubsection.3.2.3}% 
+\contentsline {subsection}{\numberline {3.3}Server}{13}{subsection.3.3}% 
+\contentsline {subsubsection}{\numberline {3.3.1}Síť}{14}{subsubsection.3.3.1}% 
+\contentsline {subsubsection}{\numberline {3.3.2}Reakce na zprávy}{14}{subsubsection.3.3.2}% 
+\contentsline {subsubsection}{\numberline {3.3.3}Implementace hry}{14}{subsubsection.3.3.3}% 
+\contentsline {subsubsection}{\numberline {3.3.4}Herní objekty}{15}{subsubsection.3.3.4}% 
+\contentsline {subsubsection}{\numberline {3.3.5}Použité kninhovny}{17}{subsubsection.3.3.5}% 
+\contentsline {subsection}{\numberline {3.4}Klient}{17}{subsection.3.4}% 
+\contentsline {subsubsection}{\numberline {3.4.1}Síť}{18}{subsubsection.3.4.1}% 
+\contentsline {subsubsection}{\numberline {3.4.2}Herní menu}{18}{subsubsection.3.4.2}% 
+\contentsline {subsubsection}{\numberline {3.4.3}Hra}{18}{subsubsection.3.4.3}% 
+\contentsline {subsection}{\numberline {3.5}Sestavení a spuštění aplikace}{19}{subsection.3.5}% 
+\contentsline {section}{\numberline {4}Závěr a zhodnocení práce}{19}{section.4}% 

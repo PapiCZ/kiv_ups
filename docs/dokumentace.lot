@@ -6,15 +6,15 @@
 \contentsline {table}{\numberline {5}{\ignorespaces Specifikace Authenticate}}{5}{table.5}% 
 \contentsline {table}{\numberline {6}{\ignorespaces Specifikace DeleteLobby}}{5}{table.6}% 
 \contentsline {table}{\numberline {7}{\ignorespaces Specifikace JoinLobby}}{6}{table.7}% 
-\contentsline {table}{\numberline {8}{\ignorespaces Specifikace PlayerMove}}{7}{table.8}% 
-\contentsline {table}{\numberline {9}{\ignorespaces Specifikace ListLobbiesResponse}}{8}{table.9}% 
+\contentsline {table}{\numberline {8}{\ignorespaces Specifikace PlayerMove}}{8}{table.8}% 
+\contentsline {table}{\numberline {9}{\ignorespaces Specifikace ListLobbiesResponse}}{9}{table.9}% 
 \contentsline {table}{\numberline {10}{\ignorespaces Specifikace ListLobbiesResponse}}{9}{table.10}% 
 \contentsline {table}{\numberline {11}{\ignorespaces Specifikace ListLobbyPlayersResponse}}{9}{table.11}% 
-\contentsline {table}{\numberline {12}{\ignorespaces Specifikace LobbyPlayerConnected}}{9}{table.12}% 
+\contentsline {table}{\numberline {12}{\ignorespaces Specifikace LobbyPlayerConnected}}{10}{table.12}% 
 \contentsline {table}{\numberline {13}{\ignorespaces Specifikace LobbyPlayerDisconnected}}{10}{table.13}% 
 \contentsline {table}{\numberline {14}{\ignorespaces Specifikace GameEnd}}{10}{table.14}% 
-\contentsline {table}{\numberline {15}{\ignorespaces Specifikace GameReconnectAvailableResponse}}{10}{table.15}% 
-\contentsline {table}{\numberline {16}{\ignorespaces Specifikace veřejné části struktury \texttt {Asteroid}}}{13}{table.16}% 
-\contentsline {table}{\numberline {17}{\ignorespaces Specifikace veřejné části struktury \texttt {Spaceship}}}{14}{table.17}% 
-\contentsline {table}{\numberline {18}{\ignorespaces Specifikace veřejné části struktury \texttt {Score}}}{14}{table.18}% 
-\contentsline {table}{\numberline {19}{\ignorespaces Specifikace veřejné části struktury \texttt {Projectile}}}{14}{table.19}% 
+\contentsline {table}{\numberline {15}{\ignorespaces Specifikace GameReconnectAvailableResponse}}{11}{table.15}% 
+\contentsline {table}{\numberline {16}{\ignorespaces Specifikace veřejné části struktury \texttt {Asteroid}}}{16}{table.16}% 
+\contentsline {table}{\numberline {17}{\ignorespaces Specifikace veřejné části struktury \texttt {Spaceship}}}{16}{table.17}% 
+\contentsline {table}{\numberline {18}{\ignorespaces Specifikace veřejné části struktury \texttt {Score}}}{16}{table.18}% 
+\contentsline {table}{\numberline {19}{\ignorespaces Specifikace veřejné části struktury \texttt {Projectile}}}{17}{table.19}% 

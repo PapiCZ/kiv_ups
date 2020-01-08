@@ -81,14 +81,12 @@ func (s *Server) RunAction(message tcp.ClientMessage) (err error) {
 		return nil
 	}
 
-	if message.GetTypeId() >= GameServerTypeMin && message.GetTypeId() <= GameServerTypeMax {
-		gameServer := player.GetGameServer()
-		if gameServer != nil {
-			// Forward message to game server
-			gameServer.GetRequestMessageChan() <- &PlayerMessage{
-				ClientMessage: &message,
-				Player:        player,
-			}
+	if message.GetTypeId() >= GameServerTypeMin && message.GetTypeId() <= GameServerTypeMax &&
+		player.GetGameServer() != nil {
+		// Forward message to game server
+		player.GetGameServer().GetRequestMessageChan() <- &PlayerMessage{
+			ClientMessage: &message,
+			Player:        player,
 		}
 
 		return nil

@@ -184,6 +184,7 @@ keywordstyle=\color{blue}
 
     \subsubsection*{Authenticate}
     Typ zprávy: 200\\
+    Kontext: \texttt{DefaultContext}\\
 
     Autentizační zpráva musí být klientem zaslána jako první zpráva po připojení k serveru.
     V případě neposlání této zprávy nemá klient žádné pravomoce, mimo zasílání \textit{KeepAlive}.
@@ -203,6 +204,7 @@ keywordstyle=\color{blue}
 
     \subsubsection*{CreateLobby}
     Typ zprávy: 201\\
+    Kontext: \texttt{LoggedInMenuContext}\\
 
     Zpráva určená k založení lobby.
     Hráč, který lobby vytváří, je automaticky do lobby připojen a není již potřeba posílat \textit{JoinLobby}.
@@ -224,6 +226,7 @@ keywordstyle=\color{blue}
 
     \subsubsection*{DeleteLobby}
     Typ zprávy: 202\\
+    Kontext: \texttt{LobbyContext}\\
 
     Zpráva určená ke smazání lobby.
     Ačkoliv zpráva přjímá jako parametr název lobby ke smazání, tak hráč má právo smazat lobby jenom za předpokladu, že je jejím vlastníkem.
@@ -243,11 +246,13 @@ keywordstyle=\color{blue}
 
     \subsubsection*{ListLobbies}
     Typ zprávy: 203\\
+    Kontext: \texttt{LoggedInMenuContext}\\
 
     Prázdná zpráva sloužící k získání seznamu všech dostupných lobby.
 
     \subsubsection*{JoinLobby}
     Typ zprávy: 204\\
+    Kontext: \texttt{LoggedInMenuContext}\\
 
     Zpráva sloužící k připojení do lobby.
     Připojení je možné pouze za předpokladu, že je v lobby volný slot pro hráče.
@@ -268,37 +273,45 @@ keywordstyle=\color{blue}
 
     \subsubsection*{LeaveLobby}
     Typ zprávy: 214\\
+    Kontext: \texttt{LobbyContext}\\
 
     Prázdná zpráva, kterou se hráč odpojí z lobby.
 
     \subsubsection*{ListLobbyPlayers}
     Typ zprávy: 206\\
+    Kontext: \texttt{LobbyContext}\\
 
     Prázdná zpráva sloužící k získání seznamu hráčů přípojených do lobby.
 
     \subsubsection*{StartGame}
     Typ zprávy: 207\\\\
+    Kontext: \texttt{LobbyContext}\\
+
     Prázdná zpráva pro spuštění hry.
     Tuto zprávu může poslat libovolný hráč z lobby.
     Od této chvíle je na serveru vytvořená instance hry, a všichni hráči jsou neustále informováni o jejím stavu.
 
     \subsubsection*{GameReconnectAvailable}
     Typ zprávy: 211\\
+    Kontext: \texttt{LoggedInMenuContext}\\
 
     Touto prázdnou zprávou si může klient ověřit, zda připojený hráč nepatří do nějaké hry, a tudíž se do ní může opět připojit, nebo se z ní odpojit.
 
     \subsubsection*{Reconnect}
     Typ zprávy: 212\\
+    Kontext: \texttt{LoggedInMenuContext}\\
 
     Zasláním této prázdné zprávy se hráč připojí zpět do probíhající hry, kterou předtím opustil.
 
     \subsubsection*{LeaveGame}
     Typ zprávy: 213\\
+    Kontext: \texttt{InGameContext}\\
 
     Zasláním této prázdné zprávy hráč definitivně opustí probíhající hru, ze které odešel, a již se do ní nemůže vrátit.
    
     \subsubsection*{PlayerMove}
     Typ zprávy: 400\\
+    Kontext: \texttt{InGameContext}\\
 
     Zpráva, která informuje server o změně atributů hráče.
     Tuto zprávu by měl klient posílat při změně své pozice, nebo libovolného atributu svého pohybu (vektor pohybu, rotace, \dots).
@@ -327,6 +340,7 @@ keywordstyle=\color{blue}
 
     \subsubsection*{ShootProjectile}
     Typ zprávy: 401\\
+    Kontext: \texttt{InGameContext}\\
 
     Prázdná zpráva informující server o vystřelení projektilu
 
@@ -510,6 +524,23 @@ keywordstyle=\color{blue}
     Odpověď na zprávu: LeaveLobby\\
 
     Prázdná zpráva informující klienta o úspěšném opuštění lobby.
+
+    \newpage
+    \subsubsection{Diagram přechodů mezi kontexty}
+    Připojený klient má od serveru přidělený kontext (stav).
+    Tento kontext definuje jakou množinu zpráv může klient zasílat.
+    Pokud se hráč pokusí poslat zprávu mimo kontext, tak dostane od serveru odpověď \texttt{ActionError} a je mu zvýšeno počítadlo nesprávných zpráv.
+    Pokud toto pořčítadlo dosáhne hodnoty 5, tak je hráč odpojen ze serveru.
+    V případě, že pošle validní zprávu, tak je toto počítadlo vyresetováno.
+
+    Následující diagram vizualizuje přechody mezi jednotlivými kontexty.
+    Z diagramu je vypuštěna zpráva \texttt{KeepAlive}, jelikož tu je možné poslat v libovolném stavu.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{diagram.png}
+        \caption{Diagram přesunů mezi kontexty na základě zaslaných zpráv}
+    \end{figure}
 
 
     \subsection{Server}
