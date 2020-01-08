@@ -64,7 +64,7 @@ func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.Play
 }
 
 func (a CreateLobbyAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
-	if m.GetPlayer().GetConnectedLobby() == nil {
+	if m.GetPlayer().GetConnectedLobby() == nil || len(m.GetPlayer().GetConnectedLobby().GetPlayers()) == 0 {
 		// Create new lobby and add it to server
 		createLobbyData := m.GetMessage().Message.(*protocol.CreateLobbyMessage)
 		lobby := interfaces.Lobby{
@@ -312,6 +312,7 @@ func (a ReconnectAction) Process(s interfaces.MasterServer, m interfaces.PlayerM
 
 func (a LeaveGameAction) Process(s interfaces.MasterServer, m interfaces.PlayerMessage) ActionResponse {
 	m.GetPlayer().LeaveGame()
+	m.GetPlayer().SetConnectedLobby(nil)
 	// Remove player from game
 	return ActionResponse{
 		ServerMessage: tcp.ServerMessage{
