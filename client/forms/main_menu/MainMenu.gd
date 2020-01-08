@@ -51,8 +51,6 @@ func _input(ev):
 		Network.disconnect_message(MessageTypes.PLAYER_DISCONNECTED)
 		Network.disconnect_message(MessageTypes.PLAYER_CONNECTED)
 
-		print(Network.connected_signals)
-
 		get_tree().get_root().find_node("InGame", true, false).queue_free()
 		Menu.reset_all()
 		Menu.go(Menu.MENU_LEVEL.MAIN)
