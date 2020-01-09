@@ -209,7 +209,7 @@ func (gs *GameServer) ManageGame() {
 // shareState sends current state of game tree to all players
 func (gs *GameServer) shareState() {
 	for _, player := range gs.GetPlayers() {
-		if gs.IsPlayerDisconnected(player) {
+		if gs.IsPlayerDisconnected(player) || !player.IsConnected() {
 			continue
 		}
 
