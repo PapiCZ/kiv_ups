@@ -38,6 +38,20 @@ func (a AuthenticateAction) Process(s interfaces.MasterServer, m interfaces.Play
 	authenticateData := m.GetMessage().Message.(*protocol.AuthenticateMessage)
 	connectedPlayer := m.GetPlayer()
 
+	// Check if player with the same name is already connected
+	for _, player := range s.GetPlayers() {
+		if player.IsConnected() && player.GetName() == authenticateData.Name {
+			return ActionResponse{
+				ServerMessage: tcp.ServerMessage{
+					Data:    authenticateData,
+					Status:  false,
+					Message: "the player with the specified name is already connected",
+				},
+				Targets: []interfaces.Player{m.GetPlayer()},
+			}
+		}
+	}
+
 	// Reconnect?
 	for _, player := range s.GetPlayers() {
 		if player.GetName() == authenticateData.Name && player.GetGameServer() != nil &&

@@ -1,0 +1,10 @@
+[gd_scene format=2]
+
+[node name="AuthenticationFailedDialog" type="AcceptDialog"]
+margin_right = 820.0
+margin_bottom = 250.0
+window_title = "Authentication error"
+dialog_text = "
+    You can't use given
+   nickname because it's
+      currently in use"

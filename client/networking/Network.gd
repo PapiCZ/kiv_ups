@@ -3,6 +3,7 @@ extends Node
 signal disconnected
 signal connected
 signal authenticated
+signal authentication_failed
 
 const DEBUG = true
 
@@ -248,6 +249,9 @@ func auth(response_callback_obj=null, response_callback_func=null):
 func start_thread(host, port):
 	print("Spawned new network thread")
 	if init(host, port) == true:
+		# Try to authenticate
+		auth(self, "_auth_callback")
+
 		# Intialization of connection was successful
 		if disconnection_notified:
 			get_tree().get_root().get_node("Game/NetworkConnectedDialog").popup_centered()
@@ -282,16 +286,20 @@ func init(host, port):
 	
 	network_ok()
 	emit_signal("connected")
-	# Try to authenticate
-	auth(self, "_auth_callback")
 
 	return true
 
 func _auth_callback(data):
-	mutex.lock()
-	authenticated = true
-	mutex.unlock()
-	emit_signal("authenticated")
+	if data[0].response.status:
+		mutex.lock()
+		authenticated = true
+		mutex.unlock()
+		emit_signal("authenticated")
+	else:
+		mutex.lock()
+		authenticated = false
+		mutex.unlock()
+		emit_signal("authentication_failed")
 
 func _start(params):
 	# Start method that is meant to be started in new thread, because
