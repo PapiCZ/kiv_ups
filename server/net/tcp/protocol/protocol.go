@@ -115,6 +115,10 @@ func (gp *GameProtocol) Encode(msg ProtoMessage, writer io.WriteCloser) {
 // InfinityDecode indefinitely decoding data from reader and sends ProtoMessages to given channel.
 // Status channel is used to notify outside world about status of decoding.
 func (gp *GameProtocol) InfiniteDecode(reader io.ReadCloser, msgChan chan *ProtoMessage, status chan bool) {
+    defer func() {
+        recover()
+    }()
+
 	buffReader := bufio.NewReader(reader)
 
 	for {
