@@ -8,7 +8,7 @@ func _on_LoginButton_pressed():
 	if len($FormContainer/Nickname.text):
 		Network.stop(true)
 		Network.set_auth_data($FormContainer/Nickname.text)
-		Network.start_thread($FormContainer/Host.text, $FormContainer/Port.value)
+		Network.start_thread($FormContainer/Host.text, $FormContainer/Port.value, false)
 
 func _authenticated():
 	Menu.go(Menu.MENU_LEVEL.MAIN)

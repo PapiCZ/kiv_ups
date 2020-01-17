@@ -246,7 +246,7 @@ func auth(response_callback_obj=null, response_callback_func=null):
 	# Send authentication request to the server
 	send({"name": username}, MessageTypes.AUTHENTICATE, response_callback_obj, response_callback_func)
 
-func start_thread(host, port):
+func start_thread(host, port, auto_reconnect=true):
 	print("Spawned new network thread")
 	if init(host, port) == true:
 		# Try to authenticate
@@ -261,9 +261,10 @@ func start_thread(host, port):
 		thread = Thread.new()
 		thread.start(self, "_start")
 	else:
-		# Sleep 1 second and try to reconnect
-		yield(get_tree().create_timer(1), "timeout")
-		self.call_deferred("reconnect")
+		if auto_reconnect:
+			# Sleep 1 second and try to reconnect
+			yield(get_tree().create_timer(1), "timeout")
+			self.call_deferred("reconnect")
 
 func init(host, port):
 	# Initialize server connection and try to connect to the server
@@ -277,7 +278,7 @@ func init(host, port):
 	mutex.unlock()
 	print("Connecting to host")
 
-	for i in range(100):
+	for i in range(10000000):
 		if client.get_status() == client.STATUS_CONNECTED:
 			break
 
